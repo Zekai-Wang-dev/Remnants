@@ -16,12 +16,15 @@ public class PlayerController : MonoBehaviour
     public GameObject background; // Reference to the background for parallax effect
     private ParallaxBackground backgroundScript; // Reference to the ParallaxBackground script to call the parallax function
 
+    public GameObject leftBorder; 
+    public GameObject rightBorder;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         
         backgroundScript = background.GetComponent<ParallaxBackground>();
-
+       
     }
 
     // Update is called once per frame
@@ -47,6 +50,17 @@ public class PlayerController : MonoBehaviour
         }
         else velocity.x = 0;
 
+        if (transform.position.x < leftBorder.transform.position.x + 0.5f) // Check if the player is near the left border
+        {
+            transform.position = new Vector3(leftBorder.transform.position.x + 0.5f, transform.position.y, transform.position.z); // Prevent the player from moving past the left border
+        }
+        else if (transform.position.x > rightBorder.transform.position.x - 0.5f) // Check if the player is near the right border
+        {
+            transform.position = new Vector3(rightBorder.transform.position.x - 0.5f, transform.position.y, transform.position.z); // Prevent the player from moving past the right border
+        }
+
+      
+
         if (velocity.magnitude > 0) isWalking = true;
 
         else isWalking = false;
@@ -60,5 +74,6 @@ public class PlayerController : MonoBehaviour
         backgroundScript.parallax(velocity, speed); // Call the parallax function in the background script to create a parallax effect based on player movement
 
     }
+
 
 }
