@@ -1,0 +1,3315 @@
+fileFormatVersion: 2
+guid: 9c0fabb4d2182a045b07abdebe511362
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1292694972914499489
+    second: Fumiko - skoam_0
+  - first:
+      213: -5410189464221578091
+    second: Fumiko - skoam_1
+  - first:
+      213: -8550186900467933554
+    second: Fumiko - skoam_2
+  - first:
+      213: 4004246452453499495
+    second: Fumiko - skoam_3
+  - first:
+      213: -6888628706923824336
+    second: Fumiko - skoam_4
+  - first:
+      213: 5196663378922240813
+    second: Fumiko - skoam_5
+  - first:
+      213: -4973433748627957015
+    second: Fumiko - skoam_6
+  - first:
+      213: 6468301004977710310
+    second: Fumiko - skoam_7
+  - first:
+      213: 8908257370234954654
+    second: Fumiko - skoam_8
+  - first:
+      213: -3872188931892304779
+    second: Fumiko - skoam_9
+  - first:
+      213: -4045690002458914854
+    second: Fumiko - skoam_10
+  - first:
+      213: 3560168634025431109
+    second: Fumiko - skoam_11
+  - first:
+      213: -3333444890474441220
+    second: Fumiko - skoam_12
+  - first:
+      213: -9099224896204293401
+    second: Fumiko - skoam_13
+  - first:
+      213: -6681567294117671820
+    second: Fumiko - skoam_14
+  - first:
+      213: -7264886756798629074
+    second: Fumiko - skoam_15
+  - first:
+      213: -6992195996868846463
+    second: Fumiko - skoam_16
+  - first:
+      213: -3358421145147576038
+    second: Fumiko - skoam_17
+  - first:
+      213: -3662810936304820582
+    second: Fumiko - skoam_18
+  - first:
+      213: -6933374197447877456
+    second: Fumiko - skoam_19
+  - first:
+      213: -1350294058774542600
+    second: Fumiko - skoam_20
+  - first:
+      213: -1479676438497074752
+    second: Fumiko - skoam_21
+  - first:
+      213: 1829320963172621708
+    second: Fumiko - skoam_22
+  - first:
+      213: -4488193213896793162
+    second: Fumiko - skoam_23
+  - first:
+      213: -8035212684412476717
+    second: Fumiko - skoam_24
+  - first:
+      213: -5753384065241303784
+    second: Fumiko - skoam_25
+  - first:
+      213: -7474505989733817585
+    second: Fumiko - skoam_26
+  - first:
+      213: 1095823650492997396
+    second: Fumiko - skoam_27
+  - first:
+      213: -3876581604366919142
+    second: Fumiko - skoam_28
+  - first:
+      213: 7885493440677916928
+    second: Fumiko - skoam_29
+  - first:
+      213: -3102988057718670854
+    second: Fumiko - skoam_30
+  - first:
+      213: -7936740915592838859
+    second: Fumiko - skoam_31
+  - first:
+      213: 7648968909746205624
+    second: Fumiko - skoam_32
+  - first:
+      213: 2313430929196824479
+    second: Fumiko - skoam_33
+  - first:
+      213: -505771131661022991
+    second: Fumiko - skoam_34
+  - first:
+      213: -5905052555078496820
+    second: Fumiko - skoam_35
+  - first:
+      213: -153132141659717830
+    second: Fumiko - skoam_36
+  - first:
+      213: 7033211416482378336
+    second: Fumiko - skoam_37
+  - first:
+      213: -2892635202834751218
+    second: Fumiko - skoam_38
+  - first:
+      213: -6715995968642499611
+    second: Fumiko - skoam_39
+  - first:
+      213: -5924718316608400075
+    second: Fumiko - skoam_40
+  - first:
+      213: -1749647417477725966
+    second: Fumiko - skoam_41
+  - first:
+      213: -727274973533983887
+    second: Fumiko - skoam_42
+  - first:
+      213: -4375738329193653237
+    second: Fumiko - skoam_43
+  - first:
+      213: 2048478249652818766
+    second: Fumiko - skoam_44
+  - first:
+      213: 4176561155171956523
+    second: Fumiko - skoam_45
+  - first:
+      213: -34062019598166145
+    second: Fumiko - skoam_46
+  - first:
+      213: 2676162781327928127
+    second: Fumiko - skoam_47
+  - first:
+      213: -513139974688528826
+    second: Fumiko - skoam_48
+  - first:
+      213: -5789407525144064522
+    second: Fumiko - skoam_49
+  - first:
+      213: 2552636857728085122
+    second: Fumiko - skoam_50
+  - first:
+      213: 8968336333483210790
+    second: Fumiko - skoam_51
+  - first:
+      213: 8301799892188033611
+    second: Fumiko - skoam_52
+  - first:
+      213: -7775707037060952045
+    second: Fumiko - skoam_53
+  - first:
+      213: -5356255182360660917
+    second: Fumiko - skoam_54
+  - first:
+      213: -1588707243340084366
+    second: Fumiko - skoam_55
+  - first:
+      213: 8579803810993531592
+    second: Fumiko - skoam_56
+  - first:
+      213: 1798726973166033924
+    second: Fumiko - skoam_57
+  - first:
+      213: 1470097773389997843
+    second: Fumiko - skoam_58
+  - first:
+      213: -673645899880683584
+    second: Fumiko - skoam_59
+  - first:
+      213: 2902168074346522703
+    second: Fumiko - skoam_60
+  - first:
+      213: -5776170863477277557
+    second: Fumiko - skoam_61
+  - first:
+      213: -4808844558415611673
+    second: Fumiko - skoam_62
+  - first:
+      213: 1079163465203307671
+    second: Fumiko - skoam_63
+  - first:
+      213: -6486835200468662911
+    second: Fumiko - skoam_64
+  - first:
+      213: 346889654359440114
+    second: Fumiko - skoam_65
+  - first:
+      213: 6392312555034578105
+    second: Fumiko - skoam_66
+  - first:
+      213: -2230122252697822929
+    second: Fumiko - skoam_67
+  - first:
+      213: -2487083701557946985
+    second: Fumiko - skoam_68
+  - first:
+      213: -8255777529920445852
+    second: Fumiko - skoam_69
+  - first:
+      213: -5543087609536457801
+    second: Fumiko - skoam_70
+  - first:
+      213: 4724528724048659470
+    second: Fumiko - skoam_71
+  - first:
+      213: 2009097365153311370
+    second: Fumiko - skoam_72
+  - first:
+      213: 3497984738516914031
+    second: Fumiko - skoam_73
+  - first:
+      213: 6229649853571530239
+    second: Fumiko - skoam_74
+  - first:
+      213: -2616496153678888481
+    second: Fumiko - skoam_75
+  - first:
+      213: 45650420270189410
+    second: Fumiko - skoam_76
+  - first:
+      213: -8030347620439442556
+    second: Fumiko - skoam_77
+  - first:
+      213: -6392799797956152968
+    second: Fumiko - skoam_78
+  - first:
+      213: -7556010061260786739
+    second: Fumiko - skoam_79
+  - first:
+      213: 8350889272923599525
+    second: Fumiko - skoam_80
+  - first:
+      213: -1045397473435904561
+    second: Fumiko - skoam_81
+  - first:
+      213: 5401121028559060133
+    second: Fumiko - skoam_82
+  - first:
+      213: 7419887424392179947
+    second: Fumiko - skoam_83
+  - first:
+      213: -6497566729692749943
+    second: Fumiko - skoam_84
+  - first:
+      213: 4988700099616523485
+    second: Fumiko - skoam_85
+  - first:
+      213: -599127038648517759
+    second: Fumiko - skoam_86
+  - first:
+      213: -8432121623865069753
+    second: Fumiko - skoam_87
+  - first:
+      213: -7207054665780599277
+    second: Fumiko - skoam_88
+  - first:
+      213: -273900830470110648
+    second: Fumiko - skoam_89
+  - first:
+      213: -3904933590782931261
+    second: Fumiko - skoam_90
+  - first:
+      213: 3887508988583768878
+    second: Fumiko - skoam_91
+  - first:
+      213: 8522400548722537301
+    second: Fumiko - skoam_92
+  - first:
+      213: 4007605158805746606
+    second: Fumiko - skoam_93
+  - first:
+      213: 1231185590021780529
+    second: Fumiko - skoam_94
+  - first:
+      213: -3337719778671154331
+    second: Fumiko - skoam_95
+  - first:
+      213: -9094050182415222627
+    second: Fumiko - skoam_96
+  - first:
+      213: 2929601984644799380
+    second: Fumiko - skoam_97
+  - first:
+      213: -5165447654564181063
+    second: Fumiko - skoam_98
+  - first:
+      213: -7313630690031509788
+    second: Fumiko - skoam_99
+  - first:
+      213: -6523680907763843314
+    second: Fumiko - skoam_100
+  - first:
+      213: 5764294825026497563
+    second: Fumiko - skoam_101
+  - first:
+      213: -7986730269425106632
+    second: Fumiko - skoam_102
+  - first:
+      213: -5530617419789600192
+    second: Fumiko - skoam_103
+  - first:
+      213: -3674606731014060484
+    second: Fumiko - skoam_104
+  - first:
+      213: -3328930585702085838
+    second: Fumiko - skoam_105
+  - first:
+      213: -3257139557859292262
+    second: Fumiko - skoam_106
+  - first:
+      213: 6160286101796366617
+    second: Fumiko - skoam_107
+  - first:
+      213: -6656681504776412670
+    second: Fumiko - skoam_108
+  - first:
+      213: 9095398287047185541
+    second: Fumiko - skoam_109
+  - first:
+      213: 4161927948434142909
+    second: Fumiko - skoam_110
+  - first:
+      213: 4514047599362530045
+    second: Fumiko - skoam_111
+  - first:
+      213: -6039261150840638142
+    second: Fumiko - skoam_112
+  - first:
+      213: -4613198428787676290
+    second: Fumiko - skoam_113
+  - first:
+      213: 8833302986398152299
+    second: Fumiko - skoam_114
+  - first:
+      213: 7382808161502135121
+    second: Fumiko - skoam_115
+  - first:
+      213: 4878981919063651963
+    second: Fumiko - skoam_116
+  - first:
+      213: -3747104032470657088
+    second: Fumiko - skoam_117
+  - first:
+      213: 4276942806430660703
+    second: Fumiko - skoam_118
+  - first:
+      213: 7360817483687918203
+    second: Fumiko - skoam_119
+  - first:
+      213: -3786450063644556063
+    second: Fumiko - skoam_120
+  - first:
+      213: 3085119130506283587
+    second: Fumiko - skoam_121
+  - first:
+      213: 6893773846326014229
+    second: Fumiko - skoam_122
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 24
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Fumiko - skoam_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 223
+        width: 15
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f508f7865cc6f0ee0800000000000000
+      internalID: -1292694972914499489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_1
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 224
+        width: 18
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59c0381c8552be4b0800000000000000
+      internalID: -5410189464221578091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_2
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 223
+        width: 15
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8e196a9052a75980800000000000000
+      internalID: -8550186900467933554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_3
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 224
+        width: 17
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 762eb9fdee0f19730800000000000000
+      internalID: 4004246452453499495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_4
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 225
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03b3f3640bca660a0800000000000000
+      internalID: -6888628706923824336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_5
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 224
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2bf0fd5fc14e1840800000000000000
+      internalID: 5196663378922240813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_6
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 223
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ea57132b50dafab0800000000000000
+      internalID: -4973433748627957015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_7
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 224
+        width: 22
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e4aff55e7504c950800000000000000
+      internalID: 6468301004977710310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_8
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 226
+        width: 18
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e932c9851ec70ab70800000000000000
+      internalID: 8908257370234954654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_9
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 224
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5742c53aea8334ac0800000000000000
+      internalID: -3872188931892304779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_10
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 224
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adf4614b062dad7c0800000000000000
+      internalID: -4045690002458914854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_11
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 224
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 540d2939282486130800000000000000
+      internalID: 3560168634025431109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_12
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 225
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf51ee098893db1d0800000000000000
+      internalID: -3333444890474441220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_13
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 224
+        width: 62
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ea3a5aaa2f09b180800000000000000
+      internalID: -9099224896204293401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_14
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 191
+        width: 15
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47c8f3b42fd4643a0800000000000000
+      internalID: -6681567294117671820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_15
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 192
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2bf3975cffed2b90800000000000000
+      internalID: -7264886756798629074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_16
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 192
+        width: 15
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18c59be79cab6fe90800000000000000
+      internalID: -6992195996868846463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_17
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 193
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a11715d13cd7461d0800000000000000
+      internalID: -3358421145147576038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_18
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 191
+        width: 17
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9e922e1cd41b2dc0800000000000000
+      internalID: -3662810936304820582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_19
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 193
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bc924ae6e4b7cf90800000000000000
+      internalID: -6933374197447877456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_20
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 191
+        width: 24
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f64c6c25bac24de0800000000000000
+      internalID: -1350294058774542600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_21
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 191
+        width: 21
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c1eddc6e12277be0800000000000000
+      internalID: -1479676438497074752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_22
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 191
+        width: 24
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8d541e49bd036910800000000000000
+      internalID: 1829320963172621708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_23
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 192
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b3ec5a2d0cb6b1c0800000000000000
+      internalID: -4488193213896793162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_24
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 192
+        width: 19
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d2a1eac2a03d7090800000000000000
+      internalID: -8035212684412476717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_25
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 192
+        width: 21
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81536e6ecafd720b0800000000000000
+      internalID: -5753384065241303784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_26
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 192
+        width: 21
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f03e26a6768354890800000000000000
+      internalID: -7474505989733817585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_27
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 193
+        width: 37
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41f5b10edc5253f00800000000000000
+      internalID: 1095823650492997396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_28
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 191
+        width: 15
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1a55e0e19d933ac0800000000000000
+      internalID: -3876581604366919142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_29
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 192
+        width: 18
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 001b7425186ee6d60800000000000000
+      internalID: 7885493440677916928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_30
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 159
+        width: 16
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af936654dc8ffe4d0800000000000000
+      internalID: -3102988057718670854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_31
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 160
+        width: 18
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 531c7cb10380bd190800000000000000
+      internalID: -7936740915592838859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_32
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 159
+        width: 16
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b3fd6b82b8962a60800000000000000
+      internalID: 7648968909746205624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_33
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f97bd2b4c25fa1020800000000000000
+      internalID: 2313430929196824479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_34
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 161
+        width: 16
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f882bfd5d32bf8f0800000000000000
+      internalID: -505771131661022991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_35
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccd888accf90d0ea0800000000000000
+      internalID: -5905052555078496820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_36
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 159
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3f7da4e027ffddf0800000000000000
+      internalID: -153132141659717830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_37
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 159
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06277ad058cfa9160800000000000000
+      internalID: 7033211416482378336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_38
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 159
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e01ae3edb9b4bd7d0800000000000000
+      internalID: -2892635202834751218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_39
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ebbb18df3dfbc2a0800000000000000
+      internalID: -6715995968642499611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_40
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5355e40e41c27cda0800000000000000
+      internalID: -5924718316608400075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_41
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f08f0f91f008b7e0800000000000000
+      internalID: -1749647417477725966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_42
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 160
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17ba97cc34338e5f0800000000000000
+      internalID: -727274973533983887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_43
+      rect:
+        serializedVersion: 2
+        x: 313
+        y: 161
+        width: 39
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0cd95a5c214643c0800000000000000
+      internalID: -4375738329193653237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_44
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 159
+        width: 15
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e439ba06d18ad6c10800000000000000
+      internalID: 2048478249652818766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_45
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 160
+        width: 18
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2738b40e3026f930800000000000000
+      internalID: 4176561155171956523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_46
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 128
+        width: 15
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f77d48d06ccf68ff0800000000000000
+      internalID: -34062019598166145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_47
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 128
+        width: 14
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3b2c26eed3a32520800000000000000
+      internalID: 2676162781327928127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_48
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 127
+        width: 15
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64623a869e5f0e8f0800000000000000
+      internalID: -513139974688528826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_49
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 129
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fd80db8784e7afa0800000000000000
+      internalID: -5789407525144064522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_50
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 127
+        width: 17
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28ca37992b9cc6320800000000000000
+      internalID: 2552636857728085122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_51
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 129
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 628fe77016ee57c70800000000000000
+      internalID: 8968336333483210790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_52
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 127
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b427e32640be53370800000000000000
+      internalID: 8301799892188033611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_53
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 127
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3101a72b5a3271490800000000000000
+      internalID: -7775707037060952045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_54
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 127
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b443c015a42caa5b0800000000000000
+      internalID: -5356255182360660917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_55
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 128
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27bcf94fd27c3f9e0800000000000000
+      internalID: -1588707243340084366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_56
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 128
+        width: 21
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8caefccbb16911770800000000000000
+      internalID: 8579803810993531592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_57
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 128
+        width: 21
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40c997be6ac56f810800000000000000
+      internalID: 1798726973166033924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_58
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 128
+        width: 21
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 317e000d226d66410800000000000000
+      internalID: 1470097773389997843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_59
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 132
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c7a6398f9ab6a6f0800000000000000
+      internalID: -673645899880683584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_60
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 95
+        width: 45
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4867edbc72964820800000000000000
+      internalID: 2902168074346522703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_61
+      rect:
+        serializedVersion: 2
+        x: 386
+        y: 128
+        width: 21
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8cb970043be6dfa0800000000000000
+      internalID: -5776170863477277557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_62
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 95
+        width: 23
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e8319b3a5d834db0800000000000000
+      internalID: -4808844558415611673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_63
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 95
+        width: 18
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 794d5063475f9fe00800000000000000
+      internalID: 1079163465203307671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_64
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 96
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 185c09ff0c12af5a0800000000000000
+      internalID: -6486835200468662911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_65
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 95
+        width: 17
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fa3a508d4660d400800000000000000
+      internalID: 346889654359440114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_66
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 96
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bc0b10a66e06b850800000000000000
+      internalID: 6392312555034578105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_67
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 63
+        width: 24
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f29904a70a30d01e0800000000000000
+      internalID: -2230122252697822929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_68
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 95
+        width: 21
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79599f1fc8a1c7dd0800000000000000
+      internalID: -2487083701557946985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_69
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 96
+        width: 17
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 462a078d3169d6d80800000000000000
+      internalID: -8255777529920445852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_70
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 96
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b3d5ba003ff213b0800000000000000
+      internalID: -5543087609536457801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_71
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 96
+        width: 24
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e04cc08c7d5e09140800000000000000
+      internalID: 4724528724048659470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_72
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 96
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8ae221b86fb1eb10800000000000000
+      internalID: 2009097365153311370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_73
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 95
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6fc90926965b8030800000000000000
+      internalID: 3497984738516914031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_74
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 96
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ffdf1352989247650800000000000000
+      internalID: 6229649853571530239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_75
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 95
+        width: 19
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd14bcb6c9650bbd0800000000000000
+      internalID: -2616496153678888481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_76
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 96
+        width: 42
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26b4d0cb0de22a000800000000000000
+      internalID: 45650420270189410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_77
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48bbdc4c2697e8090800000000000000
+      internalID: -8030347620439442556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_78
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 31
+        width: 19
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87172aa44763847a0800000000000000
+      internalID: -6392799797956152968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_79
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 64
+        width: 21
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc3f54bf1e8a32790800000000000000
+      internalID: -7556010061260786739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_80
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 31
+        width: 18
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a23b3f7c8154e370800000000000000
+      internalID: 8350889272923599525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_81
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 64
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc513c269800e71f0800000000000000
+      internalID: -1045397473435904561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_82
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 64
+        width: 23
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5acb72885f2a4fa40800000000000000
+      internalID: 5401121028559060133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_83
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 64
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be0b84cdc4cb8f660800000000000000
+      internalID: 7419887424392179947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_84
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 31
+        width: 18
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98f54442c7104d5a0800000000000000
+      internalID: -6497566729692749943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_85
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 64
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd449903f4c6b3540800000000000000
+      internalID: 4988700099616523485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_86
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 64
+        width: 18
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18bf506f1297fa7f0800000000000000
+      internalID: -599127038648517759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_87
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 26
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74fe1a2fe061bfa80800000000000000
+      internalID: -8432121623865069753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_88
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 64
+        width: 24
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 316635157f56bfb90800000000000000
+      internalID: -7207054665780599277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_89
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 63
+        width: 18
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 842052855a8e23cf0800000000000000
+      internalID: -273900830470110648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_90
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 64
+        width: 26
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ce84e1a693eec9c0800000000000000
+      internalID: -3904933590782931261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_91
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 64
+        width: 19
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e237ca504d433f530800000000000000
+      internalID: 3887508988583768878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_92
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 64
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 553733c3526a54670800000000000000
+      internalID: 8522400548722537301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_93
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 64
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea3b3a2a8afdd9730800000000000000
+      internalID: 4007605158805746606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_94
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 64
+        width: 21
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 134f3d165cc061110800000000000000
+      internalID: 1231185590021780529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_95
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 31
+        width: 18
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56ba2889b890ea1d0800000000000000
+      internalID: -3337719778671154331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_96
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 31
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d98709b9a817bc180800000000000000
+      internalID: -9094050182415222627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_97
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 31
+        width: 18
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49b580cbb7908a820800000000000000
+      internalID: 2929601984644799380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_98
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 31
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bbc3d3d9b4a058b0800000000000000
+      internalID: -5165447654564181063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_99
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 32
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eed64ef2a3c08a90800000000000000
+      internalID: -7313630690031509788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_100
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 32
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0ffcb047ca3775a0800000000000000
+      internalID: -6523680907763843314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_101
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 32
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1ca3525a93eeff40800000000000000
+      internalID: 5764294825026497563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_102
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 32
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8318e0ea22f692190800000000000000
+      internalID: -7986730269425106632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_103
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 31
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04a7ad852cc4f33b0800000000000000
+      internalID: -5530617419789600192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_104
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 32
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c36c5a4a5ac210dc0800000000000000
+      internalID: -3674606731014060484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_105
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 31
+        width: 17
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23b4b4d05434dc1d0800000000000000
+      internalID: -3328930585702085838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_106
+      rect:
+        serializedVersion: 2
+        x: 313
+        y: 32
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9b8ce544d05cc2d0800000000000000
+      internalID: -3257139557859292262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_107
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 32
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 919295c229bbd7550800000000000000
+      internalID: 6160286101796366617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_108
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 0
+        width: 23
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 202a3e4a077be93a0800000000000000
+      internalID: -6656681504776412670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_109
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 0
+        width: 21
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 584d4267d88593e70800000000000000
+      internalID: 9095398287047185541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_110
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 0
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db6ff231b6322c930800000000000000
+      internalID: 4161927948434142909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_111
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 23
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfa553b006e15ae30800000000000000
+      internalID: 4514047599362530045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_112
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 245b35e0bfb303ca0800000000000000
+      internalID: -6039261150840638142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_113
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 0
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7b68b58870aaffb0800000000000000
+      internalID: -4613198428787676290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_114
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b66b8a9e342369a70800000000000000
+      internalID: 8833302986398152299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_115
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 0
+        width: 19
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 153803738e0057660800000000000000
+      internalID: 7382808161502135121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_116
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 0
+        width: 21
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b76b7579430a5b340800000000000000
+      internalID: 4878981919063651963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_117
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 0
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c717284cbc9ffbc0800000000000000
+      internalID: -3747104032470657088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_118
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 0
+        width: 19
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5836fd72d0ca5b30800000000000000
+      internalID: 4276942806430660703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_119
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 0
+        width: 24
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7af3bb8080e62660800000000000000
+      internalID: 7360817483687918203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_120
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 1
+        width: 20
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e406b48ab3d37bc0800000000000000
+      internalID: -3786450063644556063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_121
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 0
+        width: 20
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34ac697e08b80da20800000000000000
+      internalID: 3085119130506283587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fumiko - skoam_122
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 0
+        width: 21
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 511f328d9ca9baf50800000000000000
+      internalID: 6893773846326014229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Fumiko - skoam_0: -1292694972914499489
+      Fumiko - skoam_1: -5410189464221578091
+      Fumiko - skoam_10: -4045690002458914854
+      Fumiko - skoam_100: -6523680907763843314
+      Fumiko - skoam_101: 5764294825026497563
+      Fumiko - skoam_102: -7986730269425106632
+      Fumiko - skoam_103: -5530617419789600192
+      Fumiko - skoam_104: -3674606731014060484
+      Fumiko - skoam_105: -3328930585702085838
+      Fumiko - skoam_106: -3257139557859292262
+      Fumiko - skoam_107: 6160286101796366617
+      Fumiko - skoam_108: -6656681504776412670
+      Fumiko - skoam_109: 9095398287047185541
+      Fumiko - skoam_11: 3560168634025431109
+      Fumiko - skoam_110: 4161927948434142909
+      Fumiko - skoam_111: 4514047599362530045
+      Fumiko - skoam_112: -6039261150840638142
+      Fumiko - skoam_113: -4613198428787676290
+      Fumiko - skoam_114: 8833302986398152299
+      Fumiko - skoam_115: 7382808161502135121
+      Fumiko - skoam_116: 4878981919063651963
+      Fumiko - skoam_117: -3747104032470657088
+      Fumiko - skoam_118: 4276942806430660703
+      Fumiko - skoam_119: 7360817483687918203
+      Fumiko - skoam_12: -3333444890474441220
+      Fumiko - skoam_120: -3786450063644556063
+      Fumiko - skoam_121: 3085119130506283587
+      Fumiko - skoam_122: 6893773846326014229
+      Fumiko - skoam_13: -9099224896204293401
+      Fumiko - skoam_14: -6681567294117671820
+      Fumiko - skoam_15: -7264886756798629074
+      Fumiko - skoam_16: -6992195996868846463
+      Fumiko - skoam_17: -3358421145147576038
+      Fumiko - skoam_18: -3662810936304820582
+      Fumiko - skoam_19: -6933374197447877456
+      Fumiko - skoam_2: -8550186900467933554
+      Fumiko - skoam_20: -1350294058774542600
+      Fumiko - skoam_21: -1479676438497074752
+      Fumiko - skoam_22: 1829320963172621708
+      Fumiko - skoam_23: -4488193213896793162
+      Fumiko - skoam_24: -8035212684412476717
+      Fumiko - skoam_25: -5753384065241303784
+      Fumiko - skoam_26: -7474505989733817585
+      Fumiko - skoam_27: 1095823650492997396
+      Fumiko - skoam_28: -3876581604366919142
+      Fumiko - skoam_29: 7885493440677916928
+      Fumiko - skoam_3: 4004246452453499495
+      Fumiko - skoam_30: -3102988057718670854
+      Fumiko - skoam_31: -7936740915592838859
+      Fumiko - skoam_32: 7648968909746205624
+      Fumiko - skoam_33: 2313430929196824479
+      Fumiko - skoam_34: -505771131661022991
+      Fumiko - skoam_35: -5905052555078496820
+      Fumiko - skoam_36: -153132141659717830
+      Fumiko - skoam_37: 7033211416482378336
+      Fumiko - skoam_38: -2892635202834751218
+      Fumiko - skoam_39: -6715995968642499611
+      Fumiko - skoam_4: -6888628706923824336
+      Fumiko - skoam_40: -5924718316608400075
+      Fumiko - skoam_41: -1749647417477725966
+      Fumiko - skoam_42: -727274973533983887
+      Fumiko - skoam_43: -4375738329193653237
+      Fumiko - skoam_44: 2048478249652818766
+      Fumiko - skoam_45: 4176561155171956523
+      Fumiko - skoam_46: -34062019598166145
+      Fumiko - skoam_47: 2676162781327928127
+      Fumiko - skoam_48: -513139974688528826
+      Fumiko - skoam_49: -5789407525144064522
+      Fumiko - skoam_5: 5196663378922240813
+      Fumiko - skoam_50: 2552636857728085122
+      Fumiko - skoam_51: 8968336333483210790
+      Fumiko - skoam_52: 8301799892188033611
+      Fumiko - skoam_53: -7775707037060952045
+      Fumiko - skoam_54: -5356255182360660917
+      Fumiko - skoam_55: -1588707243340084366
+      Fumiko - skoam_56: 8579803810993531592
+      Fumiko - skoam_57: 1798726973166033924
+      Fumiko - skoam_58: 1470097773389997843
+      Fumiko - skoam_59: -673645899880683584
+      Fumiko - skoam_6: -4973433748627957015
+      Fumiko - skoam_60: 2902168074346522703
+      Fumiko - skoam_61: -5776170863477277557
+      Fumiko - skoam_62: -4808844558415611673
+      Fumiko - skoam_63: 1079163465203307671
+      Fumiko - skoam_64: -6486835200468662911
+      Fumiko - skoam_65: 346889654359440114
+      Fumiko - skoam_66: 6392312555034578105
+      Fumiko - skoam_67: -2230122252697822929
+      Fumiko - skoam_68: -2487083701557946985
+      Fumiko - skoam_69: -8255777529920445852
+      Fumiko - skoam_7: 6468301004977710310
+      Fumiko - skoam_70: -5543087609536457801
+      Fumiko - skoam_71: 4724528724048659470
+      Fumiko - skoam_72: 2009097365153311370
+      Fumiko - skoam_73: 3497984738516914031
+      Fumiko - skoam_74: 6229649853571530239
+      Fumiko - skoam_75: -2616496153678888481
+      Fumiko - skoam_76: 45650420270189410
+      Fumiko - skoam_77: -8030347620439442556
+      Fumiko - skoam_78: -6392799797956152968
+      Fumiko - skoam_79: -7556010061260786739
+      Fumiko - skoam_8: 8908257370234954654
+      Fumiko - skoam_80: 8350889272923599525
+      Fumiko - skoam_81: -1045397473435904561
+      Fumiko - skoam_82: 5401121028559060133
+      Fumiko - skoam_83: 7419887424392179947
+      Fumiko - skoam_84: -6497566729692749943
+      Fumiko - skoam_85: 4988700099616523485
+      Fumiko - skoam_86: -599127038648517759
+      Fumiko - skoam_87: -8432121623865069753
+      Fumiko - skoam_88: -7207054665780599277
+      Fumiko - skoam_89: -273900830470110648
+      Fumiko - skoam_9: -3872188931892304779
+      Fumiko - skoam_90: -3904933590782931261
+      Fumiko - skoam_91: 3887508988583768878
+      Fumiko - skoam_92: 8522400548722537301
+      Fumiko - skoam_93: 4007605158805746606
+      Fumiko - skoam_94: 1231185590021780529
+      Fumiko - skoam_95: -3337719778671154331
+      Fumiko - skoam_96: -9094050182415222627
+      Fumiko - skoam_97: 2929601984644799380
+      Fumiko - skoam_98: -5165447654564181063
+      Fumiko - skoam_99: -7313630690031509788
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
