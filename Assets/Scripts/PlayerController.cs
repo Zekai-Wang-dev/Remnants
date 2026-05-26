@@ -59,8 +59,6 @@ public class PlayerController : MonoBehaviour
             transform.position = new Vector3(rightBorder.transform.position.x - 0.5f, transform.position.y, transform.position.z); // Prevent the player from moving past the right border
         }
 
-      
-
         if (velocity.magnitude > 0) isWalking = true;
 
         else isWalking = false;
@@ -71,7 +69,7 @@ public class PlayerController : MonoBehaviour
 
         transform.Translate(velocity * Time.deltaTime); // Move the player based on velocity and frame time
 
-        backgroundScript.parallax(velocity, speed); // Call the parallax function in the background script to create a parallax effect based on player movement
+        backgroundScript.parallax(velocity); // Call the parallax function in the background script to create a parallax effect based on player movement
 
     }
 
