@@ -1,77 +1,95 @@
-using UnityEditor.Tilemaps;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XInput;
 
 public class PlayerController : MonoBehaviour
 {
+    public float speed = 5f;
+    public Vector2 velocity;
+    public Animator animator;
+    public GameObject background;
+    private ParallaxBackground backgroundScript;
+    private SpawnManager spawnManager;
 
-    public float speed = 5f; // Speed of the player movement
-    public Vector2 velocity; // Store the movement input
+    private Rigidbody2D rb;
+    private Vector2 lastPosition;
+    private bool isBlocked = false;
 
-    public Animator animator; // Reference to the Animator component for handling animations
-
-    public bool isWalking = false;
-
-    public GameObject background; // Reference to the background for parallax effect
-    private ParallaxBackground backgroundScript; // Reference to the ParallaxBackground script to call the parallax function
-
-    public GameObject leftBorder; 
-    public GameObject rightBorder;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
         backgroundScript = background.GetComponent<ParallaxBackground>();
-       
+
+        rb.gravityScale = 0;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        lastPosition = rb.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-
-        movement(); // Call the movement function to handle player movement each frame
-
+        HandleInput();
+        UpdateAnimations();
     }
 
-    private void movement()
+    void FixedUpdate()
     {
+        // Calculate actual movement
+        Vector2 newPosition = rb.position + velocity * Time.fixedDeltaTime;
+        Vector2 movementDelta = newPosition - lastPosition;
+
+        // Apply movement
+        rb.MovePosition(newPosition);
+
+        // Only apply parallax if player actually moved (not blocked)
+        if (movementDelta.magnitude > 0.1f)
+        {
+            backgroundScript.parallax(movementDelta);
+        }
+
+        lastPosition = rb.position;
+    }
+
+    void HandleInput()
+    {
+        velocity.x = 0;
 
         if (Input.GetKey(KeyCode.A))
-        {
             velocity.x = -speed;
-
-        }
         else if (Input.GetKey(KeyCode.D))
-        {
             velocity.x = speed;
-
-        }
-        else velocity.x = 0;
-
-        if (transform.position.x < leftBorder.transform.position.x + 0.5f) // Check if the player is near the left border
-        {
-            transform.position = new Vector3(leftBorder.transform.position.x + 0.5f, transform.position.y, transform.position.z); // Prevent the player from moving past the left border
-        }
-        else if (transform.position.x > rightBorder.transform.position.x - 0.5f) // Check if the player is near the right border
-        {
-            transform.position = new Vector3(rightBorder.transform.position.x - 0.5f, transform.position.y, transform.position.z); // Prevent the player from moving past the right border
-        }
-
-        if (velocity.magnitude > 0) isWalking = true;
-
-        else isWalking = false;
-
-        animator.SetBool("walking", isWalking);
-
-        animator.SetFloat("xvelocity", velocity.x); // Set the xvelocity parameter in the Animator to control animations based on horizontal movement
-
-        transform.Translate(velocity * Time.deltaTime); // Move the player based on velocity and frame time
-
-        backgroundScript.parallax(velocity); // Call the parallax function in the background script to create a parallax effect based on player movement
-
     }
 
+    void UpdateAnimations()
+    {
+        bool isWalking = velocity.magnitude > 0 && !isBlocked;
+        animator.SetBool("walking", isWalking);
+        animator.SetFloat("xvelocity", velocity.x);
+    }
 
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground")) return;
+
+        isBlocked = true;
+        velocity = Vector2.zero;
+
+        if (collision.gameObject.CompareTag("LeftArea"))
+        {
+            SpawnManager.Instance.NextArea("Left");
+
+
+        }
+        else if (collision.gameObject.CompareTag("RightArea"))
+        {
+            SpawnManager.Instance.NextArea("Right");
+
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (!collision.gameObject.CompareTag("Ground"))
+        {
+            isBlocked = false;
+        }
+    }
 }
