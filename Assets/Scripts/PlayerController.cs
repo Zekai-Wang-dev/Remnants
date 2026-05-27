@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
         // Only apply parallax if player actually moved (not blocked)
         if (movementDelta.magnitude > 0.1f)
         {
-            backgroundScript.parallax(movementDelta);
+            backgroundScript.parallax(velocity);
         }
 
         lastPosition = rb.position;

@@ -1,53 +1,48 @@
-using JetBrains.Annotations;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
-
 public class Area
 {
-
     public string areaName;
     public string areaId;
     public string areaType;
     public Vector2 areaIndex;
-    public Vector2 spawnArea; 
-    
+    public Vector2 spawnArea;
 }
 
 [System.Serializable]
 public class Scene
 {
-
-    public string sceneName; // Name of the scene to load
+    public string sceneName;
     public string sceneId;
     public Vector2 sceneIndex;
-    public List<Area> areas; 
-
+    public List<Area> areas;
 }
 
 public class SpawnManager : MonoBehaviour
 {
-
-    public List<Scene> scenes; // List of scenes with their areas
-    public string currentSceneId; // ID of the current scene
+    public List<Scene> scenes;
+    public string currentSceneId;
     public string currentAreaId;
     public Vector2 currentAreaIndex;
-    public Vector2 currentSceneIndex; 
+    public Vector2 currentSceneIndex;
+
+    // Store player positions for EACH area separately
+    private Dictionary<string, Vector2> areaPositions = new Dictionary<string, Vector2>();
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
+
     public void Awake()
     {
-
         if (_instance != null && _instance != this)
         {
-            Destroy(gameObject); // Ensure only one instance of SpawnManager exists
+            Destroy(gameObject);
             return;
         }
 
-        // Load the initial scene and area
         LoadScene(currentSceneId, currentAreaId);
         DontDestroyOnLoad(gameObject);
         _instance = this;
@@ -55,138 +50,116 @@ public class SpawnManager : MonoBehaviour
 
     public int FindSceneIndex(string currentSceneId)
     {
-
-        int scenesIndex = 0;
-
-        for (int i = 0; i < scenes.Count; i++ )
+        for (int i = 0; i < scenes.Count; i++)
         {
-
             if (scenes[i].sceneId == currentSceneId)
-            {
-                scenesIndex = i;
-                break;
-            }
-
+                return i;
         }
-
-        return scenesIndex;
+        return 0;
     }
 
     public int FindAreaIndex(string currentAreaId)
     {
-        int areaIndex = 0;
-        for (int i = 0; i < scenes[FindSceneIndex(currentSceneId)].areas.Count; i++)
+        int sceneIdx = FindSceneIndex(currentSceneId);
+        for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
         {
-            if (scenes[FindSceneIndex(currentSceneId)].areas[i].areaId == currentAreaId)
-            {
-                areaIndex = i;
-                break;
-            }
+            if (scenes[sceneIdx].areas[i].areaId == currentAreaId)
+                return i;
         }
-        return areaIndex;
+        return 0;
     }
 
     public void UpdateCurrentIdInfo()
     {
-
         for (int i = 0; i < scenes.Count; i++)
         {
             if (scenes[i].sceneIndex == currentSceneIndex)
-            {
                 currentSceneId = scenes[i].sceneId;
-
-            }
-
         }
 
-        for (int i = 0; i < scenes[FindSceneIndex(currentSceneId)].areas.Count; i++)
+        int sceneIdx = FindSceneIndex(currentSceneId);
+        for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
         {
-            if (scenes[FindSceneIndex(currentSceneId)].areas[i].areaIndex == currentAreaIndex)
-            {
-                currentAreaId = scenes[FindSceneIndex(currentSceneId)].areas[i].areaId;
-            }
+            if (scenes[sceneIdx].areas[i].areaIndex == currentAreaIndex)
+                currentAreaId = scenes[sceneIdx].areas[i].areaId;
         }
-
     }
 
     public void NextArea(string Direction)
     {
+        // Store current position BEFORE changing area
+        StoreCurrentAreaPosition();
 
         if (Direction == "Left")
-        {
             currentAreaIndex.x -= 1;
-            UpdateCurrentIdInfo();
-            LoadArea(currentSceneId, currentAreaId);
-
-        }
         else if (Direction == "Right")
-        {
             currentAreaIndex.x += 1;
-            UpdateCurrentIdInfo();
-            LoadArea(currentSceneId, currentAreaId);
-
-        }
         else if (Direction == "Forward")
-        {
             currentAreaIndex.y += 1;
-            UpdateCurrentIdInfo();
-            LoadArea(currentSceneId, currentAreaId);
-
-        }
         else if (Direction == "Backward")
-        {
             currentAreaIndex.y -= 1;
-            UpdateCurrentIdInfo();
-            LoadArea(currentSceneId, currentAreaId);
 
-        }
-
+        UpdateCurrentIdInfo();
+        LoadArea(currentSceneId, currentAreaId);
     }
 
     public void NextScene(string Direction)
     {
+        // Store current position BEFORE changing scene
+        StoreCurrentAreaPosition();
+
         if (Direction == "Left")
-        {
             currentSceneIndex.x -= 1;
-            UpdateCurrentIdInfo();
-            LoadScene(currentSceneId, currentAreaId);
-        }
         else if (Direction == "Right")
-        {
             currentSceneIndex.x += 1;
-            UpdateCurrentIdInfo();
-            LoadScene(currentSceneId, currentAreaId);
-        }
         else if (Direction == "Forward")
-        {
             currentSceneIndex.y += 1;
-            UpdateCurrentIdInfo();
-            LoadScene(currentSceneId, currentAreaId);
-        }
         else if (Direction == "Backward")
-        {
             currentSceneIndex.y -= 1;
-            UpdateCurrentIdInfo();
-            LoadScene(currentSceneId, currentAreaId);
+
+        UpdateCurrentIdInfo();
+        LoadScene(currentSceneId, currentAreaId);
+    }
+
+    private void StoreCurrentAreaPosition()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+            if (playerRb != null)
+            {
+                // Store position for THIS specific area
+                areaPositions[currentAreaId] = playerRb.position;
+            }
         }
     }
 
     public void LoadArea(string sceneId, string areaId)
     {
-
         Scene sceneToLoad = scenes.Find(scene => scene.sceneId == sceneId);
         if (sceneToLoad != null)
         {
             Area areaToSpawn = sceneToLoad.areas.Find(area => area.areaId == areaId);
             if (areaToSpawn != null)
             {
-                // After the scene is loaded, set the player's position to the spawn area
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
+                Rigidbody2D playerRb = player?.GetComponent<Rigidbody2D>();
+
+                if (playerRb != null)
                 {
-                    player.transform.position = areaToSpawn.spawnArea;
+                    // Check if we have a stored position for this area
+                    if (areaPositions.ContainsKey(areaId))
+                    {
+                        // Return to exact position where player left
+                        playerRb.position = areaPositions[areaId];
+                    }
+                    else
+                    {
+                        // First time entering this area - use spawn point
+                        playerRb.position = areaToSpawn.spawnArea;
+                    }
                 }
-                
             }
             else
             {
@@ -197,7 +170,6 @@ public class SpawnManager : MonoBehaviour
         {
             Debug.LogError($"Scene with ID {sceneId} not found");
         }
-
     }
 
     public void LoadScene(string sceneId, string areaId)
@@ -208,14 +180,24 @@ public class SpawnManager : MonoBehaviour
             Area areaToSpawn = sceneToLoad.areas.Find(area => area.areaId == areaId);
             if (areaToSpawn != null)
             {
-                // Load the scene asynchronously
                 SceneManager.LoadSceneAsync(sceneToLoad.sceneName).completed += (asyncOperation) =>
                 {
-                    // After the scene is loaded, set the player's position to the spawn area
                     GameObject player = GameObject.FindGameObjectWithTag("Player");
                     if (player != null)
                     {
-                        player.transform.position = areaToSpawn.spawnArea;
+                        Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+                        if (playerRb != null)
+                        {
+                            // Check if we have a stored position for this area
+                            if (areaPositions.ContainsKey(areaId))
+                            {
+                                playerRb.position = areaPositions[areaId];
+                            }
+                            else
+                            {
+                                playerRb.position = areaToSpawn.spawnArea;
+                            }
+                        }
                     }
                 };
             }
@@ -229,5 +211,4 @@ public class SpawnManager : MonoBehaviour
             Debug.LogError($"Scene with ID {sceneId} not found");
         }
     }
-
 }

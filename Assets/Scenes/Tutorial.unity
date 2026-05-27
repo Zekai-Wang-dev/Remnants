@@ -3034,10 +3034,13 @@ MonoBehaviour:
   layer3Speed: 1
   backgroundLayers1:
   - {fileID: 56940700}
+  - {fileID: 1799218201}
   backgroundLayers2:
   - {fileID: 255624298}
+  - {fileID: 340051073}
   backgroundLayers3:
   - {fileID: 1909776170}
+  - {fileID: 1184481680}
 --- !u!1 &448019706
 GameObject:
   m_ObjectHideFlags: 0
