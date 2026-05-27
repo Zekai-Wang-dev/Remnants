@@ -7,7 +7,6 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     public GameObject background;
     private ParallaxBackground backgroundScript;
-    private SpawnManager spawnManager;
 
     private Rigidbody2D rb;
     private Vector2 lastPosition;

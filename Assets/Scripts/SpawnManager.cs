@@ -10,6 +10,8 @@ public class Area
     public string areaType;
     public Vector2 areaIndex;
     public Vector2 spawnArea;
+    public Vector2 leftBorder; 
+    public Vector2 rightBorder;
 }
 
 [System.Serializable]
@@ -34,6 +36,17 @@ public class SpawnManager : MonoBehaviour
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
+
+    private PlayerController GetPlayerController()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        return player?.GetComponent<PlayerController>();
+    }
+
+    private CameraController GetCameraController()
+    {
+        return Camera.main?.GetComponent<CameraController>();
+    }
 
     public void Awake()
     {
@@ -101,6 +114,7 @@ public class SpawnManager : MonoBehaviour
 
         UpdateCurrentIdInfo();
         LoadArea(currentSceneId, currentAreaId);
+        GetCameraController()?.changeBorders();
     }
 
     public void NextScene(string Direction)
@@ -119,6 +133,7 @@ public class SpawnManager : MonoBehaviour
 
         UpdateCurrentIdInfo();
         LoadScene(currentSceneId, currentAreaId);
+        GetCameraController()?.changeBorders();
     }
 
     private void StoreCurrentAreaPosition()

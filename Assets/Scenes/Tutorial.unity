@@ -5569,10 +5569,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   target: {fileID: 124265613}
-  leftBorder: {fileID: 1534660278}
-  rightBorder: {fileID: 1193672676}
+  leftBorder: {x: 0, y: 0}
+  rightBorder: {x: 0, y: 0}
   cam: {fileID: 0}
   background: {fileID: 422076670}
+  spawnManager: {fileID: 566013809}
 --- !u!1 &566013808
 GameObject:
   m_ObjectHideFlags: 0
@@ -5612,15 +5613,20 @@ MonoBehaviour:
       areaType: Tutorial
       areaIndex: {x: 0, y: 0}
       spawnArea: {x: -6.88, y: -1.52}
+      leftBorder: {x: -14.78, y: -1}
+      rightBorder: {x: 7.85, y: -1}
     - areaName: Testing2
       areaId: 001
       areaType: Tutorial
       areaIndex: {x: 1, y: 0}
       spawnArea: {x: 31.93151, y: -1.52}
+      leftBorder: {x: 24.07, y: -1}
+      rightBorder: {x: 46.7, y: -1}
   currentSceneId: 000
   currentAreaId: 000
   currentAreaIndex: {x: 0, y: 0}
   currentSceneIndex: {x: 0, y: 0}
+  cameraController: {fileID: 0}
 --- !u!4 &566013810
 Transform:
   m_ObjectHideFlags: 0
@@ -7629,7 +7635,7 @@ Transform:
   m_GameObject: {fileID: 1317495843}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.9999962, y: 0.13239002, z: 0}
+  m_LocalPosition: {x: 3, y: 0.13239002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
