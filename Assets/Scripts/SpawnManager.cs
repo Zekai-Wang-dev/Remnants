@@ -30,6 +30,10 @@ public class SpawnManager : MonoBehaviour
     public string currentAreaId;
     public Vector2 currentAreaIndex;
     public Vector2 currentSceneIndex;
+    public string previousSceneId;
+    public string previousAreaId;
+    public Vector2 previousAreaIndex; 
+    public Vector2 previousSceneIndex;
 
     // Store player positions for EACH area separately
     private Dictionary<string, Vector2> areaPositions = new Dictionary<string, Vector2>();
@@ -87,21 +91,49 @@ public class SpawnManager : MonoBehaviour
         for (int i = 0; i < scenes.Count; i++)
         {
             if (scenes[i].sceneIndex == currentSceneIndex)
+            {
+
                 currentSceneId = scenes[i].sceneId;
+                break;
+
+            }
+            
         }
 
         int sceneIdx = FindSceneIndex(currentSceneId);
         for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
         {
             if (scenes[sceneIdx].areas[i].areaIndex == currentAreaIndex)
+            {
+
                 currentAreaId = scenes[sceneIdx].areas[i].areaId;
+                break;
+
+            }
+            
         }
+
+        if (currentAreaId == previousAreaId)
+        {
+            currentAreaIndex = previousAreaIndex;
+
+        }
+
+        if (currentSceneId == previousSceneId)
+        {
+            currentSceneIndex = previousSceneIndex;
+
+        }
+
     }
 
     public void NextArea(string Direction)
     {
         // Store current position BEFORE changing area
         StoreCurrentAreaPosition();
+
+        previousAreaIndex = currentAreaIndex;
+        previousAreaId = currentAreaId;
 
         if (Direction == "Left")
             currentAreaIndex.x -= 1;
@@ -121,6 +153,9 @@ public class SpawnManager : MonoBehaviour
     {
         // Store current position BEFORE changing scene
         StoreCurrentAreaPosition();
+
+        previousSceneIndex = currentSceneIndex; // Store the scene index 
+        previousSceneId = currentSceneId;
 
         if (Direction == "Left")
             currentSceneIndex.x -= 1;
