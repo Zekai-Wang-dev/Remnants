@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 [System.Serializable]
@@ -198,27 +199,45 @@ public class SpawnManager : MonoBehaviour
 
                 if (playerRb != null)
                 {
-                    // Check if we have a stored position for this area
-                    if (areaPositions.ContainsKey(areaId))
+
+                    ParallaxBackground backgroundManager = GameObject.Find("BackgroundManager")?.GetComponent<ParallaxBackground>();
+                    if (backgroundManager != null)
                     {
-                        // Return to exact position where player left
-                        playerRb.position = areaPositions[areaId];
+
+                        for (int i = 0; i < backgroundManager.parallaxAreas.Count; i++)
+                        {
+                            {
+                                if (backgroundManager.parallaxAreas[i].areaIndex == areaToSpawn.areaIndex)
+                                {
+                                    backgroundManager.currentParallaxArea = backgroundManager.parallaxAreas[i];
+                                    break;
+                                }
+                            }
+
+                        }
+
+                        // Check if we have a stored position for this area
+                        if (areaPositions.ContainsKey(areaId))
+                        {
+                            // Return to exact position where player left
+                            playerRb.position = areaPositions[areaId];
+                        }
+                        else
+                        {
+                            // First time entering this area - use spawn point
+                            playerRb.position = areaToSpawn.spawnArea;
+                        }
                     }
-                    else
-                    {
-                        // First time entering this area - use spawn point
-                        playerRb.position = areaToSpawn.spawnArea;
-                    }
+                }
+                else
+                {
+                    Debug.LogError($"Area with ID {areaId} not found in scene {sceneId}");
                 }
             }
             else
             {
-                Debug.LogError($"Area with ID {areaId} not found in scene {sceneId}");
+                Debug.LogError($"Scene with ID {sceneId} not found");
             }
-        }
-        else
-        {
-            Debug.LogError($"Scene with ID {sceneId} not found");
         }
     }
 

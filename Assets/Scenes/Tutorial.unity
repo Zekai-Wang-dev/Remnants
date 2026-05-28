@@ -3029,18 +3029,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParallaxBackground
   borderReached: 0
-  layer1Speed: 2
-  layer2Speed: 1.2
-  layer3Speed: 1
-  backgroundLayers1:
-  - {fileID: 56940700}
-  - {fileID: 1799218201}
-  backgroundLayers2:
-  - {fileID: 255624298}
-  - {fileID: 340051073}
-  backgroundLayers3:
-  - {fileID: 1909776170}
-  - {fileID: 1184481680}
+  parallaxAreas:
+  - areaIndex: {x: 0, y: 0}
+    layer1Speed: 2
+    layer2Speed: 1.5
+    layer3Speed: 1
+    backgroundLayers1:
+    - {fileID: 56940700}
+    backgroundLayers2:
+    - {fileID: 255624298}
+    backgroundLayers3:
+    - {fileID: 1909776170}
+  - areaIndex: {x: 1, y: 0}
+    layer1Speed: 2
+    layer2Speed: 1.5
+    layer3Speed: 1
+    backgroundLayers1:
+    - {fileID: 1799218201}
+    backgroundLayers2:
+    - {fileID: 340051073}
+    backgroundLayers3:
+    - {fileID: 1184481680}
+  currentParallaxArea:
+    areaIndex: {x: 0, y: 0}
+    layer1Speed: 0
+    layer2Speed: 0
+    layer3Speed: 0
+    backgroundLayers1: []
+    backgroundLayers2: []
+    backgroundLayers3: []
 --- !u!1 &448019706
 GameObject:
   m_ObjectHideFlags: 0
@@ -5626,7 +5643,10 @@ MonoBehaviour:
   currentAreaId: 000
   currentAreaIndex: {x: 0, y: 0}
   currentSceneIndex: {x: 0, y: 0}
-  cameraController: {fileID: 0}
+  previousSceneId: 
+  previousAreaId: 
+  previousAreaIndex: {x: 0, y: 0}
+  previousSceneIndex: {x: 0, y: 0}
 --- !u!4 &566013810
 Transform:
   m_ObjectHideFlags: 0
