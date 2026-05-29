@@ -9,6 +9,7 @@ TagManager:
   - RightArea
   - Forward
   - Backward
+  - Enemy
   layers:
   - Default
   - TransparentFX
