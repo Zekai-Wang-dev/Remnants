@@ -36,7 +36,7 @@ public class CameraController : MonoBehaviour
 
         leftBorder = newLeftBorder;
         rightBorder = newRightBorder;      
-        transform.position = new Vector3(target.position.x, transform.position.y, transform.position.z); // Move camera to the new position immediately
+        transform.position = new Vector3(target.position.x, target.position.y + 1, transform.position.z); // Move camera to the new position immediately
 
     }
 
@@ -50,6 +50,7 @@ public class CameraController : MonoBehaviour
         Vector3 pos = transform.position;
 
         pos.x = target.position.x;
+        pos.y = target.position.y + 1; // Add vertical offset to keep the player slightly below the center of the screen
 
         float leftEdge = pos.x - halfCameraWidth;
         float rightEdge = pos.x + halfCameraWidth;

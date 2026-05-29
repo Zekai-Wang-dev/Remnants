@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,15 +8,20 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
     public GameObject background;
     private ParallaxBackground backgroundScript;
+    private SpawnManager spawnManager; 
 
     private Rigidbody2D rb;
     private Vector2 lastPosition;
     private bool isBlocked = false;
 
+    public float InteractRadius;
+    public float ExitRadius; 
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         backgroundScript = background.GetComponent<ParallaxBackground>();
+        spawnManager = SpawnManager.Instance;
 
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -47,6 +53,33 @@ public class PlayerController : MonoBehaviour
         lastPosition = rb.position;
     }
 
+    private void OnDrawGizmos()
+    {
+        
+        Gizmos.DrawWireCube(transform.position, new Vector2(ExitRadius, ExitRadius));
+
+    }
+
+    void CheckForExits(string direction)
+    {
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(ExitRadius, ExitRadius), 0f, LayerMask.GetMask("Exit"));
+
+       foreach (Collider2D hit in hits)
+        {
+
+            if (hit.CompareTag(direction))
+            {
+
+                spawnManager.NextArea(direction);
+                print("Exit " + direction + " detected, changing area...");
+
+            }
+        
+        }
+
+    }
+
     void HandleInput()
     {
         velocity.x = 0;
@@ -55,6 +88,10 @@ public class PlayerController : MonoBehaviour
             velocity.x = -speed;
         else if (Input.GetKey(KeyCode.D))
             velocity.x = speed;
+        else if (Input.GetKeyDown(KeyCode.W))
+            CheckForExits("Forward");
+        else if (Input.GetKeyDown(KeyCode.S))
+            CheckForExits("Backward");
     }
 
     void UpdateAnimations()
