@@ -270,7 +270,6 @@ public class SpawnManager : MonoBehaviour
         foreach (var enemyEntry in areaData.enemies)
         {
             // Check if this specific enemy has been defeated individually
-            // (optional - if you want to track individual enemies too)
             if (defeatedEncounters.ContainsKey(areaData.areaId) &&
                 defeatedEncounters[areaData.areaId].Contains(enemyEntry.spawnPointId))
             {
@@ -300,8 +299,8 @@ public class SpawnManager : MonoBehaviour
     {
         if (!defeatedEncounters.ContainsKey(areaId)) return;
 
-        // Find all encounter triggers in the scene
-        EncounterTrigger[] triggers = Object.FindObjectsOfType<EncounterTrigger>();
+        // Find all encounter triggers in the scene - MODERN API
+        EncounterTrigger[] triggers = Object.FindObjectsByType<EncounterTrigger>(FindObjectsSortMode.None);
 
         foreach (EncounterTrigger trigger in triggers)
         {
