@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Assuming CharacterData is defined elsewhere
-// [System.Serializable]
-// public class CharacterData { ... }
-
 public class Character : MonoBehaviour
 {
     public CharacterData data;
@@ -14,22 +10,19 @@ public class Character : MonoBehaviour
     public string threatType;
     public string state;
     public Character target;
-    public bool isPlayer; // True if controlled by player, false if AI (including companions)
+    public bool isPlayer;
     public int gridLocation;
 
-    public int team; // 0 = Player team, 1 = Enemy team
+    public int team;
 
     public float health;
 
-    // Defense capabilities (configurable per character)
     public bool canDodge = true;
     public bool canParry = true;
     public bool canBlock = true;
 
-    // Track last defense for feedback
     public string lastDefenseUsed = "";
 
-    // Animation properties
     private Vector3 originalPosition;
     private Transform myTransform;
 
@@ -39,9 +32,6 @@ public class Character : MonoBehaviour
         originalPosition = myTransform.position;
     }
 
-    /// <summary>
-    /// Starts the character's turn. Skips if staggered or dead.
-    /// </summary>
     public void BeginTurn(List<Character> opponentTeam)
     {
         if (state == "Staggered") return;
@@ -55,12 +45,8 @@ public class Character : MonoBehaviour
         health = data.maxHealth;
     }
 
-    /// <summary>
-    /// Selects a target from the opponent team based on threat type.
-    /// </summary>
     private void FindTargetByThreat(List<Character> opponentTeam)
     {
-        // Filter to only opponents from the other team
         List<Character> validTargets = new List<Character>();
         foreach (Character c in opponentTeam)
         {
@@ -72,7 +58,7 @@ public class Character : MonoBehaviour
 
         if (validTargets.Count == 0)
         {
-            target = null; // No valid target
+            target = null;
             return;
         }
 
@@ -91,32 +77,25 @@ public class Character : MonoBehaviour
         target = validTargets[0];
     }
 
-    /// <summary>
-    /// Attempts all available defenses in priority order: Dodge → Parry → Block
-    /// </summary>
     public bool AttemptDefense(float attackStartTime, float attackDuration, out string defenseType)
     {
         defenseType = "";
         bool defenseSucceeded = false;
 
-        // If no target, cannot defend
         if (target == null) return false;
 
-        // Priority 1: Dodge
         if (canDodge && !defenseSucceeded)
         {
             defenseSucceeded = RollForDodge(attackStartTime, attackDuration);
             if (defenseSucceeded) defenseType = "Dodge";
         }
 
-        // Priority 2: Parry (if dodge failed)
         if (canParry && !defenseSucceeded)
         {
             defenseSucceeded = RollForParry(attackStartTime, attackDuration);
             if (defenseSucceeded) defenseType = "Parry";
         }
 
-        // Priority 3: Block (last resort)
         if (canBlock && !defenseSucceeded)
         {
             defenseSucceeded = RollForBlock(attackStartTime, attackDuration);
@@ -127,12 +106,8 @@ public class Character : MonoBehaviour
         return defenseSucceeded;
     }
 
-    /// <summary>
-    /// Calculates and resolves a parry attempt. Window scales with parry chance.
-    /// </summary>
     public bool RollForParry(float attackStartTime, float attackDuration)
     {
-        // Guard against null target
         if (target == null || target.data == null) return false;
 
         float parryChance = target.data.parryChance;
@@ -149,11 +124,9 @@ public class Character : MonoBehaviour
 
         if (isPlayer)
         {
-            // Window scales with parry chance: higher chance = larger window
-            float baseWindowSize = 0.15f; // Base 15% of attack duration
-            float windowSize = baseWindowSize * (1f + parryChance * 0.5f); // Up to 75% larger with max chance
+            float baseWindowSize = 0.15f;
+            float windowSize = baseWindowSize * (1f + parryChance * 0.5f);
 
-            // Position window near the end of attack
             float windowStart = attackDuration * (1f - windowSize);
             float windowEnd = attackDuration;
 
@@ -175,12 +148,8 @@ public class Character : MonoBehaviour
         return success;
     }
 
-    /// <summary>
-    /// Calculates and resolves a dodge attempt. Window scales with dodge chance.
-    /// </summary>
     public bool RollForDodge(float attackStartTime, float attackDuration)
     {
-        // Guard against null target
         if (target == null || target.data == null) return false;
 
         float dodgeChance = data.dodgeChance;
@@ -197,11 +166,9 @@ public class Character : MonoBehaviour
 
         if (isPlayer)
         {
-            // Window scales with dodge chance: higher chance = larger window
-            float baseWindowSize = 0.25f; // Base 25% of attack duration
-            float windowSize = baseWindowSize * (1f + dodgeChance * 0.4f); // Up to 60% larger with max chance
+            float baseWindowSize = 0.25f;
+            float windowSize = baseWindowSize * (1f + dodgeChance * 0.4f);
 
-            // Position window early in attack
             float windowStart = 0f;
             float windowEnd = windowStart + windowSize;
 
@@ -223,12 +190,8 @@ public class Character : MonoBehaviour
         return success;
     }
 
-    /// <summary>
-    /// Calculates and resolves a block attempt. Window scales with block chance.
-    /// </summary>
     public bool RollForBlock(float attackStartTime, float attackDuration)
     {
-        // Guard against null target
         if (target == null || target.data == null) return false;
 
         float blockChance = data.blockChance;
@@ -243,11 +206,9 @@ public class Character : MonoBehaviour
 
         if (isPlayer)
         {
-            // Window scales with block chance: higher chance = larger window
-            float baseWindowSize = 0.35f; // Base 35% of attack duration
-            float windowSize = baseWindowSize * (1f + blockChance * 0.3f); // Up to 65% larger with max chance
+            float baseWindowSize = 0.35f;
+            float windowSize = baseWindowSize * (1f + blockChance * 0.3f);
 
-            // Position window in middle of attack
             float windowStart = attackDuration * 0.3f;
             float windowEnd = windowStart + windowSize;
 
@@ -269,9 +230,6 @@ public class Character : MonoBehaviour
         return success;
     }
 
-    /// <summary>
-    /// Lerps the character towards the target and back for attack animation
-    /// </summary>
     public IEnumerator AttackAnimation(Transform targetTransform, float duration)
     {
         if (targetTransform == null) yield break;
@@ -281,13 +239,11 @@ public class Character : MonoBehaviour
         Vector3 direction = (targetPos - startPos).normalized;
         float distance = Vector3.Distance(startPos, targetPos);
 
-        // Move forward (70% of the way to target)
         Vector3 forwardPos = startPos + direction * (distance * 0.7f);
 
         float elapsed = 0f;
         float halfDuration = duration * 0.5f;
 
-        // Move towards target
         while (elapsed < halfDuration)
         {
             myTransform.position = Vector3.Lerp(startPos, forwardPos, elapsed / halfDuration);
@@ -295,7 +251,6 @@ public class Character : MonoBehaviour
             yield return null;
         }
 
-        // Move back to original position
         elapsed = 0f;
         while (elapsed < halfDuration)
         {
@@ -304,7 +259,6 @@ public class Character : MonoBehaviour
             yield return null;
         }
 
-        // Ensure we're exactly at original position
         myTransform.position = startPos;
     }
 }
@@ -316,8 +270,8 @@ public class CombatManager : MonoBehaviour
     public int currentTurnIndex = 0;
 
     [Header("Animation Settings")]
-    public float attackMoveDistance = 1.5f; // How far characters move during attack
-    public float attackAnimationDuration = 0.5f; // Duration of attack animation
+    public float attackMoveDistance = 1.5f;
+    public float attackAnimationDuration = 0.5f;
 
     void Awake()
     {
@@ -333,20 +287,18 @@ public class CombatManager : MonoBehaviour
     {
         combatants = new List<Character>();
 
-        // Assign teams
         foreach (Character c in playerTeam)
         {
-            c.team = 0; // Player team
+            c.team = 0;
             combatants.Add(c);
         }
 
         foreach (Character c in enemyTeam)
         {
-            c.team = 1; // Enemy team
+            c.team = 1;
             combatants.Add(c);
         }
 
-        // Sort by speed (highest first)
         combatants.Sort((a, b) => b.data.speed.CompareTo(a.data.speed));
 
         foreach (Character c in combatants)
@@ -362,23 +314,27 @@ public class CombatManager : MonoBehaviour
     {
         while (combatants.Count > 0)
         {
+            if (currentTurnIndex >= combatants.Count)
+            {
+                currentTurnIndex = 0;
+            }
+
             Character current = combatants[currentTurnIndex];
 
             if (current.state == "Dead")
             {
+                RemoveDeadCharacter(current);
                 NextTurn();
                 continue;
             }
 
             current.BeginTurn(GetOpponentTeam(current));
 
-            // Check if target is valid
             if (current.target != null)
             {
                 float attackStartTime = Time.time;
                 float attackDuration = current.data.attackDuration;
 
-                // Start attack animation
                 StartCoroutine(current.AttackAnimation(current.target.transform, attackAnimationDuration));
 
                 bool defenseSucceeded = false;
@@ -401,8 +357,36 @@ public class CombatManager : MonoBehaviour
             }
             else
             {
-                // No target available, skip turn
                 Debug.Log($"{current.data.name} has no valid target. Skipping turn.");
+            }
+
+            RemoveAllDeadCharacters();
+
+            // Check if combat is over
+            bool playerTeamAlive = false;
+            bool enemyTeamAlive = false;
+
+            foreach (Character c in combatants)
+            {
+                if (c.team == 0 && c.state != "Dead") playerTeamAlive = true;
+                if (c.team == 1 && c.state != "Dead") enemyTeamAlive = true;
+            }
+
+            if (!enemyTeamAlive)
+            {
+                SpawnManager spawnManager = SpawnManager.Instance;
+                if (spawnManager != null)
+                {
+                    // Mark the entire encounter as defeated
+                    spawnManager.MarkEncounterDefeated(spawnManager.currentEncounterAreaId, spawnManager.currentEncounterId);
+                    spawnManager.NextScene("CombatOver");
+                }
+                yield break;
+            }
+            else if (!playerTeamAlive)
+            {
+                Debug.Log("Player team defeated!");
+                yield break;
             }
 
             NextTurn();
@@ -419,7 +403,6 @@ public class CombatManager : MonoBehaviour
 
         if (defender.isPlayer)
         {
-            // Player can press buttons anytime during the attack duration
             while (elapsed < attackDuration && !defenseSucceeded)
             {
                 if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -444,9 +427,8 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
-            // AI automatically chooses the best defense instantly
             defenseSucceeded = defender.AttemptDefense(attackStartTime, attackDuration, out defenseType);
-            yield return null; // No waiting needed
+            yield return null;
         }
 
         onComplete?.Invoke(defenseSucceeded, defenseType);
@@ -474,7 +456,6 @@ public class CombatManager : MonoBehaviour
 
     private void CalculateDamage(Character attacker, Character defender, string defenseContext = "None")
     {
-        // Guard against null defender or data
         if (defender == null || defender.data == null) return;
 
         float damage = attacker.data.damage - defender.data.defense;
@@ -487,7 +468,6 @@ public class CombatManager : MonoBehaviour
                 break;
             case "Counter":
                 damage = 0;
-                // Optional: counter damage calculation
                 break;
             case "Dodge":
                 damage = 0;
@@ -527,5 +507,30 @@ public class CombatManager : MonoBehaviour
             }
         }
         return opponents;
+    }
+
+    private void RemoveDeadCharacter(Character deadCharacter)
+    {
+        if (deadCharacter == null) return;
+
+        combatants.Remove(deadCharacter);
+
+        if (deadCharacter.gameObject != null)
+        {
+            Destroy(deadCharacter.gameObject);
+        }
+
+        Debug.Log($"{deadCharacter.data.name} removed from combat.");
+    }
+
+    private void RemoveAllDeadCharacters()
+    {
+        for (int i = combatants.Count - 1; i >= 0; i--)
+        {
+            if (combatants[i].state == "Dead")
+            {
+                RemoveDeadCharacter(combatants[i]);
+            }
+        }
     }
 }

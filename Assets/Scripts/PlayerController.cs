@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 velocity;
     public Animator animator;
     public ParallaxBackground backgroundScript;
-    private SpawnManager spawnManager; 
+    private SpawnManager spawnManager;
 
     private Rigidbody2D rb;
     private Vector2 lastPosition;
@@ -21,7 +21,6 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -30,7 +29,6 @@ public class PlayerController : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
     }
 
     void Start()
@@ -52,72 +50,67 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Calculate actual movement
         Vector2 newPosition = rb.position + velocity * Time.fixedDeltaTime;
         Vector2 movementDelta = newPosition - lastPosition;
 
-        // Apply movement
         rb.MovePosition(newPosition);
 
-        // Only apply parallax if player actually moved (not blocked)
         if (movementDelta.magnitude > 0.1f && backgroundScript != null)
         {
             backgroundScript.parallax(velocity);
         }
 
         lastPosition = rb.position;
-        CheckForEncounters(); 
+        CheckForEncounters();
     }
 
     private void OnDrawGizmos()
     {
-        
         Gizmos.DrawWireCube(transform.position, new Vector2(ExitRadius, ExitRadius));
-
     }
 
     public void FindBgScript(ParallaxBackground bg)
     {
-
         if (bg == null) return;
         backgroundScript = bg;
-
     }
 
     void CheckForExits(string direction)
     {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(ExitRadius, ExitRadius), 0f, LayerMask.GetMask("Exit"));
 
-       Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(ExitRadius, ExitRadius), 0f, LayerMask.GetMask("Exit"));
-
-       foreach (Collider2D hit in hits)
+        foreach (Collider2D hit in hits)
         {
-
             if (hit.CompareTag(direction))
             {
-
                 spawnManager.NextArea(direction);
                 print("Exit " + direction + " detected, changing area...");
-
             }
-        
         }
-
     }
 
     void CheckForEncounters()
     {
+        if (spawnManager.currentSceneId == "001") return;
+
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, InteractRadius, LayerMask.GetMask("Encounter"));
 
-        foreach(Collider2D hit in hits)
+        foreach (Collider2D hit in hits)
         {
             if (hit.CompareTag("Encounter"))
             {
-                // Trigger encounter logic here
+                EncounterTrigger trigger = hit.GetComponent<EncounterTrigger>();
+                if (trigger != null)
+                {
+                    // Store the encounter info for when we return from combat
+                    spawnManager.SetCurrentEncounter(trigger.areaId, trigger.encounterId);
+                }
+
                 print("Enemy detected, triggering encounter...");
+                Destroy(hit.gameObject);
+                spawnManager.NextScene("Combat");
             }
-
         }
-
     }
 
     void HandleInput()
@@ -151,15 +144,11 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("LeftArea"))
         {
             SpawnManager.Instance.NextArea("Left");
-
-
         }
         else if (collision.gameObject.CompareTag("RightArea"))
         {
             SpawnManager.Instance.NextArea("Right");
-
         }
-      
     }
 
     void OnCollisionExit2D(Collision2D collision)

@@ -15,4 +15,6 @@ MonoBehaviour:
   areaId: 000
   areaName: Tutorial 1
   areaIndex: {x: 0, y: 0}
-  enemies: []
+  enemies:
+  - enemyData: {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
+    spawnPointId: EnemySpawn1

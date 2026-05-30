@@ -25,6 +25,11 @@ public class SpawnManager : MonoBehaviour
 
     private Dictionary<string, Vector2> areaPositions = new Dictionary<string, Vector2>();
     private SpawnPointRegistry spawnPointRegistry;
+    private Dictionary<string, HashSet<string>> defeatedEncounters = new Dictionary<string, HashSet<string>>();
+
+    // Store current encounter info
+    public string currentEncounterAreaId;
+    public string currentEncounterId;
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
@@ -50,6 +55,7 @@ public class SpawnManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         _instance = this;
+        LoadDefeatedEncounters();
     }
 
     private void Start()
@@ -59,6 +65,12 @@ public class SpawnManager : MonoBehaviour
             Debug.LogError("SpawnPointRegistry not found in scene!");
 
         LoadScene(currentSceneId, currentAreaId);
+    }
+
+    public void SetCurrentEncounter(string areaId, string encounterId)
+    {
+        currentEncounterAreaId = areaId;
+        currentEncounterId = encounterId;
     }
 
     public int FindSceneIndex(string currentSceneId)
@@ -130,8 +142,11 @@ public class SpawnManager : MonoBehaviour
     {
         StoreCurrentAreaPosition();
 
-        previousSceneIndex = currentSceneIndex;
-        previousSceneId = currentSceneId;
+        if (currentSceneId != "001")
+        {
+            previousSceneIndex = currentSceneIndex;
+            previousSceneId = currentSceneId;
+        }
 
         switch (direction)
         {
@@ -139,6 +154,8 @@ public class SpawnManager : MonoBehaviour
             case "Right": currentSceneIndex.x++; break;
             case "Forward": currentSceneIndex.y++; break;
             case "Backward": currentSceneIndex.y--; break;
+            case "Combat": currentSceneIndex = new Vector2(1, 0); break;
+            case "CombatOver": currentSceneIndex = previousSceneIndex; break;
         }
 
         UpdateCurrentIdInfo();
@@ -201,6 +218,7 @@ public class SpawnManager : MonoBehaviour
             cam.SetBorders(spawnPoints.leftBorder, spawnPoints.rightBorder);
 
         SpawnEnemies(areaData, spawnPoints);
+        CleanupDefeatedEncounters(areaId);
     }
 
     public void LoadScene(string sceneId, string areaId)
@@ -239,16 +257,27 @@ public class SpawnManager : MonoBehaviour
                 cam.SetBorders(spawnPoints.leftBorder, spawnPoints.rightBorder);
 
             SpawnEnemies(areaData, spawnPoints);
+            CleanupDefeatedEncounters(areaId);
         };
     }
 
     private void SpawnEnemies(AreaData areaData, SpawnPointRegistry.SpawnPoint spawnPoints)
     {
+        // Destroy existing enemies
         foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
             Destroy(enemy);
 
         foreach (var enemyEntry in areaData.enemies)
         {
+            // Check if this specific enemy has been defeated individually
+            // (optional - if you want to track individual enemies too)
+            if (defeatedEncounters.ContainsKey(areaData.areaId) &&
+                defeatedEncounters[areaData.areaId].Contains(enemyEntry.spawnPointId))
+            {
+                Debug.Log($"Skipping defeated enemy {enemyEntry.spawnPointId} in area {areaData.areaId}");
+                continue;
+            }
+
             SpawnPointRegistry.EnemySpawn enemySpawn = spawnPoints.enemySpawns
                 .Find(e => e.spawnPointId == enemyEntry.spawnPointId);
 
@@ -265,5 +294,80 @@ public class SpawnManager : MonoBehaviour
             if (ec != null)
                 ec.Initialize(enemyEntry.enemyData);
         }
+    }
+
+    private void CleanupDefeatedEncounters(string areaId)
+    {
+        if (!defeatedEncounters.ContainsKey(areaId)) return;
+
+        // Find all encounter triggers in the scene
+        EncounterTrigger[] triggers = Object.FindObjectsOfType<EncounterTrigger>();
+
+        foreach (EncounterTrigger trigger in triggers)
+        {
+            if (trigger.areaId == areaId &&
+                defeatedEncounters[areaId].Contains(trigger.encounterId))
+            {
+                Debug.Log($"Destroying defeated encounter trigger: {trigger.encounterId}");
+                Destroy(trigger.gameObject);
+            }
+        }
+    }
+
+    public void MarkEncounterDefeated(string areaId, string encounterId)
+    {
+        if (!defeatedEncounters.ContainsKey(areaId))
+        {
+            defeatedEncounters[areaId] = new HashSet<string>();
+        }
+
+        defeatedEncounters[areaId].Add(encounterId);
+        SaveDefeatedEncounters();
+        Debug.Log($"Encounter {encounterId} in area {areaId} marked as defeated.");
+    }
+
+    private void LoadDefeatedEncounters()
+    {
+        string defeatedString = PlayerPrefs.GetString("DefeatedEncounters", "");
+        if (!string.IsNullOrEmpty(defeatedString))
+        {
+            string[] entries = defeatedString.Split(';');
+            foreach (string entry in entries)
+            {
+                string[] parts = entry.Split(':');
+                if (parts.Length == 2)
+                {
+                    string areaId = parts[0];
+                    string encounterIds = parts[1];
+
+                    if (!defeatedEncounters.ContainsKey(areaId))
+                    {
+                        defeatedEncounters[areaId] = new HashSet<string>();
+                    }
+
+                    string[] ids = encounterIds.Split(',');
+                    foreach (string id in ids)
+                    {
+                        if (!string.IsNullOrEmpty(id))
+                            defeatedEncounters[areaId].Add(id);
+                    }
+                }
+            }
+        }
+    }
+
+    private void SaveDefeatedEncounters()
+    {
+        List<string> entries = new List<string>();
+        foreach (var kvp in defeatedEncounters)
+        {
+            string areaId = kvp.Key;
+            string encounterIds = string.Join(",", kvp.Value);
+            entries.Add($"{areaId}:{encounterIds}");
+        }
+
+        string defeatedString = string.Join(";", entries);
+        PlayerPrefs.SetString("DefeatedEncounters", defeatedString);
+        PlayerPrefs.Save();
     }
 }
