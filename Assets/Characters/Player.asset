@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f1162f1889dd540ab7123413dd4163, type: 3}
+  m_Name: Player
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  charType: Friendly
+  isPlayer: 1
+  maxHealth: 200
+  speed: 5
+  damage: 50
+  defense: 20
+  trueDefense: 0
+  accuracy: 50
+  blockBypassRate: 0
+  dodgeBypassRate: 0
+  energyReserves: 0
+  parryChance: 0.3
+  blockChance: 0.3
+  dodgeChance: 0.3
+  attackDuration: 1
+  gridLocation: 4
+  characterPrefab: {fileID: 8480755311966221645, guid: 4840b798cc5d7114180162ef5524e9ab, type: 3}

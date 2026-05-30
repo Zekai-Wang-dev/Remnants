@@ -11660,6 +11660,11 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 3b7b7828daa733a41b6bfee15ffc0bd0, type: 2}
     - {fileID: 11400000, guid: 3f7a84bf31368ba4aa079445a8e7ad69, type: 2}
     - {fileID: 11400000, guid: 905818cbb1b9f6b48a923b5f6bbbe9e6, type: 2}
+  - sceneName: Combat
+    sceneId: 001
+    sceneIndex: {x: 1, y: 0}
+    areas:
+    - {fileID: 11400000, guid: 47c5896890ea5614bb6b8dc066e36db8, type: 2}
   currentSceneId: 000
   currentAreaId: 000
   currentAreaIndex: {x: 0, y: 0}

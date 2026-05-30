@@ -13,6 +13,6 @@ public class AreaData : ScriptableObject
 [System.Serializable]
 public class EnemyEntry
 {
-    public EnemyData enemyData;   // ScriptableObject with stats + prefab
+    public CharacterData enemyData;   // ScriptableObject with stats + prefab
     public string spawnPointId;   // Matches ID in SpawnPointRegistry
 }

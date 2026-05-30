@@ -24,23 +24,14 @@ public class SaveSystem
 [System.Serializable]
 public class PlayerData
 {
-    // Base stats (unchanging unless upgraded)
-    public float baseMaxHealth;
-    public float baseSpeed;
-    public float baseDamage;
-    public float baseTrueDefense;
-    public float baseAccuracy;
-    public float baseBlockBypassRate;
-    public float baseDodgeBypassRate;
-    public float baseEnergyReserves;
-    public float baseParryChance;
-    public float baseBlockChance;
-    public float baseDodgeChance;
+    // Reference to the CharacterData asset name (for loading)
+    public string characterDataName;
 
     // Current stats (change during gameplay)
     public float currentHealth;
     public float currentSpeed;
     public float currentDamage;
+    public float currentBaseDefense;
     public float currentTrueDefense;
     public float currentAccuracy;
     public float currentBlockBypassRate;
@@ -50,25 +41,23 @@ public class PlayerData
     public float currentBlockChance;
     public float currentDodgeChance;
 
-    // Derived stats (calculated)
-    public float MaxHealth => baseMaxHealth;
-    public float Speed => baseSpeed;
-    public float Damage => baseDamage;
-
-    // Reset current stats to base values
-    public void ResetToBaseStats()
+    // Reset current stats to base values from CharacterData
+    public void ResetToBaseStats(CharacterData characterData)
     {
-        currentHealth = baseMaxHealth;
-        currentSpeed = baseSpeed;
-        currentDamage = baseDamage;
-        currentTrueDefense = baseTrueDefense;
-        currentAccuracy = baseAccuracy;
-        currentBlockBypassRate = baseBlockBypassRate;
-        currentDodgeBypassRate = baseDodgeBypassRate;
-        currentEnergyReserves = baseEnergyReserves;
-        currentParryChance = baseParryChance;
-        currentBlockChance = baseBlockChance;
-        currentDodgeChance = baseDodgeChance;
+        if (characterData == null) return;
+
+        currentHealth = characterData.maxHealth;
+        currentSpeed = characterData.speed;
+        currentDamage = characterData.damage;
+        currentBaseDefense = characterData.defense;
+        currentTrueDefense = characterData.trueDefense;
+        currentAccuracy = characterData.accuracy;
+        currentBlockBypassRate = characterData.blockBypassRate;
+        currentDodgeBypassRate = characterData.dodgeBypassRate;
+        currentEnergyReserves = characterData.energyReserves;
+        currentParryChance = characterData.parryChance;
+        currentBlockChance = characterData.blockChance;
+        currentDodgeChance = characterData.dodgeChance;
     }
 
     // Apply damage
@@ -80,27 +69,17 @@ public class PlayerData
     // Heal
     public void Heal(float amount)
     {
-        currentHealth = Mathf.Min(baseMaxHealth, currentHealth + amount);
+        // We need to know max health from CharacterData, but we don't have it here
+        // We'll handle this in PlayerDataManager
     }
-
 }
+
 public class PlayerDataManager : MonoBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
 
-    [Header("Base Stats (Configurable in Inspector)")]
-    public float baseMaxHealth = 500f;
-    public float baseSpeed = 5f;
-    public float baseDamage = 10f;
-    public float baseTrueDefense = 5f;
-    public float baseAccuracy = 0.8f;
-    public float baseBlockBypassRate = 0.1f;
-    public float baseDodgeBypassRate = 0.1f;
-    public float baseEnergyReserves = 10f;
-    public float baseParryChance = 0.1f;
-    public float baseBlockChance = 0.2f;
-    public float baseDodgeChance = 0.15f;
-    // ... other base stats
+    [Header("Player Character Data")]
+    public CharacterData playerCharacterData; // Assign in inspector
 
     [Header("Runtime Data")]
     public PlayerData playerData;
@@ -122,15 +101,75 @@ public class PlayerDataManager : MonoBehaviour
 
     void InitializePlayerData()
     {
-        playerData = new PlayerData();
+        // Try to load saved data
+        playerData = SaveSystem.LoadPlayerData();
 
-        // Set base stats
-        playerData.baseMaxHealth = baseMaxHealth;
-        playerData.baseSpeed = baseSpeed;
-        playerData.baseDamage = baseDamage;
-        // ... set all base stats
+        if (playerData == null)
+        {
+            // No saved data, create new
+            playerData = new PlayerData();
+            playerData.characterDataName = playerCharacterData.name;
+            playerData.ResetToBaseStats(playerCharacterData);
+        }
+        else
+        {
+            // Verify the saved data matches current CharacterData
+            if (playerData.characterDataName != playerCharacterData.name)
+            {
+                Debug.LogWarning("Saved character data doesn't match current CharacterData. Resetting to base stats.");
+                playerData.ResetToBaseStats(playerCharacterData);
+            }
+        }
+    }
 
-        // Initialize current stats to base values
-        playerData.ResetToBaseStats();
+    // Public method to heal player (needs max health from CharacterData)
+    public void HealPlayer(float amount)
+    {
+        if (playerCharacterData == null) return;
+
+        playerData.currentHealth = Mathf.Min(playerCharacterData.maxHealth,
+                                             playerData.currentHealth + amount);
+    }
+
+    // Public method to take damage
+    public void DamagePlayer(float damage)
+    {
+        playerData.TakeDamage(damage);
+    }
+
+    // Public method to reset player to base stats
+    public void ResetPlayerToBaseStats()
+    {
+        playerData.ResetToBaseStats(playerCharacterData);
+    }
+
+    // Save player data
+    public void SavePlayer()
+    {
+        SaveSystem.SavePlayerData(playerData);
+    }
+
+    // Load player data
+    public void LoadPlayer()
+    {
+        playerData = SaveSystem.LoadPlayerData();
+        if (playerData == null)
+        {
+            // If no save exists, initialize fresh
+            InitializePlayerData();
+        }
+    }
+
+    // Get current player health percentage
+    public float GetHealthPercentage()
+    {
+        if (playerCharacterData == null) return 0f;
+        return playerData.currentHealth / playerCharacterData.maxHealth;
+    }
+
+    // Check if player is alive
+    public bool IsPlayerAlive()
+    {
+        return playerData.currentHealth > 0;
     }
 }

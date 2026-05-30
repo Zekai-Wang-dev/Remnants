@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    private EnemyData enemyData;
+    private CharacterData enemyData;
 
-    public void Initialize(EnemyData data)
+    public void Initialize(CharacterData data)
     {
         enemyData = data;
         // Add any initialization logic here

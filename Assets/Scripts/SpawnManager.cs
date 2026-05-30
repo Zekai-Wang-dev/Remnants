@@ -256,7 +256,7 @@ public class SpawnManager : MonoBehaviour
                 continue;
 
             GameObject enemy = Instantiate(
-                enemyEntry.enemyData.enemyPrefab,
+                enemyEntry.enemyData.characterPrefab,
                 enemySpawn.transform.position,
                 Quaternion.identity
             );
