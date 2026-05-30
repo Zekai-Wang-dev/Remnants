@@ -10,6 +10,7 @@ TagManager:
   - Forward
   - Backward
   - Enemy
+  - Encounter
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - Exit
   - Water
   - UI
-  - 
+  - Encounter
   - 
   - 
   - 

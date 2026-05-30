@@ -22,9 +22,18 @@ public class ParallaxBackground : MonoBehaviour
     public void Start()
     {
         SpawnManager spawnManager = SpawnManager.Instance;
+        PlayerController playerController = PlayerController.Instance;
+
         if (spawnManager != null && parallaxAreas != null)
         {
             currentParallaxArea = parallaxAreas.Find(area => area.areaIndex == spawnManager.currentAreaIndex);
+        }
+
+        if (playerController != null)
+        {
+
+            playerController.FindBgScript(this);
+
         }
     }
 

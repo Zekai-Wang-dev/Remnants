@@ -1,13 +1,13 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
     public Vector2 velocity;
     public Animator animator;
-    public GameObject background;
-    private ParallaxBackground backgroundScript;
+    public ParallaxBackground backgroundScript;
     private SpawnManager spawnManager; 
 
     private Rigidbody2D rb;
@@ -15,12 +15,27 @@ public class PlayerController : MonoBehaviour
     private bool isBlocked = false;
 
     public float InteractRadius;
-    public float ExitRadius; 
+    public float ExitRadius;
+
+    public static PlayerController Instance { get; private set; }
+
+    void Awake()
+    {
+        // Singleton pattern
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        backgroundScript = background.GetComponent<ParallaxBackground>();
         spawnManager = SpawnManager.Instance;
 
         rb.gravityScale = 0;
@@ -45,12 +60,13 @@ public class PlayerController : MonoBehaviour
         rb.MovePosition(newPosition);
 
         // Only apply parallax if player actually moved (not blocked)
-        if (movementDelta.magnitude > 0.1f)
+        if (movementDelta.magnitude > 0.1f && backgroundScript != null)
         {
             backgroundScript.parallax(velocity);
         }
 
         lastPosition = rb.position;
+        CheckForEncounters(); 
     }
 
     private void OnDrawGizmos()
@@ -60,10 +76,18 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void FindBgScript(ParallaxBackground bg)
+    {
+
+        if (bg == null) return;
+        backgroundScript = bg;
+
+    }
+
     void CheckForExits(string direction)
     {
 
-        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(ExitRadius, ExitRadius), 0f, LayerMask.GetMask("Exit"));
+       Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, new Vector2(ExitRadius, ExitRadius), 0f, LayerMask.GetMask("Exit"));
 
        foreach (Collider2D hit in hits)
         {
@@ -76,6 +100,22 @@ public class PlayerController : MonoBehaviour
 
             }
         
+        }
+
+    }
+
+    void CheckForEncounters()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, InteractRadius, LayerMask.GetMask("Encounter"));
+
+        foreach(Collider2D hit in hits)
+        {
+            if (hit.CompareTag("Encounter"))
+            {
+                // Trigger encounter logic here
+                print("Enemy detected, triggering encounter...");
+            }
+
         }
 
     }
@@ -119,6 +159,7 @@ public class PlayerController : MonoBehaviour
             SpawnManager.Instance.NextArea("Right");
 
         }
+      
     }
 
     void OnCollisionExit2D(Collision2D collision)

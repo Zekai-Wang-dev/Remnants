@@ -10,12 +10,16 @@ public class CameraController : MonoBehaviour
     private SpawnPointRegistry registry;
     public ParallaxBackground background;
     public SpawnManager spawnManager;
+    public PlayerController playerController;
 
     void Start()
     {
         cam = Camera.main;
         spawnManager = SpawnManager.Instance;
+        playerController = PlayerController.Instance;
         registry = Object.FindFirstObjectByType<SpawnPointRegistry>();
+
+        target = playerController.GetComponentInParent<Transform>();
 
         if (registry == null)
         {
