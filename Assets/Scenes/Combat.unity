@@ -536,6 +536,7 @@ MonoBehaviour:
   - {fileID: 1521260350}
   - {fileID: 489355797}
   - {fileID: 2055120626}
+  playerSpawn: {fileID: 930996199}
 --- !u!4 &693093624
 Transform:
   m_ObjectHideFlags: 0
@@ -546,6 +547,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4.84868, y: 0.14271, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &930996198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 930996199}
+  m_Layer: 0
+  m_Name: PlayerSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &930996199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930996198}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -26.34, y: 6.31, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -841,6 +873,8 @@ MonoBehaviour:
   currentTurnIndex: 0
   attackMoveDistance: 1.5
   attackAnimationDuration: 0.5
+  bufferTimePreCombat: 3
+  bufferTimePostCombat: 3
 --- !u!4 &1427927934
 Transform:
   m_ObjectHideFlags: 0
@@ -980,7 +1014,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPointRegistry
   spawnPoints:
   - areaId: 000
-    playerSpawn: {fileID: 0}
+    playerSpawn: {fileID: 930996199}
     leftBorder: {fileID: 0}
     rightBorder: {fileID: 0}
     enemySpawns: []
@@ -1071,3 +1105,4 @@ SceneRoots:
   - {fileID: 693093624}
   - {fileID: 31592971}
   - {fileID: 990100132}
+  - {fileID: 930996199}

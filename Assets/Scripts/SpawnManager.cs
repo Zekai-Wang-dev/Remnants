@@ -154,13 +154,42 @@ public class SpawnManager : MonoBehaviour
             case "Right": currentSceneIndex.x++; break;
             case "Forward": currentSceneIndex.y++; break;
             case "Backward": currentSceneIndex.y--; break;
-            case "Combat": currentSceneIndex = new Vector2(1, 0); break;
-            case "CombatOver": currentSceneIndex = previousSceneIndex; break;
+            case "Combat":
+                currentSceneIndex = new Vector2(1, 0);
+                currentAreaIndex = new Vector2(0, 0);
+                // ✅ Hide player during combat
+                SetPlayerVisibility(false);
+                break;
+            case "CombatOver":
+                currentSceneIndex = previousSceneIndex;
+                currentAreaIndex = previousAreaIndex;
+                // ✅ Show player after combat
+                SetPlayerVisibility(true);
+                break;
         }
 
         UpdateCurrentIdInfo();
         LoadScene(currentSceneId, currentAreaId);
         GetCameraController()?.changeBorders();
+    }
+
+    private void SetPlayerVisibility(bool visible)
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            // Disable/enable SpriteRenderer
+            SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
+            if (sr != null) sr.enabled = visible;
+
+            // Disable/enable Collider2D
+            Collider2D col = player.GetComponent<Collider2D>();
+            if (col != null) col.enabled = visible;
+
+            // Disable/enable PlayerController
+            PlayerController pc = player.GetComponent<PlayerController>();
+            if (pc != null) pc.enabled = visible;
+        }
     }
 
     private void StoreCurrentAreaPosition()
@@ -208,6 +237,7 @@ public class SpawnManager : MonoBehaviour
             }
         }
 
+        // ✅ Restore player position from saved area position
         if (areaPositions.ContainsKey(areaId))
             playerRb.position = areaPositions[areaId];
         else
@@ -224,10 +254,10 @@ public class SpawnManager : MonoBehaviour
     public void LoadScene(string sceneId, string areaId)
     {
         Scene sceneToLoad = scenes.Find(s => s.sceneId == sceneId);
-        if (sceneToLoad == null) return;
+        if (sceneToLoad == null) { Debug.Log("Cannot Find Scene with id: " + sceneId); return; }
 
         AreaData areaData = sceneToLoad.areas.Find(a => a.areaId == areaId);
-        if (areaData == null) return;
+        if (areaData == null) { Debug.Log("Cannot Find Area with Id: " + areaId); return; }
 
         SceneManager.LoadSceneAsync(sceneToLoad.sceneName).completed += (_) =>
         {
@@ -247,6 +277,7 @@ public class SpawnManager : MonoBehaviour
             SpawnPointRegistry.SpawnPoint spawnPoints = spawnPointRegistry.Get(areaId);
             if (spawnPoints == null) return;
 
+            // ✅ Restore player position from saved area position
             if (areaPositions.ContainsKey(areaId))
                 playerRb.position = areaPositions[areaId];
             else
@@ -368,5 +399,17 @@ public class SpawnManager : MonoBehaviour
         string defeatedString = string.Join(";", entries);
         PlayerPrefs.SetString("DefeatedEncounters", defeatedString);
         PlayerPrefs.Save();
+    }
+
+    public AreaData GetCurrentAreaData()
+    {
+        Scene sceneToLoad = scenes.Find(s => s.sceneId == currentSceneId);
+        if (sceneToLoad == null) return null;
+
+        AreaData areaData = sceneToLoad.areas.Find(a => a.areaId == currentAreaId);
+        if (areaData == null) return null;
+
+        Debug.Log($"Current spawn area data: {areaData.areaId}");
+        return areaData;
     }
 }

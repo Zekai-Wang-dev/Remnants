@@ -269,9 +269,15 @@ public class CombatManager : MonoBehaviour
     public List<Character> combatants;
     public int currentTurnIndex = 0;
 
+    private float timeSinceCombatEnded; 
+
     [Header("Animation Settings")]
     public float attackMoveDistance = 1.5f;
     public float attackAnimationDuration = 0.5f;
+
+    [Header("Buffer Time Settings")]
+    public float bufferTimePreCombat = 3f;
+    public float bufferTimePostCombat = 3f;
 
     void Awake()
     {
@@ -285,6 +291,17 @@ public class CombatManager : MonoBehaviour
 
     public void StartCombat(List<Character> playerTeam, List<Character> enemyTeam)
     {
+        StartCoroutine(StartCombatWithBuffer(playerTeam, enemyTeam));
+    }
+
+    private IEnumerator StartCombatWithBuffer(List<Character> playerTeam, List<Character> enemyTeam)
+    {
+        Debug.Log($"Combat starting in {bufferTimePreCombat} seconds...");
+        
+        // ✅ Pre-combat buffer: Wait before starting combat
+        yield return new WaitForSeconds(bufferTimePreCombat);
+
+        // Now initialize combat
         combatants = new List<Character>();
 
         foreach (Character c in playerTeam)
@@ -378,7 +395,17 @@ public class CombatManager : MonoBehaviour
                 if (spawnManager != null)
                 {
                     // Mark the entire encounter as defeated
-                    spawnManager.MarkEncounterDefeated(spawnManager.currentEncounterAreaId, spawnManager.currentEncounterId);
+                    PlayerController playerController = PlayerController.Instance;
+                    if (!playerController.currentArea.enableRandomEncounters)
+                    {
+                        spawnManager.MarkEncounterDefeated(spawnManager.currentEncounterAreaId, spawnManager.currentEncounterId);
+                    }
+                    
+                    Debug.Log($"Victory! Waiting {bufferTimePostCombat} seconds before returning...");
+                    
+                    // ✅ Post-combat buffer: Wait before scene transition
+                    yield return new WaitForSeconds(bufferTimePostCombat);
+                    
                     spawnManager.NextScene("CombatOver");
                 }
                 yield break;

@@ -18,3 +18,7 @@ MonoBehaviour:
   enemies:
   - enemyData: {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
     spawnPointId: EnemySpawn1
+  enableRandomEncounters: 0
+  randomEncounterPool: []
+  randomEncounterChance: 0.1
+  minDistanceBetweenEncounters: 5

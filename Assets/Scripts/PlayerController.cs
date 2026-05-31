@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
@@ -16,6 +17,17 @@ public class PlayerController : MonoBehaviour
 
     public float InteractRadius;
     public float ExitRadius;
+
+    public float areaTransitionCooldown = 0.5f;
+    private float lastTransitionTime = -10f;
+    private bool isTransitioning = false;
+
+    public AreaData currentArea;
+
+    // ✅ NEW: Throttle random encounters
+    private float randomCheckInterval = 0.5f; // Check every 0.5 seconds
+    private float nextRandomCheckTime = 0f;
+    public float accumulatedDistance;
 
     public static PlayerController Instance { get; private set; }
 
@@ -39,13 +51,21 @@ public class PlayerController : MonoBehaviour
         rb.gravityScale = 0;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        lastPosition = rb.position;
+
+        ResetDistanceTracking();
     }
 
     void Update()
     {
         HandleInput();
         UpdateAnimations();
+
+        // ✅ Only check for random encounters at intervals
+        if (Time.time >= nextRandomCheckTime)
+        {
+            CheckForRandomEncounters();
+            nextRandomCheckTime = Time.time + randomCheckInterval;
+        }
     }
 
     void FixedUpdate()
@@ -60,6 +80,8 @@ public class PlayerController : MonoBehaviour
             backgroundScript.parallax(velocity);
         }
 
+        accumulatedDistance += movementDelta.magnitude; 
+
         lastPosition = rb.position;
         CheckForEncounters();
     }
@@ -67,6 +89,42 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector2(ExitRadius, ExitRadius));
+    }
+
+    void ResetDistanceTracking()
+    {
+        lastPosition = rb.position;
+        accumulatedDistance = 0f;
+        Debug.Log("Distance tracking reset");
+    }
+
+    private void GetCurrentArea()
+    {
+        currentArea = spawnManager.GetCurrentAreaData();
+    }
+    void CheckForRandomEncounters()
+    {
+        if (spawnManager.currentSceneId == "001") return;
+
+        AreaData area = spawnManager.GetCurrentAreaData();
+        if (area == null || !area.enableRandomEncounters) return; 
+
+        // ✅ Only check for encounter if we've moved enough distance
+        if (accumulatedDistance < area.minDistanceBetweenEncounters) return;
+
+        float roll = Random.value;
+        Debug.Log($"Rolled: {roll:F3}, Needed: {area.randomEncounterChance:F3}");
+
+        if (roll < area.randomEncounterChance)
+        {
+            Debug.Log("✅ Random encounter triggered!");
+
+            CharacterData enemy = area.PickRandomEnemy();
+            spawnManager.SetCurrentEncounter(area.areaId, "random_" + enemy.name);
+
+            accumulatedDistance = 0f;
+            spawnManager.NextScene("Combat");
+        }
     }
 
     public void FindBgScript(ParallaxBackground bg)
@@ -83,8 +141,12 @@ public class PlayerController : MonoBehaviour
         {
             if (hit.CompareTag(direction))
             {
+                ResetDistanceTracking();
                 spawnManager.NextArea(direction);
                 print("Exit " + direction + " detected, changing area...");
+                GetCurrentArea();
+                ResetDistanceTracking();
+
             }
         }
     }
@@ -102,12 +164,12 @@ public class PlayerController : MonoBehaviour
                 EncounterTrigger trigger = hit.GetComponent<EncounterTrigger>();
                 if (trigger != null)
                 {
-                    // Store the encounter info for when we return from combat
                     spawnManager.SetCurrentEncounter(trigger.areaId, trigger.encounterId);
                 }
 
                 print("Enemy detected, triggering encounter...");
                 Destroy(hit.gameObject);
+                ResetDistanceTracking();
                 spawnManager.NextScene("Combat");
             }
         }
@@ -115,7 +177,10 @@ public class PlayerController : MonoBehaviour
 
     void HandleInput()
     {
+
         velocity.x = 0;
+        if (spawnManager.currentSceneId == "001") return;
+
 
         if (Input.GetKey(KeyCode.A))
             velocity.x = -speed;
@@ -141,14 +206,42 @@ public class PlayerController : MonoBehaviour
         isBlocked = true;
         velocity = Vector2.zero;
 
+        if (Time.time - lastTransitionTime < areaTransitionCooldown) return;
+
         if (collision.gameObject.CompareTag("LeftArea"))
         {
-            SpawnManager.Instance.NextArea("Left");
+            if (velocity.x < 0 || Input.GetKey(KeyCode.A) || transform.position.x > collision.transform.position.x)
+            {
+                ExecuteAreaTransition("Left", collision);
+            }
         }
         else if (collision.gameObject.CompareTag("RightArea"))
         {
-            SpawnManager.Instance.NextArea("Right");
+            if (velocity.x > 0 || Input.GetKey(KeyCode.D) || transform.position.x < collision.transform.position.x)
+            {
+                ExecuteAreaTransition("Right", collision);
+            }
         }
+    }
+
+    void ExecuteAreaTransition(string direction, Collision2D collision)
+    {
+        Vector2 offset = Vector2.zero;
+        if (direction == "Left")
+            offset = new Vector2(-2f, 0f);
+        else if (direction == "Right")
+            offset = new Vector2(2f, 0f);
+
+        rb.MovePosition(rb.position + offset);
+        SpawnManager.Instance.NextArea(direction);
+
+        ResetDistanceTracking();
+
+        lastTransitionTime = Time.time;
+        isTransitioning = true;
+        GetCurrentArea();
+
+        print($"Transitioned {direction} with offset");
     }
 
     void OnCollisionExit2D(Collision2D collision)
@@ -156,6 +249,7 @@ public class PlayerController : MonoBehaviour
         if (!collision.gameObject.CompareTag("Ground"))
         {
             isBlocked = false;
+            isTransitioning = false;
         }
     }
 }

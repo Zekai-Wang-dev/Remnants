@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.IO;
+using Unity.VisualScripting.FullSerializer;
 
 public class SaveSystem
 {
@@ -15,6 +16,7 @@ public class SaveSystem
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
+            Debug.Log(path);
             return JsonUtility.FromJson<PlayerData>(json);
         }
         return null;

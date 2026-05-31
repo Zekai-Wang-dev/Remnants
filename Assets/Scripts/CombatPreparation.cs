@@ -13,6 +13,9 @@ public class CombatPreparation : MonoBehaviour
 
     public void combatPreparations()
     {
+
+        GetCharacterData();
+
         foreach (CharacterData c in data)
         {
             if (c.charType == "Friendly")
@@ -58,6 +61,27 @@ public class CombatPreparation : MonoBehaviour
                 t1Characters.Add(enemyC);
             }
         }
+    }
+
+    public void GetCharacterData()
+    {
+
+        data.Clear();
+
+        PlayerController playerController = PlayerController.Instance;
+        PlayerDataManager playerDataManager = PlayerDataManager.Instance;
+
+        List<RandomEnemyEntry> randomEnemyEntries = playerController.currentArea.randomEncounterPool;
+
+        data.Add(playerDataManager.playerCharacterData);
+
+        foreach (RandomEnemyEntry entry in randomEnemyEntries)
+        {
+
+            data.Add(entry.enemyData);
+
+        }
+
     }
 
     void Start()
