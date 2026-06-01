@@ -16,7 +16,7 @@ MonoBehaviour:
   isPlayer: 1
   maxHealth: 200
   speed: 5
-  damage: 1000
+  damage: 50
   defense: 20
   trueDefense: 0
   accuracy: 50

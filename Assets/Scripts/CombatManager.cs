@@ -8,11 +8,10 @@ public class Character : MonoBehaviour
 
     public float threatLevel;
     public string threatType;
-    public string state;
+    public string state = "Alive";
     public Character target;
     public bool isPlayer;
     public int gridLocation;
-
     public int team;
 
     public float health;
@@ -23,13 +22,11 @@ public class Character : MonoBehaviour
 
     public string lastDefenseUsed = "";
 
-    private Vector3 originalPosition;
     private Transform myTransform;
 
     void Awake()
     {
         myTransform = transform;
-        originalPosition = myTransform.position;
     }
 
     public void BeginTurn(List<Character> opponentTeam)
@@ -42,15 +39,20 @@ public class Character : MonoBehaviour
 
     public void ResetHealth()
     {
+        if (data == null) return;
+
         health = data.maxHealth;
+        if (state == "Dead") state = "Alive";
+        if (string.IsNullOrEmpty(state)) state = "Alive";
     }
 
     private void FindTargetByThreat(List<Character> opponentTeam)
     {
-        List<Character> validTargets = new List<Character>();
+        List<Character> validTargets = new();
+
         foreach (Character c in opponentTeam)
         {
-            if (c.team != this.team && c.state != "Dead")
+            if (c != null && c.team != team && c.state != "Dead")
             {
                 validTargets.Add(c);
             }
@@ -74,31 +76,33 @@ public class Character : MonoBehaviour
         {
             validTargets.Sort((a, b) => b.data.speed.CompareTo(a.data.speed));
         }
+
+        // Default behavior if threatType is blank/unknown: attack first valid target.
         target = validTargets[0];
     }
 
-    public bool AttemptDefense(float attackStartTime, float attackDuration, out string defenseType)
+    public bool AttemptDefense(Character attacker, float attackStartTime, float attackDuration, out string defenseType)
     {
         defenseType = "";
         bool defenseSucceeded = false;
 
-        if (target == null) return false;
+        if (attacker == null || attacker.data == null || data == null) return false;
 
         if (canDodge && !defenseSucceeded)
         {
-            defenseSucceeded = RollForDodge(attackStartTime, attackDuration);
+            defenseSucceeded = RollForDodge(attacker, attackStartTime, attackDuration);
             if (defenseSucceeded) defenseType = "Dodge";
         }
 
         if (canParry && !defenseSucceeded)
         {
-            defenseSucceeded = RollForParry(attackStartTime, attackDuration);
+            defenseSucceeded = RollForParry(attacker, attackStartTime, attackDuration);
             if (defenseSucceeded) defenseType = "Parry";
         }
 
         if (canBlock && !defenseSucceeded)
         {
-            defenseSucceeded = RollForBlock(attackStartTime, attackDuration);
+            defenseSucceeded = RollForBlock(attacker, attackStartTime, attackDuration);
             if (defenseSucceeded) defenseType = "Block";
         }
 
@@ -106,21 +110,19 @@ public class Character : MonoBehaviour
         return defenseSucceeded;
     }
 
-    public bool RollForParry(float attackStartTime, float attackDuration)
+    public bool RollForParry(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (target == null || target.data == null) return false;
+        if (attacker == null || attacker.data == null || data == null) return false;
 
-        float parryChance = target.data.parryChance;
-        float speedDiff = data.speed - target.data.speed;
-        float accuracyDiff = data.accuracy - target.data.accuracy;
+        float parryChance = data.parryChance;
+        float speedDiff = data.speed - attacker.data.speed;
+        float accuracyDiff = data.accuracy - attacker.data.accuracy;
 
         float speedModifier = Mathf.Log10(1f + Mathf.Abs(speedDiff)) * Mathf.Sign(speedDiff);
         float accuracyModifier = Mathf.Log10(1f + Mathf.Abs(accuracyDiff)) * Mathf.Sign(accuracyDiff);
 
-        parryChance *= 1 + speedModifier * 0.05f + accuracyModifier * 0.1f;
+        parryChance *= 1f + speedModifier * 0.05f + accuracyModifier * 0.1f;
         parryChance = Mathf.Clamp(parryChance, 0.05f, 0.95f);
-
-        bool success = false;
 
         if (isPlayer)
         {
@@ -130,39 +132,29 @@ public class Character : MonoBehaviour
             float windowStart = attackDuration * (1f - windowSize);
             float windowEnd = attackDuration;
 
-            float currentTime = Time.time;
-            float timeSinceAttackStart = currentTime - attackStartTime;
+            float timeSinceAttackStart = Time.time - attackStartTime;
 
-            if (Input.GetKeyDown(KeyCode.Space) &&
-                timeSinceAttackStart >= windowStart &&
-                timeSinceAttackStart <= windowEnd)
-            {
-                success = true;
-            }
-        }
-        else
-        {
-            success = Random.value < parryChance;
+            return Input.GetKeyDown(KeyCode.Space)
+                && timeSinceAttackStart >= windowStart
+                && timeSinceAttackStart <= windowEnd;
         }
 
-        return success;
+        return Random.value < parryChance;
     }
 
-    public bool RollForDodge(float attackStartTime, float attackDuration)
+    public bool RollForDodge(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (target == null || target.data == null) return false;
+        if (attacker == null || attacker.data == null || data == null) return false;
 
         float dodgeChance = data.dodgeChance;
-        float speedDiff = data.speed - target.data.speed;
-        float accuracyDiff = data.accuracy - target.data.accuracy;
+        float speedDiff = data.speed - attacker.data.speed;
+        float accuracyDiff = data.accuracy - attacker.data.accuracy;
 
         float speedModifier = Mathf.Log10(1f + Mathf.Abs(speedDiff)) * Mathf.Sign(speedDiff);
         float accuracyModifier = Mathf.Log10(1f + Mathf.Abs(accuracyDiff)) * Mathf.Sign(accuracyDiff);
 
-        dodgeChance *= 1 + speedModifier * 0.08f + accuracyModifier * 0.12f;
+        dodgeChance *= 1f + speedModifier * 0.08f + accuracyModifier * 0.12f;
         dodgeChance = Mathf.Clamp(dodgeChance, 0.05f, 0.95f);
-
-        bool success = false;
 
         if (isPlayer)
         {
@@ -172,37 +164,27 @@ public class Character : MonoBehaviour
             float windowStart = 0f;
             float windowEnd = windowStart + windowSize;
 
-            float currentTime = Time.time;
-            float timeSinceAttackStart = currentTime - attackStartTime;
+            float timeSinceAttackStart = Time.time - attackStartTime;
 
-            if (Input.GetKeyDown(KeyCode.LeftShift) &&
-                timeSinceAttackStart >= windowStart &&
-                timeSinceAttackStart <= windowEnd)
-            {
-                success = true;
-            }
-        }
-        else
-        {
-            success = Random.value < dodgeChance;
+            return Input.GetKeyDown(KeyCode.LeftShift)
+                && timeSinceAttackStart >= windowStart
+                && timeSinceAttackStart <= windowEnd;
         }
 
-        return success;
+        return Random.value < dodgeChance;
     }
 
-    public bool RollForBlock(float attackStartTime, float attackDuration)
+    public bool RollForBlock(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (target == null || target.data == null) return false;
+        if (attacker == null || attacker.data == null || data == null) return false;
 
         float blockChance = data.blockChance;
-        float defenseDiff = data.defense - target.data.damage;
+        float defenseDiff = data.defense - attacker.data.damage;
 
         float defenseModifier = Mathf.Log10(1f + Mathf.Abs(defenseDiff)) * Mathf.Sign(defenseDiff);
 
-        blockChance *= 1 + defenseModifier * 0.15f;
+        blockChance *= 1f + defenseModifier * 0.15f;
         blockChance = Mathf.Clamp(blockChance, 0.1f, 0.9f);
-
-        bool success = false;
 
         if (isPlayer)
         {
@@ -212,29 +194,23 @@ public class Character : MonoBehaviour
             float windowStart = attackDuration * 0.3f;
             float windowEnd = windowStart + windowSize;
 
-            float currentTime = Time.time;
-            float timeSinceAttackStart = currentTime - attackStartTime;
+            float timeSinceAttackStart = Time.time - attackStartTime;
 
-            if (Input.GetMouseButton(1) &&
-                timeSinceAttackStart >= windowStart &&
-                timeSinceAttackStart <= windowEnd)
-            {
-                success = true;
-            }
-        }
-        else
-        {
-            success = Random.value < blockChance;
+            return Input.GetMouseButtonDown(1)
+                && timeSinceAttackStart >= windowStart
+                && timeSinceAttackStart <= windowEnd;
         }
 
-        return success;
+        return Random.value < blockChance;
     }
 
     public IEnumerator AttackAnimation(Transform targetTransform, float duration)
     {
         if (targetTransform == null) yield break;
 
-        Vector3 startPos = originalPosition;
+        // Important: use the current position when the attack begins.
+        // Awake can run before CombatPreparation places the prefab on the combat grid.
+        Vector3 startPos = myTransform.position;
         Vector3 targetPos = targetTransform.position;
         Vector3 direction = (targetPos - startPos).normalized;
         float distance = Vector3.Distance(startPos, targetPos);
@@ -242,7 +218,7 @@ public class Character : MonoBehaviour
         Vector3 forwardPos = startPos + direction * (distance * 0.7f);
 
         float elapsed = 0f;
-        float halfDuration = duration * 0.5f;
+        float halfDuration = Mathf.Max(0.01f, duration * 0.5f);
 
         while (elapsed < halfDuration)
         {
@@ -250,6 +226,8 @@ public class Character : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        myTransform.position = forwardPos;
 
         elapsed = 0f;
         while (elapsed < halfDuration)
@@ -266,10 +244,9 @@ public class Character : MonoBehaviour
 public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance { get; private set; }
-    public List<Character> combatants;
-    public int currentTurnIndex = 0;
 
-    private float timeSinceCombatEnded; 
+    public List<Character> combatants = new();
+    public int currentTurnIndex = 0;
 
     [Header("Animation Settings")]
     public float attackMoveDistance = 1.5f;
@@ -286,33 +263,42 @@ public class CombatManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
     public void StartCombat(List<Character> playerTeam, List<Character> enemyTeam)
     {
+        StopAllCoroutines();
         StartCoroutine(StartCombatWithBuffer(playerTeam, enemyTeam));
     }
 
     private IEnumerator StartCombatWithBuffer(List<Character> playerTeam, List<Character> enemyTeam)
     {
         Debug.Log($"Combat starting in {bufferTimePreCombat} seconds...");
-        
-        // ✅ Pre-combat buffer: Wait before starting combat
+
         yield return new WaitForSeconds(bufferTimePreCombat);
 
-        // Now initialize combat
         combatants = new List<Character>();
+        currentTurnIndex = 0;
 
         foreach (Character c in playerTeam)
         {
+            if (c == null || c.data == null) continue;
+
             c.team = 0;
+            c.state = "Alive";
+            c.ResetHealth();
             combatants.Add(c);
         }
 
         foreach (Character c in enemyTeam)
         {
+            if (c == null || c.data == null) continue;
+
             c.team = 1;
+            c.state = "Alive";
+            c.ResetHealth();
             combatants.Add(c);
         }
 
@@ -321,7 +307,6 @@ public class CombatManager : MonoBehaviour
         foreach (Character c in combatants)
         {
             c.threatLevel = 0;
-            c.ResetHealth();
         }
 
         StartCoroutine(CombatLoop());
@@ -338,10 +323,9 @@ public class CombatManager : MonoBehaviour
 
             Character current = combatants[currentTurnIndex];
 
-            if (current.state == "Dead")
+            if (current == null || current.state == "Dead")
             {
                 RemoveDeadCharacter(current);
-                NextTurn();
                 continue;
             }
 
@@ -349,16 +333,24 @@ public class CombatManager : MonoBehaviour
 
             if (current.target != null)
             {
-                float attackStartTime = Time.time;
-                float attackDuration = current.data.attackDuration;
+                float attackDuration = current.data.attackDuration > 0f
+                    ? current.data.attackDuration
+                    : attackAnimationDuration;
 
-                StartCoroutine(current.AttackAnimation(current.target.transform, attackAnimationDuration));
+                float attackStartTime = Time.time;
+
+                StartCoroutine(current.AttackAnimation(current.target.transform, attackDuration));
 
                 bool defenseSucceeded = false;
                 string defenseType = "";
 
-                yield return StartCoroutine(HandleDefenseWindow(current, current.target, attackStartTime, attackDuration,
-                    (success, type) => {
+                yield return StartCoroutine(HandleDefenseWindow(
+                    current,
+                    current.target,
+                    attackStartTime,
+                    attackDuration,
+                    (success, type) =>
+                    {
                         defenseSucceeded = success;
                         defenseType = type;
                     }));
@@ -379,38 +371,23 @@ public class CombatManager : MonoBehaviour
 
             RemoveAllDeadCharacters();
 
-            // Check if combat is over
             bool playerTeamAlive = false;
             bool enemyTeamAlive = false;
 
             foreach (Character c in combatants)
             {
-                if (c.team == 0 && c.state != "Dead") playerTeamAlive = true;
-                if (c.team == 1 && c.state != "Dead") enemyTeamAlive = true;
+                if (c == null || c.state == "Dead") continue;
+                if (c.team == 0) playerTeamAlive = true;
+                if (c.team == 1) enemyTeamAlive = true;
             }
 
             if (!enemyTeamAlive)
             {
-                SpawnManager spawnManager = SpawnManager.Instance;
-                if (spawnManager != null)
-                {
-                    // Mark the entire encounter as defeated
-                    PlayerController playerController = PlayerController.Instance;
-                    if (!playerController.currentArea.enableRandomEncounters)
-                    {
-                        spawnManager.MarkEncounterDefeated(spawnManager.currentEncounterAreaId, spawnManager.currentEncounterId);
-                    }
-                    
-                    Debug.Log($"Victory! Waiting {bufferTimePostCombat} seconds before returning...");
-                    
-                    // ✅ Post-combat buffer: Wait before scene transition
-                    yield return new WaitForSeconds(bufferTimePostCombat);
-                    
-                    spawnManager.NextScene("CombatOver");
-                }
+                yield return StartCoroutine(HandleVictory());
                 yield break;
             }
-            else if (!playerTeamAlive)
+
+            if (!playerTeamAlive)
             {
                 Debug.Log("Player team defeated!");
                 yield break;
@@ -421,48 +398,59 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private IEnumerator HandleDefenseWindow(Character attacker, Character defender, float attackStartTime, float attackDuration,
+    private IEnumerator HandleDefenseWindow(
+        Character attacker,
+        Character defender,
+        float attackStartTime,
+        float attackDuration,
         System.Action<bool, string> onComplete)
     {
         bool defenseSucceeded = false;
         string defenseType = "";
-        float elapsed = 0f;
+
+        if (attacker == null || defender == null)
+        {
+            onComplete?.Invoke(false, "");
+            yield break;
+        }
 
         if (defender.isPlayer)
         {
-            while (elapsed < attackDuration && !defenseSucceeded)
+            while (Time.time - attackStartTime < attackDuration && !defenseSucceeded)
             {
                 if (Input.GetKeyDown(KeyCode.LeftShift))
                 {
-                    defenseSucceeded = defender.RollForDodge(attackStartTime, attackDuration);
+                    defenseSucceeded = defender.RollForDodge(attacker, attackStartTime, attackDuration);
                     if (defenseSucceeded) defenseType = "Dodge";
                 }
                 else if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    defenseSucceeded = defender.RollForParry(attackStartTime, attackDuration);
+                    defenseSucceeded = defender.RollForParry(attacker, attackStartTime, attackDuration);
                     if (defenseSucceeded) defenseType = "Parry";
                 }
                 else if (Input.GetMouseButtonDown(1))
                 {
-                    defenseSucceeded = defender.RollForBlock(attackStartTime, attackDuration);
+                    defenseSucceeded = defender.RollForBlock(attacker, attackStartTime, attackDuration);
                     if (defenseSucceeded) defenseType = "Block";
                 }
 
-                elapsed = Time.time - attackStartTime;
                 yield return null;
             }
         }
         else
         {
-            defenseSucceeded = defender.AttemptDefense(attackStartTime, attackDuration, out defenseType);
+            defenseSucceeded = defender.AttemptDefense(attacker, attackStartTime, attackDuration, out defenseType);
             yield return null;
         }
 
+        defender.lastDefenseUsed = defenseType;
         onComplete?.Invoke(defenseSucceeded, defenseType);
     }
 
     private void ApplyDefenseResults(Character attacker, Character defender, string defenseType)
     {
+        if (attacker == null || defender == null) return;
+
         switch (defenseType)
         {
             case "Dodge":
@@ -483,34 +471,64 @@ public class CombatManager : MonoBehaviour
 
     private void CalculateDamage(Character attacker, Character defender, string defenseContext = "None")
     {
-        if (defender == null || defender.data == null) return;
+        if (attacker == null || attacker.data == null || defender == null || defender.data == null) return;
+        if (attacker.state == "Dead" || defender.state == "Dead") return;
 
         float damage = attacker.data.damage - defender.data.defense;
-        damage = Mathf.Max(damage, 1);
+        damage = Mathf.Max(damage, 1f);
 
         switch (defenseContext)
         {
             case "Blocked":
                 damage *= 0.5f;
                 break;
+
             case "Counter":
-                damage = 0;
+                // Current behavior: parry avoids incoming damage and deals defender's attack damage back.
+                damage = Mathf.Max(attacker.data.damage - defender.data.defense, 1f);
                 break;
+
             case "Dodge":
-                damage = 0;
+                damage = 0f;
                 break;
         }
 
-        if (damage > 0)
-        {
-            defender.health -= damage;
-            Debug.Log($"{attacker.data.name} dealt {damage} damage to {defender.data.name}");
+        if (damage <= 0f) return;
 
-            if (defender.health <= 0)
+        defender.health -= damage;
+        Debug.Log($"{attacker.data.name} dealt {damage} damage to {defender.data.name}");
+
+        if (defender.health <= 0f)
+        {
+            defender.state = "Dead";
+            Debug.Log($"{defender.data.name} died!");
+        }
+    }
+
+    private IEnumerator HandleVictory()
+    {
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager != null)
+        {
+            string encounterId = spawnManager.currentEncounterId;
+            string encounterAreaId = spawnManager.currentEncounterAreaId;
+
+            // Random encounters should not permanently remove fixed world encounters.
+            bool isRandomEncounter = !string.IsNullOrEmpty(encounterId) && encounterId.StartsWith("random_");
+
+            if (!isRandomEncounter &&
+                !string.IsNullOrEmpty(encounterAreaId) &&
+                !string.IsNullOrEmpty(encounterId))
             {
-                defender.state = "Dead";
-                Debug.Log($"{defender.data.name} died!");
+                spawnManager.MarkEncounterDefeated(encounterAreaId, encounterId);
             }
+
+            Debug.Log($"Victory! Waiting {bufferTimePostCombat} seconds before returning...");
+            yield return new WaitForSeconds(bufferTimePostCombat);
+
+            spawnManager.ClearCurrentEncounter();
+            spawnManager.NextScene("CombatOver");
         }
     }
 
@@ -525,22 +543,34 @@ public class CombatManager : MonoBehaviour
 
     private List<Character> GetOpponentTeam(Character character)
     {
-        List<Character> opponents = new List<Character>();
+        List<Character> opponents = new();
+
         foreach (Character c in combatants)
         {
-            if (c.team != character.team && c.state != "Dead")
+            if (c != null && c.team != character.team && c.state != "Dead")
             {
                 opponents.Add(c);
             }
         }
+
         return opponents;
     }
 
     private void RemoveDeadCharacter(Character deadCharacter)
     {
-        if (deadCharacter == null) return;
+        if (deadCharacter == null)
+        {
+            combatants.RemoveAll(c => c == null);
+            return;
+        }
 
+        int removedIndex = combatants.IndexOf(deadCharacter);
         combatants.Remove(deadCharacter);
+
+        if (removedIndex >= 0 && removedIndex < currentTurnIndex)
+        {
+            currentTurnIndex--;
+        }
 
         if (deadCharacter.gameObject != null)
         {
@@ -554,7 +584,7 @@ public class CombatManager : MonoBehaviour
     {
         for (int i = combatants.Count - 1; i >= 0; i--)
         {
-            if (combatants[i].state == "Dead")
+            if (combatants[i] == null || combatants[i].state == "Dead")
             {
                 RemoveDeadCharacter(combatants[i]);
             }

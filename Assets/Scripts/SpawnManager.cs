@@ -23,26 +23,19 @@ public class SpawnManager : MonoBehaviour
     public Vector2 previousAreaIndex;
     public Vector2 previousSceneIndex;
 
-    private Dictionary<string, Vector2> areaPositions = new Dictionary<string, Vector2>();
+    private readonly Dictionary<string, Vector2> areaPositions = new();
     private SpawnPointRegistry spawnPointRegistry;
-    private Dictionary<string, HashSet<string>> defeatedEncounters = new Dictionary<string, HashSet<string>>();
+    private readonly Dictionary<string, HashSet<string>> defeatedEncounters = new();
 
-    // Store current encounter info
     public string currentEncounterAreaId;
     public string currentEncounterId;
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
 
-    private PlayerController GetPlayerController()
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        return player?.GetComponent<PlayerController>();
-    }
-
     private CameraController GetCameraController()
     {
-        return Camera.main?.GetComponent<CameraController>();
+        return Camera.main != null ? Camera.main.GetComponent<CameraController>() : null;
     }
 
     private void Awake()
@@ -62,7 +55,9 @@ public class SpawnManager : MonoBehaviour
     {
         spawnPointRegistry = Object.FindFirstObjectByType<SpawnPointRegistry>();
         if (spawnPointRegistry == null)
+        {
             Debug.LogError("SpawnPointRegistry not found in scene!");
+        }
 
         LoadScene(currentSceneId, currentAreaId);
     }
@@ -73,20 +68,42 @@ public class SpawnManager : MonoBehaviour
         currentEncounterId = encounterId;
     }
 
-    public int FindSceneIndex(string currentSceneId)
+    public void ClearCurrentEncounter()
+    {
+        currentEncounterAreaId = "";
+        currentEncounterId = "";
+    }
+
+    public int FindSceneIndex(string sceneId)
     {
         for (int i = 0; i < scenes.Count; i++)
-            if (scenes[i].sceneId == currentSceneId)
+        {
+            if (scenes[i].sceneId == sceneId)
+            {
                 return i;
+            }
+        }
+
         return 0;
     }
 
-    public int FindAreaIndex(string currentAreaId)
+    public int FindAreaIndex(string areaId)
     {
         int sceneIdx = FindSceneIndex(currentSceneId);
+
+        if (sceneIdx < 0 || sceneIdx >= scenes.Count || scenes[sceneIdx].areas == null)
+        {
+            return 0;
+        }
+
         for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
-            if (scenes[sceneIdx].areas[i].areaId == currentAreaId)
+        {
+            if (scenes[sceneIdx].areas[i].areaId == areaId)
+            {
                 return i;
+            }
+        }
+
         return 0;
     }
 
@@ -102,20 +119,27 @@ public class SpawnManager : MonoBehaviour
         }
 
         int sceneIdx = FindSceneIndex(currentSceneId);
-        for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
+        if (sceneIdx >= 0 && sceneIdx < scenes.Count && scenes[sceneIdx].areas != null)
         {
-            if (scenes[sceneIdx].areas[i].areaIndex == currentAreaIndex)
+            for (int i = 0; i < scenes[sceneIdx].areas.Count; i++)
             {
-                currentAreaId = scenes[sceneIdx].areas[i].areaId;
-                break;
+                if (scenes[sceneIdx].areas[i].areaIndex == currentAreaIndex)
+                {
+                    currentAreaId = scenes[sceneIdx].areas[i].areaId;
+                    break;
+                }
             }
         }
 
         if (currentAreaId == previousAreaId)
+        {
             currentAreaIndex = previousAreaIndex;
+        }
 
         if (currentSceneId == previousSceneId)
+        {
             currentSceneIndex = previousSceneIndex;
+        }
     }
 
     public void NextArea(string direction)
@@ -127,10 +151,18 @@ public class SpawnManager : MonoBehaviour
 
         switch (direction)
         {
-            case "Left": currentAreaIndex.x--; break;
-            case "Right": currentAreaIndex.x++; break;
-            case "Forward": currentAreaIndex.y++; break;
-            case "Backward": currentAreaIndex.y--; break;
+            case "Left":
+                currentAreaIndex.x--;
+                break;
+            case "Right":
+                currentAreaIndex.x++;
+                break;
+            case "Forward":
+                currentAreaIndex.y++;
+                break;
+            case "Backward":
+                currentAreaIndex.y--;
+                break;
         }
 
         UpdateCurrentIdInfo();
@@ -146,24 +178,32 @@ public class SpawnManager : MonoBehaviour
         {
             previousSceneIndex = currentSceneIndex;
             previousSceneId = currentSceneId;
+            previousAreaIndex = currentAreaIndex;
+            previousAreaId = currentAreaId;
         }
 
         switch (direction)
         {
-            case "Left": currentSceneIndex.x--; break;
-            case "Right": currentSceneIndex.x++; break;
-            case "Forward": currentSceneIndex.y++; break;
-            case "Backward": currentSceneIndex.y--; break;
+            case "Left":
+                currentSceneIndex.x--;
+                break;
+            case "Right":
+                currentSceneIndex.x++;
+                break;
+            case "Forward":
+                currentSceneIndex.y++;
+                break;
+            case "Backward":
+                currentSceneIndex.y--;
+                break;
             case "Combat":
                 currentSceneIndex = new Vector2(1, 0);
                 currentAreaIndex = new Vector2(0, 0);
-                // ✅ Hide player during combat
                 SetPlayerVisibility(false);
                 break;
             case "CombatOver":
                 currentSceneIndex = previousSceneIndex;
                 currentAreaIndex = previousAreaIndex;
-                // ✅ Show player after combat
                 SetPlayerVisibility(true);
                 break;
         }
@@ -176,30 +216,27 @@ public class SpawnManager : MonoBehaviour
     private void SetPlayerVisibility(bool visible)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            // Disable/enable SpriteRenderer
-            SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
-            if (sr != null) sr.enabled = visible;
+        if (player == null) return;
 
-            // Disable/enable Collider2D
-            Collider2D col = player.GetComponent<Collider2D>();
-            if (col != null) col.enabled = visible;
+        SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
+        if (sr != null) sr.enabled = visible;
 
-            // Disable/enable PlayerController
-            PlayerController pc = player.GetComponent<PlayerController>();
-            if (pc != null) pc.enabled = visible;
-        }
+        Collider2D col = player.GetComponent<Collider2D>();
+        if (col != null) col.enabled = visible;
+
+        PlayerController pc = player.GetComponent<PlayerController>();
+        if (pc != null) pc.enabled = visible;
     }
 
     private void StoreCurrentAreaPosition()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        if (player == null) return;
+
+        Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+        if (playerRb != null)
         {
-            Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
-            if (playerRb != null)
-                areaPositions[currentAreaId] = playerRb.position;
+            areaPositions[currentAreaId] = playerRb.position;
         }
     }
 
@@ -217,35 +254,34 @@ public class SpawnManager : MonoBehaviour
         Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
         if (playerRb == null) return;
 
-        SpawnPointRegistry.SpawnPoint spawnPoints = spawnPointRegistry.Get(areaId);
+        if (spawnPointRegistry == null)
+        {
+            spawnPointRegistry = Object.FindFirstObjectByType<SpawnPointRegistry>();
+        }
+
+        SpawnPointRegistry.SpawnPoint spawnPoints = spawnPointRegistry != null ? spawnPointRegistry.Get(areaId) : null;
         if (spawnPoints == null)
         {
             Debug.LogError($"No spawn points found for area {areaId}");
             return;
         }
 
-        ParallaxBackground backgroundManager = Object.FindFirstObjectByType<ParallaxBackground>();
-        if (backgroundManager != null)
-        {
-            foreach (var parallaxArea in backgroundManager.parallaxAreas)
-            {
-                if (parallaxArea.areaIndex == areaData.areaIndex)
-                {
-                    backgroundManager.currentParallaxArea = parallaxArea;
-                    break;
-                }
-            }
-        }
+        UpdateParallaxArea(areaData);
 
-        // ✅ Restore player position from saved area position
         if (areaPositions.ContainsKey(areaId))
+        {
             playerRb.position = areaPositions[areaId];
+        }
         else
+        {
             playerRb.position = spawnPoints.playerSpawn.position;
+        }
 
         CameraController cam = GetCameraController();
         if (cam != null)
+        {
             cam.SetBorders(spawnPoints.leftBorder, spawnPoints.rightBorder);
+        }
 
         SpawnEnemies(areaData, spawnPoints);
         CleanupDefeatedEncounters(areaId);
@@ -254,10 +290,18 @@ public class SpawnManager : MonoBehaviour
     public void LoadScene(string sceneId, string areaId)
     {
         Scene sceneToLoad = scenes.Find(s => s.sceneId == sceneId);
-        if (sceneToLoad == null) { Debug.Log("Cannot Find Scene with id: " + sceneId); return; }
+        if (sceneToLoad == null)
+        {
+            Debug.Log("Cannot Find Scene with id: " + sceneId);
+            return;
+        }
 
         AreaData areaData = sceneToLoad.areas.Find(a => a.areaId == areaId);
-        if (areaData == null) { Debug.Log("Cannot Find Area with Id: " + areaId); return; }
+        if (areaData == null)
+        {
+            Debug.Log("Cannot Find Area with Id: " + areaId);
+            return;
+        }
 
         SceneManager.LoadSceneAsync(sceneToLoad.sceneName).completed += (_) =>
         {
@@ -277,30 +321,54 @@ public class SpawnManager : MonoBehaviour
             SpawnPointRegistry.SpawnPoint spawnPoints = spawnPointRegistry.Get(areaId);
             if (spawnPoints == null) return;
 
-            // ✅ Restore player position from saved area position
+            UpdateParallaxArea(areaData);
+
             if (areaPositions.ContainsKey(areaId))
+            {
                 playerRb.position = areaPositions[areaId];
+            }
             else
+            {
                 playerRb.position = spawnPoints.playerSpawn.position;
+            }
 
             CameraController cam = GetCameraController();
             if (cam != null)
+            {
                 cam.SetBorders(spawnPoints.leftBorder, spawnPoints.rightBorder);
+            }
 
             SpawnEnemies(areaData, spawnPoints);
             CleanupDefeatedEncounters(areaId);
         };
     }
 
+    private void UpdateParallaxArea(AreaData areaData)
+    {
+        ParallaxBackground backgroundManager = Object.FindFirstObjectByType<ParallaxBackground>();
+        if (backgroundManager == null || areaData == null) return;
+
+        foreach (ParallaxArea parallaxArea in backgroundManager.parallaxAreas)
+        {
+            if (parallaxArea.areaIndex == areaData.areaIndex)
+            {
+                backgroundManager.currentParallaxArea = parallaxArea;
+                break;
+            }
+        }
+    }
+
     private void SpawnEnemies(AreaData areaData, SpawnPointRegistry.SpawnPoint spawnPoints)
     {
-        // Destroy existing enemies
-        foreach (var enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-            Destroy(enemy);
-
-        foreach (var enemyEntry in areaData.enemies)
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            // Check if this specific enemy has been defeated individually
+            Destroy(enemy);
+        }
+
+        foreach (EnemyEntry enemyEntry in areaData.enemies)
+        {
+            if (enemyEntry == null) continue;
+
             if (defeatedEncounters.ContainsKey(areaData.areaId) &&
                 defeatedEncounters[areaData.areaId].Contains(enemyEntry.spawnPointId))
             {
@@ -312,17 +380,20 @@ public class SpawnManager : MonoBehaviour
                 .Find(e => e.spawnPointId == enemyEntry.spawnPointId);
 
             if (enemySpawn == null || enemyEntry.enemyData == null)
+            {
                 continue;
+            }
 
             GameObject enemy = Instantiate(
                 enemyEntry.enemyData.characterPrefab,
                 enemySpawn.transform.position,
-                Quaternion.identity
-            );
+                Quaternion.identity);
 
             EnemyController ec = enemy.GetComponent<EnemyController>();
             if (ec != null)
+            {
                 ec.Initialize(enemyEntry.enemyData);
+            }
         }
     }
 
@@ -330,7 +401,6 @@ public class SpawnManager : MonoBehaviour
     {
         if (!defeatedEncounters.ContainsKey(areaId)) return;
 
-        // Find all encounter triggers in the scene - MODERN API
         EncounterTrigger[] triggers = Object.FindObjectsByType<EncounterTrigger>(FindObjectsSortMode.None);
 
         foreach (EncounterTrigger trigger in triggers)
@@ -346,6 +416,8 @@ public class SpawnManager : MonoBehaviour
 
     public void MarkEncounterDefeated(string areaId, string encounterId)
     {
+        if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(encounterId)) return;
+
         if (!defeatedEncounters.ContainsKey(areaId))
         {
             defeatedEncounters[areaId] = new HashSet<string>();
@@ -359,28 +431,28 @@ public class SpawnManager : MonoBehaviour
     private void LoadDefeatedEncounters()
     {
         string defeatedString = PlayerPrefs.GetString("DefeatedEncounters", "");
-        if (!string.IsNullOrEmpty(defeatedString))
+        if (string.IsNullOrEmpty(defeatedString)) return;
+
+        string[] entries = defeatedString.Split(';');
+        foreach (string entry in entries)
         {
-            string[] entries = defeatedString.Split(';');
-            foreach (string entry in entries)
+            string[] parts = entry.Split(':');
+            if (parts.Length != 2) continue;
+
+            string areaId = parts[0];
+            string encounterIds = parts[1];
+
+            if (!defeatedEncounters.ContainsKey(areaId))
             {
-                string[] parts = entry.Split(':');
-                if (parts.Length == 2)
+                defeatedEncounters[areaId] = new HashSet<string>();
+            }
+
+            string[] ids = encounterIds.Split(',');
+            foreach (string id in ids)
+            {
+                if (!string.IsNullOrEmpty(id))
                 {
-                    string areaId = parts[0];
-                    string encounterIds = parts[1];
-
-                    if (!defeatedEncounters.ContainsKey(areaId))
-                    {
-                        defeatedEncounters[areaId] = new HashSet<string>();
-                    }
-
-                    string[] ids = encounterIds.Split(',');
-                    foreach (string id in ids)
-                    {
-                        if (!string.IsNullOrEmpty(id))
-                            defeatedEncounters[areaId].Add(id);
-                    }
+                    defeatedEncounters[areaId].Add(id);
                 }
             }
         }
@@ -388,8 +460,9 @@ public class SpawnManager : MonoBehaviour
 
     private void SaveDefeatedEncounters()
     {
-        List<string> entries = new List<string>();
-        foreach (var kvp in defeatedEncounters)
+        List<string> entries = new();
+
+        foreach (KeyValuePair<string, HashSet<string>> kvp in defeatedEncounters)
         {
             string areaId = kvp.Key;
             string encounterIds = string.Join(",", kvp.Value);
@@ -411,5 +484,25 @@ public class SpawnManager : MonoBehaviour
 
         Debug.Log($"Current spawn area data: {areaData.areaId}");
         return areaData;
+    }
+
+    public AreaData GetAreaDataById(string areaId)
+    {
+        if (string.IsNullOrEmpty(areaId) || scenes == null) return null;
+
+        foreach (Scene scene in scenes)
+        {
+            if (scene == null || scene.areas == null) continue;
+
+            foreach (AreaData area in scene.areas)
+            {
+                if (area != null && area.areaId == areaId)
+                {
+                    return area;
+                }
+            }
+        }
+
+        return null;
     }
 }
