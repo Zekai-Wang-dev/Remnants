@@ -92,6 +92,7 @@ public class PlayerController : MonoBehaviour
             backgroundScript.parallax(velocity);
         }
 
+        Debug.Log(velocity); 
         accumulatedDistance += movementDelta.magnitude;
         lastPosition = rb.position;
 
@@ -111,7 +112,6 @@ public class PlayerController : MonoBehaviour
         }
 
         accumulatedDistance = 0f;
-        Debug.Log("Distance tracking reset");
     }
 
     private void GetCurrentArea()
@@ -133,7 +133,6 @@ public class PlayerController : MonoBehaviour
         if (accumulatedDistance < area.minDistanceBetweenEncounters) return;
 
         float roll = Random.value;
-        Debug.Log($"Rolled: {roll:F3}, Needed: {area.randomEncounterChance:F3}");
 
         if (roll < area.randomEncounterChance)
         {
@@ -142,15 +141,14 @@ public class PlayerController : MonoBehaviour
             if (enemy == null)
             {
                 Debug.LogWarning($"Random encounter rolled in area '{area.areaId}', but no enemy could be selected.");
-                accumulatedDistance = 0f;
+                ResetDistanceTracking();
                 return;
             }
 
             Debug.Log($"Random encounter triggered: {enemy.name}");
 
             spawnManager.SetCurrentEncounter(area.areaId, "random_" + enemy.name);
-
-            accumulatedDistance = 0f;
+            ResetDistanceTracking(); 
             spawnManager.NextScene("Combat");
         }
     }
@@ -173,7 +171,6 @@ public class PlayerController : MonoBehaviour
         {
             if (hit.CompareTag(direction))
             {
-                ResetDistanceTracking();
                 spawnManager.NextArea(direction);
                 Debug.Log("Exit " + direction + " detected, changing area...");
                 GetCurrentArea();

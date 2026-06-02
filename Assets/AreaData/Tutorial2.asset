@@ -20,8 +20,8 @@ MonoBehaviour:
   randomEncounterPool:
   - enemyData: {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
     weight: 1
-    minPlayerLevel: 0
-    maxPlayerLevel: 0
+    minPlayerLevel: 1
+    maxPlayerLevel: 1
     requiredFlags: []
   randomEncounterChance: 0.1
   minDistanceBetweenEncounters: 5
