@@ -57,12 +57,30 @@ public class SpeechBubbleUI : MonoBehaviour
             yield break;
         }
 
+        yield return StartCoroutine(Play(
+            dialogueLine.characterID,
+            dialogueLine.line,
+            dialogueLine.charactersPerSecond,
+            dialogueLine.waitForPlayerInputAfterLine,
+            dialogueLine.continueKey,
+            targetOverride
+        ));
+    }
+
+    public IEnumerator Play(
+        string speakerName,
+        string line,
+        float charactersPerSecond,
+        bool waitForPlayerInputAfterLine,
+        KeyCode continueKey,
+        Transform targetOverride = null)
+    {
         followTarget = targetOverride;
 
         if (speakerNameText != null)
         {
-            speakerNameText.text = dialogueLine.characterID;
-            speakerNameText.gameObject.SetActive(!string.IsNullOrWhiteSpace(dialogueLine.characterID));
+            speakerNameText.text = speakerName;
+            speakerNameText.gameObject.SetActive(!string.IsNullOrWhiteSpace(speakerName));
         }
 
         if (canvasGroup != null)
@@ -70,11 +88,11 @@ public class SpeechBubbleUI : MonoBehaviour
             canvasGroup.alpha = 1f;
         }
 
-        yield return StartCoroutine(TypeLine(dialogueLine.line, dialogueLine.charactersPerSecond));
+        yield return StartCoroutine(TypeLine(line, charactersPerSecond));
 
-        if (dialogueLine.waitForPlayerInputAfterLine)
+        if (waitForPlayerInputAfterLine)
         {
-            yield return StartCoroutine(WaitForContinue(dialogueLine.continueKey));
+            yield return StartCoroutine(WaitForContinue(continueKey));
         }
 
         Destroy(gameObject);

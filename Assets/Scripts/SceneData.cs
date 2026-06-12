@@ -25,6 +25,10 @@ public class SceneAction
     [Header("Actor Commands")]
     public List<SceneActorCommand> actorCommands = new();
 
+    [Header("Dialogue")]
+    [Tooltip("Use this for dialogue actions. Each entry can have its own speaker, text, animation, bubble, typing speed, and continue key.")]
+    public List<DialogueBeat> dialogueBeats = new();
+
     [Header("Timing")]
     public float waitAfterAction = 0.5f;
 
@@ -39,6 +43,39 @@ public class SceneAction
 }
 
 [System.Serializable]
+public class DialogueBeat
+{
+    [Header("Who is speaking")]
+    public string actorId;
+
+    [Header("Text")]
+    [TextArea(2, 6)]
+    public string line;
+
+    [Header("UI")]
+    [Tooltip("Optional. If empty, FilmSceneManager.defaultSpeechBubblePrefab will be used.")]
+    public GameObject speechBubblePrefab;
+
+    [Header("Typing")]
+    public float charactersPerSecond = 30f;
+    public bool waitForPlayerInputAfterLine = true;
+    public KeyCode continueKey = KeyCode.Space;
+
+    [Header("Speaking Animation")]
+    [Tooltip("Optional. Plays when this line starts.")]
+    public AnimationClip speakingAnimationClip;
+
+    [Tooltip("Optional. Use this if you prefer typing an animator state name instead of assigning a clip.")]
+    public string speakingAnimationStateName;
+
+    [Tooltip("Optional. Plays after the line finishes. Leave blank if you do not need to reset animation.")]
+    public string animationStateAfterLine;
+
+    [Header("After Line")]
+    public float waitAfterLine = 0.1f;
+}
+
+[System.Serializable]
 public class SceneActorCommand
 {
     public string actorId;
@@ -48,7 +85,8 @@ public class SceneActorCommand
     public float moveDistance = 1f;
     public float moveSpeed = 1f;
 
-    [Header("Dialogue - Optional")]
+    [Header("Dialogue - Old Optional ScriptableObject")]
+    [Tooltip("Still supported for old actions, but for new dialogue use SceneAction.dialogueBeats instead.")]
     public DialogueLine dialogueLine;
 
     [Header("Animation")]

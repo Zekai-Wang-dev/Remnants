@@ -6,6 +6,11 @@ public class FilmSceneManager : MonoBehaviour
 {
     public static FilmSceneManager Instance { get; private set; }
 
+    [Header("Dialogue Defaults")]
+    public GameObject defaultSpeechBubblePrefab;
+    public float defaultCharactersPerSecond = 30f;
+    public KeyCode defaultContinueKey = KeyCode.Space;
+
     public bool inCinematic;
 
     private void Awake()
@@ -97,30 +102,128 @@ public class FilmSceneManager : MonoBehaviour
 
     private IEnumerator PlayDialogueAction(SceneAction action)
     {
-        DialogueLine line = GetDialogueLine(action);
-
-        if (line == null)
+        if (action == null)
         {
-            Debug.LogWarning($"Dialogue action '{action.actionName}' has no dialogue line.");
             yield break;
         }
 
-        if (line.speechBubblePrefab == null)
+        // New preferred workflow: one Dialogue action can contain many inline dialogue beats.
+        if (action.dialogueBeats != null && action.dialogueBeats.Count > 0)
         {
-            Debug.LogWarning($"Dialogue line '{line.name}' has no speechBubblePrefab assigned.");
+            foreach (DialogueBeat beat in action.dialogueBeats)
+            {
+                if (beat == null)
+                {
+                    continue;
+                }
+
+                yield return StartCoroutine(PlayDialogueBeat(beat));
+            }
+
             yield break;
         }
 
-        Transform speaker = GetDialogueSpeaker(action, line);
+        // Old workflow is still supported so your existing DialogueLine assets do not instantly break.
+        DialogueLine oldLine = GetOldDialogueLine(action);
+
+        if (oldLine == null)
+        {
+            Debug.LogWarning($"Dialogue action '{action.actionName}' has no dialogueBeats and no old DialogueLine.");
+            yield break;
+        }
+
+        yield return StartCoroutine(PlayOldDialogueLine(action, oldLine));
+    }
+
+    private IEnumerator PlayDialogueBeat(DialogueBeat beat)
+    {
+        if (beat == null)
+        {
+            yield break;
+        }
+
+        GameObject bubblePrefab = beat.speechBubblePrefab != null
+            ? beat.speechBubblePrefab
+            : defaultSpeechBubblePrefab;
+
+        if (bubblePrefab == null)
+        {
+            Debug.LogWarning("Dialogue beat has no speechBubblePrefab and FilmSceneManager has no defaultSpeechBubblePrefab.");
+            yield break;
+        }
+
+        Transform speaker = GetActor(beat.actorId);
+        PlaySpeakingAnimation(speaker, beat);
+
         Canvas canvas = FindFirstObjectByType<Canvas>();
-
         if (canvas == null)
         {
             Debug.LogWarning("No Canvas found for dialogue bubble.");
             yield break;
         }
 
-        GameObject bubbleObject = Instantiate(line.speechBubblePrefab, canvas.transform);
+        GameObject bubbleObject = Instantiate(bubblePrefab, canvas.transform);
+        SpeechBubbleUI bubble = bubbleObject.GetComponent<SpeechBubbleUI>();
+
+        if (bubble == null)
+        {
+            Debug.LogError("Speech bubble prefab needs a SpeechBubbleUI component on its root object.");
+            Destroy(bubbleObject);
+            yield break;
+        }
+
+        float speed = beat.charactersPerSecond > 0f
+            ? beat.charactersPerSecond
+            : defaultCharactersPerSecond;
+
+        KeyCode continueKey = beat.continueKey != KeyCode.None
+            ? beat.continueKey
+            : defaultContinueKey;
+
+        yield return StartCoroutine(bubble.Play(
+            beat.actorId,
+            beat.line,
+            speed,
+            beat.waitForPlayerInputAfterLine,
+            continueKey,
+            speaker
+        ));
+
+        PlayAnimationAfterLine(speaker, beat);
+
+        if (beat.waitAfterLine > 0f)
+        {
+            yield return new WaitForSeconds(beat.waitAfterLine);
+        }
+    }
+
+    private IEnumerator PlayOldDialogueLine(SceneAction action, DialogueLine line)
+    {
+        if (line == null)
+        {
+            yield break;
+        }
+
+        GameObject bubblePrefab = line.speechBubblePrefab != null
+            ? line.speechBubblePrefab
+            : defaultSpeechBubblePrefab;
+
+        if (bubblePrefab == null)
+        {
+            Debug.LogWarning($"Dialogue line '{line.name}' has no speechBubblePrefab and FilmSceneManager has no defaultSpeechBubblePrefab.");
+            yield break;
+        }
+
+        Transform speaker = GetOldDialogueSpeaker(action, line);
+
+        Canvas canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogWarning("No Canvas found for dialogue bubble.");
+            yield break;
+        }
+
+        GameObject bubbleObject = Instantiate(bubblePrefab, canvas.transform);
         SpeechBubbleUI bubble = bubbleObject.GetComponent<SpeechBubbleUI>();
 
         if (bubble == null)
@@ -133,28 +236,25 @@ public class FilmSceneManager : MonoBehaviour
         yield return StartCoroutine(bubble.Play(line, speaker));
     }
 
-    private DialogueLine GetDialogueLine(SceneAction action)
+    private DialogueLine GetOldDialogueLine(SceneAction action)
     {
-        if (action == null)
+        if (action == null || action.actorCommands == null)
         {
             return null;
         }
 
-        if (action.actorCommands != null)
+        foreach (SceneActorCommand command in action.actorCommands)
         {
-            foreach (SceneActorCommand command in action.actorCommands)
+            if (command != null && command.dialogueLine != null)
             {
-                if (command != null && command.dialogueLine != null)
-                {
-                    return command.dialogueLine;
-                }
+                return command.dialogueLine;
             }
         }
 
         return null;
     }
 
-    private Transform GetDialogueSpeaker(SceneAction action, DialogueLine line)
+    private Transform GetOldDialogueSpeaker(SceneAction action, DialogueLine line)
     {
         string actorId = line != null ? line.characterID : "";
 
@@ -170,6 +270,11 @@ public class FilmSceneManager : MonoBehaviour
             }
         }
 
+        return GetActor(actorId);
+    }
+
+    private Transform GetActor(string actorId)
+    {
         if (string.IsNullOrWhiteSpace(actorId))
         {
             return null;
@@ -185,10 +290,56 @@ public class FilmSceneManager : MonoBehaviour
 
         if (actor == null)
         {
-            Debug.LogWarning($"Could not find dialogue actor with ID '{actorId}'.");
+            Debug.LogWarning($"Could not find actor with ID '{actorId}'.");
         }
 
         return actor;
+    }
+
+    private void PlaySpeakingAnimation(Transform speaker, DialogueBeat beat)
+    {
+        if (speaker == null || beat == null)
+        {
+            return;
+        }
+
+        Animator animator = speaker.GetComponent<Animator>();
+        if (animator == null)
+        {
+            return;
+        }
+
+        if (beat.speakingAnimationClip != null)
+        {
+            animator.Play(beat.speakingAnimationClip.name);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(beat.speakingAnimationStateName))
+        {
+            animator.Play(beat.speakingAnimationStateName);
+        }
+    }
+
+    private void PlayAnimationAfterLine(Transform speaker, DialogueBeat beat)
+    {
+        if (speaker == null || beat == null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(beat.animationStateAfterLine))
+        {
+            return;
+        }
+
+        Animator animator = speaker.GetComponent<Animator>();
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.Play(beat.animationStateAfterLine);
     }
 
     private IEnumerator PlayMoveAction(SceneAction action)
@@ -206,13 +357,10 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
-            Transform actor = SceneCharacterRegistry.Instance != null
-                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
-                : null;
+            Transform actor = GetActor(command.actorId);
 
             if (actor == null)
             {
-                Debug.LogWarning($"Could not find actor with ID '{command.actorId}'.");
                 continue;
             }
 
@@ -287,13 +435,10 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
-            Transform actor = SceneCharacterRegistry.Instance != null
-                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
-                : null;
+            Transform actor = GetActor(command.actorId);
 
             if (actor == null)
             {
-                Debug.LogWarning($"Could not find actor with ID '{command.actorId}'.");
                 continue;
             }
 
@@ -329,9 +474,7 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
-            Transform actor = SceneCharacterRegistry.Instance != null
-                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
-                : null;
+            Transform actor = GetActor(command.actorId);
 
             if (actor == null)
             {

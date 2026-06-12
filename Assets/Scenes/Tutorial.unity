@@ -13686,6 +13686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinematicsActivator
   sceneData: {fileID: 11400000, guid: eb888e172f1615241988ab58d6efa730, type: 2}
+  destroyAfterUse: 1
 --- !u!1 &1296207983
 GameObject:
   m_ObjectHideFlags: 0
@@ -15728,6 +15729,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c84b1240fa07f014086998935b50cb14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FilmSceneManager
+  defaultSpeechBubblePrefab: {fileID: 0}
+  defaultCharactersPerSecond: 30
+  defaultContinueKey: 32
   inCinematic: 0
 --- !u!4 &1770991888
 Transform:

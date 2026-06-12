@@ -21,9 +21,10 @@ MonoBehaviour:
     - actorId: Dummy
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
-      moveSpeed: 1
+      moveSpeed: 3
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
+    dialogueBeats: []
     waitAfterAction: 1
   - actionName: Move Right
     type: 1
@@ -31,9 +32,10 @@ MonoBehaviour:
     - actorId: Dummy
       moveDirection: {x: 1, y: 0}
       moveDistance: 5
-      moveSpeed: 1
+      moveSpeed: 3
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
+    dialogueBeats: []
     waitAfterAction: 1
   - actionName: Move Left
     type: 1
@@ -41,32 +43,84 @@ MonoBehaviour:
     - actorId: Dummy
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
-      moveSpeed: 1
+      moveSpeed: 3
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
+    dialogueBeats: []
     waitAfterAction: 1
   - actionName: Say something
     type: 3
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Dummy
+      line: What am I doing?
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Say something
+    type: 3
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Dummy
+      line: Who are you?
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Move Right
+    type: 1
     actorCommands:
     - actorId: Dummy
-      moveDirection: {x: 0, y: 0}
-      moveDistance: 0
-      moveSpeed: 0
-      dialogueLine: {fileID: 11400000, guid: da110dacc5f8ab84889207c5c8e05663, type: 2}
+      moveDirection: {x: 1, y: 0}
+      moveDistance: 5
+      moveSpeed: 10
+      dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
+    dialogueBeats: []
+    waitAfterAction: 0
+  - actionName: Say something
+    type: 3
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Player
+      line: Die Bruh
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
     waitAfterAction: 1
   - actionName: Say something
     type: 3
-    actorCommands:
+    actorCommands: []
+    dialogueBeats:
     - actorId: Dummy
-      moveDirection: {x: 0, y: 0}
-      moveDistance: 0
-      moveSpeed: 0
-      dialogueLine: {fileID: 11400000, guid: de61cbf0e1be4a5438fecc475e9c76c6, type: 2}
-      animationClip: {fileID: 0}
+      line: AHHHHHHHHHHHHH!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
     waitAfterAction: 1
   isPermanent: 1
   isActivated: 0
   endCommands:
-  - actorId: 
-    endBehavior: 1
+  - actorId: Dummy
+    endBehavior: 2
