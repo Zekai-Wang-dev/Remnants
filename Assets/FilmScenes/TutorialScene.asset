@@ -33,6 +33,15 @@ MonoBehaviour:
       moveSpeed: 1
       animationClip: {fileID: 0}
     waitAfterAction: 1
+  - actionName: Move Left
+    type: 1
+    actorCommands:
+    - actorId: Dummy
+      moveDirection: {x: -1, y: 0}
+      moveDistance: 5
+      moveSpeed: 1
+      animationClip: {fileID: 0}
+    waitAfterAction: 1
   isPermanent: 1
   isActivated: 0
   endCommands:

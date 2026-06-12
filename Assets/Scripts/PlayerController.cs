@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 lastPosition;
     private bool isBlocked = false;
+    private bool canMove = true; 
 
     public float InteractRadius;
     public float ExitRadius;
@@ -120,8 +121,20 @@ public class PlayerController : MonoBehaviour
         currentArea = spawnManager.GetCurrentAreaData();
     }
 
+    public void DisableMovement()
+    {
+        velocity = Vector2.zero;
+        canMove = false;
+    }
+
+    public void EnableMovement()
+    {
+        canMove = true;
+    }
+
     void CheckForRandomEncounters()
     {
+        if (!canMove) return;
         if (spawnManager == null) return;
         if (spawnManager.currentSceneId == "001") return;
 
@@ -217,6 +230,7 @@ public class PlayerController : MonoBehaviour
         velocity.x = 0;
 
         if (spawnManager == null) return;
+        if (!canMove) return;
         if (spawnManager.currentSceneId == "001") return;
 
         if (Input.GetKey(KeyCode.A))

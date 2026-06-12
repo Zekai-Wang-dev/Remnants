@@ -40,6 +40,7 @@ public class FilmSceneManager : MonoBehaviour
     private IEnumerator PlayCinematic(SceneData filmScene)
     {
         inCinematic = true;
+        PlayerController.Instance.DisableMovement();
 
         foreach (SceneAction action in filmScene.actions)
         {
@@ -47,6 +48,7 @@ public class FilmSceneManager : MonoBehaviour
         }
 
         ApplyEndCommands(filmScene);
+        PlayerController.Instance.EnableMovement();
 
         inCinematic = false;
     }
@@ -88,6 +90,7 @@ public class FilmSceneManager : MonoBehaviour
         if (action.actorCommands == null || action.actorCommands.Count == 0)
         {
             Debug.LogWarning($"Move action '{action.actionName}' has no actor commands.");
+            PlayerController.Instance.EnableMovement();
             yield break;
         }
 
