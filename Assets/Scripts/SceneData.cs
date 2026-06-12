@@ -25,9 +25,6 @@ public class SceneAction
     [Header("Actor Commands")]
     public List<SceneActorCommand> actorCommands = new();
 
-    [Header("Dialogue")]
-    // public Dialogue dialogue;
-
     [Header("Timing")]
     public float waitAfterAction = 0.5f;
 
@@ -50,6 +47,9 @@ public class SceneActorCommand
     public Vector2 moveDirection = Vector2.right;
     public float moveDistance = 1f;
     public float moveSpeed = 1f;
+
+    [Header("Dialogue - Optional")]
+    public DialogueLine dialogueLine;
 
     [Header("Animation")]
     public AnimationClip animationClip;

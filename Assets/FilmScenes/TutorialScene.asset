@@ -22,6 +22,7 @@ MonoBehaviour:
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
       moveSpeed: 1
+      dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
     waitAfterAction: 1
   - actionName: Move Right
@@ -31,6 +32,7 @@ MonoBehaviour:
       moveDirection: {x: 1, y: 0}
       moveDistance: 5
       moveSpeed: 1
+      dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
     waitAfterAction: 1
   - actionName: Move Left
@@ -40,6 +42,27 @@ MonoBehaviour:
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
       moveSpeed: 1
+      dialogueLine: {fileID: 0}
+      animationClip: {fileID: 0}
+    waitAfterAction: 1
+  - actionName: Say something
+    type: 3
+    actorCommands:
+    - actorId: Dummy
+      moveDirection: {x: 0, y: 0}
+      moveDistance: 0
+      moveSpeed: 0
+      dialogueLine: {fileID: 11400000, guid: da110dacc5f8ab84889207c5c8e05663, type: 2}
+      animationClip: {fileID: 0}
+    waitAfterAction: 1
+  - actionName: Say something
+    type: 3
+    actorCommands:
+    - actorId: Dummy
+      moveDirection: {x: 0, y: 0}
+      moveDistance: 0
+      moveSpeed: 0
+      dialogueLine: {fileID: 11400000, guid: de61cbf0e1be4a5438fecc475e9c76c6, type: 2}
       animationClip: {fileID: 0}
     waitAfterAction: 1
   isPermanent: 1

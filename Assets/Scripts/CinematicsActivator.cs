@@ -1,19 +1,28 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class CinematicsActivator : MonoBehaviour
 {
-
     public SceneData sceneData;
-    private FilmSceneManager sceneManager = FilmSceneManager.Instance; 
+    public bool destroyAfterUse = true;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        
-        PlayerController.Instance.DisableMovement();
-        sceneManager.StartCinematic(sceneData);
-        Destroy(gameObject);
+        if (!collision.gameObject.CompareTag("Player"))
+        {
+            return;
+        }
 
+        if (FilmSceneManager.Instance == null)
+        {
+            Debug.LogError("FilmSceneManager is missing from the scene.");
+            return;
+        }
+
+        FilmSceneManager.Instance.StartCinematic(sceneData);
+
+        if (destroyAfterUse)
+        {
+            Destroy(gameObject);
+        }
     }
-
 }

@@ -40,7 +40,11 @@ public class FilmSceneManager : MonoBehaviour
     private IEnumerator PlayCinematic(SceneData filmScene)
     {
         inCinematic = true;
-        PlayerController.Instance.DisableMovement();
+
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.DisableMovement();
+        }
 
         foreach (SceneAction action in filmScene.actions)
         {
@@ -48,14 +52,21 @@ public class FilmSceneManager : MonoBehaviour
         }
 
         ApplyEndCommands(filmScene);
-        PlayerController.Instance.EnableMovement();
+
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.EnableMovement();
+        }
 
         inCinematic = false;
     }
 
     private IEnumerator PlayAction(SceneAction action)
     {
-        if (action == null) yield break;
+        if (action == null)
+        {
+            yield break;
+        }
 
         Debug.Log("Playing film action: " + action.actionName);
 
@@ -70,8 +81,7 @@ public class FilmSceneManager : MonoBehaviour
                 break;
 
             case SceneAction.ActionType.Dialogue:
-                // Add dialogue logic later.
-                Debug.Log("Dialogue action not implemented yet.");
+                yield return StartCoroutine(PlayDialogueAction(action));
                 break;
 
             case SceneAction.ActionType.Wait:
@@ -85,20 +95,120 @@ public class FilmSceneManager : MonoBehaviour
         }
     }
 
+    private IEnumerator PlayDialogueAction(SceneAction action)
+    {
+        DialogueLine line = GetDialogueLine(action);
+
+        if (line == null)
+        {
+            Debug.LogWarning($"Dialogue action '{action.actionName}' has no dialogue line.");
+            yield break;
+        }
+
+        if (line.speechBubblePrefab == null)
+        {
+            Debug.LogWarning($"Dialogue line '{line.name}' has no speechBubblePrefab assigned.");
+            yield break;
+        }
+
+        Transform speaker = GetDialogueSpeaker(action, line);
+        Canvas canvas = FindFirstObjectByType<Canvas>();
+
+        if (canvas == null)
+        {
+            Debug.LogWarning("No Canvas found for dialogue bubble.");
+            yield break;
+        }
+
+        GameObject bubbleObject = Instantiate(line.speechBubblePrefab, canvas.transform);
+        SpeechBubbleUI bubble = bubbleObject.GetComponent<SpeechBubbleUI>();
+
+        if (bubble == null)
+        {
+            Debug.LogError("Speech bubble prefab needs a SpeechBubbleUI component on its root object.");
+            Destroy(bubbleObject);
+            yield break;
+        }
+
+        yield return StartCoroutine(bubble.Play(line, speaker));
+    }
+
+    private DialogueLine GetDialogueLine(SceneAction action)
+    {
+        if (action == null)
+        {
+            return null;
+        }
+
+        if (action.actorCommands != null)
+        {
+            foreach (SceneActorCommand command in action.actorCommands)
+            {
+                if (command != null && command.dialogueLine != null)
+                {
+                    return command.dialogueLine;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Transform GetDialogueSpeaker(SceneAction action, DialogueLine line)
+    {
+        string actorId = line != null ? line.characterID : "";
+
+        if (string.IsNullOrWhiteSpace(actorId) && action.actorCommands != null)
+        {
+            foreach (SceneActorCommand command in action.actorCommands)
+            {
+                if (command != null && !string.IsNullOrWhiteSpace(command.actorId))
+                {
+                    actorId = command.actorId;
+                    break;
+                }
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(actorId))
+        {
+            return null;
+        }
+
+        if (SceneCharacterRegistry.Instance == null)
+        {
+            Debug.LogWarning("SceneCharacterRegistry is missing, so dialogue cannot follow an actor.");
+            return null;
+        }
+
+        Transform actor = SceneCharacterRegistry.Instance.GetActor(actorId);
+
+        if (actor == null)
+        {
+            Debug.LogWarning($"Could not find dialogue actor with ID '{actorId}'.");
+        }
+
+        return actor;
+    }
+
     private IEnumerator PlayMoveAction(SceneAction action)
     {
         if (action.actorCommands == null || action.actorCommands.Count == 0)
         {
             Debug.LogWarning($"Move action '{action.actionName}' has no actor commands.");
-            PlayerController.Instance.EnableMovement();
             yield break;
         }
 
-        List<Coroutine> runningMoves = new();
-
         foreach (SceneActorCommand command in action.actorCommands)
         {
-            Transform actor = SceneCharacterRegistry.Instance.GetActor(command.actorId);
+            if (command == null)
+            {
+                continue;
+            }
+
+            Transform actor = SceneCharacterRegistry.Instance != null
+                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
+                : null;
 
             if (actor == null)
             {
@@ -106,11 +216,9 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
-            Coroutine moveRoutine = StartCoroutine(MoveActor(actor, command));
-            runningMoves.Add(moveRoutine);
+            StartCoroutine(MoveActor(actor, command));
         }
 
-        // Wait until the longest movement should be finished.
         float longestDuration = GetLongestMoveDuration(action.actorCommands);
         yield return new WaitForSeconds(longestDuration);
     }
@@ -129,7 +237,6 @@ public class FilmSceneManager : MonoBehaviour
 
         float speed = Mathf.Max(0.01f, command.moveSpeed);
         float duration = command.moveDistance / speed;
-
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -148,7 +255,10 @@ public class FilmSceneManager : MonoBehaviour
 
         foreach (SceneActorCommand command in commands)
         {
-            if (command == null) continue;
+            if (command == null)
+            {
+                continue;
+            }
 
             float speed = Mathf.Max(0.01f, command.moveSpeed);
             float duration = command.moveDistance / speed;
@@ -172,7 +282,14 @@ public class FilmSceneManager : MonoBehaviour
 
         foreach (SceneActorCommand command in action.actorCommands)
         {
-            Transform actor = SceneCharacterRegistry.Instance.GetActor(command.actorId);
+            if (command == null)
+            {
+                continue;
+            }
+
+            Transform actor = SceneCharacterRegistry.Instance != null
+                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
+                : null;
 
             if (actor == null)
             {
@@ -200,11 +317,21 @@ public class FilmSceneManager : MonoBehaviour
 
     private void ApplyEndCommands(SceneData filmScene)
     {
-        if (filmScene.endCommands == null) return;
+        if (filmScene.endCommands == null)
+        {
+            return;
+        }
 
         foreach (SceneEndActorCommand command in filmScene.endCommands)
         {
-            Transform actor = SceneCharacterRegistry.Instance.GetActor(command.actorId);
+            if (command == null)
+            {
+                continue;
+            }
+
+            Transform actor = SceneCharacterRegistry.Instance != null
+                ? SceneCharacterRegistry.Instance.GetActor(command.actorId)
+                : null;
 
             if (actor == null)
             {
