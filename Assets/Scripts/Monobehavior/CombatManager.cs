@@ -42,8 +42,16 @@ public class Character : MonoBehaviour
         if (data == null) return;
 
         health = data.maxHealth;
-        if (state == "Dead") state = "Alive";
-        if (string.IsNullOrEmpty(state)) state = "Alive";
+
+        if (state == "Dead")
+        {
+            state = "Alive";
+        }
+
+        if (string.IsNullOrEmpty(state))
+        {
+            state = "Alive";
+        }
     }
 
     private void FindTargetByThreat(List<Character> opponentTeam)
@@ -77,7 +85,6 @@ public class Character : MonoBehaviour
             validTargets.Sort((a, b) => b.data.speed.CompareTo(a.data.speed));
         }
 
-        // Default behavior if threatType is blank/unknown: attack first valid target.
         target = validTargets[0];
     }
 
@@ -86,7 +93,10 @@ public class Character : MonoBehaviour
         defenseType = "";
         bool defenseSucceeded = false;
 
-        if (attacker == null || attacker.data == null || data == null) return false;
+        if (attacker == null || attacker.data == null || data == null)
+        {
+            return false;
+        }
 
         if (canDodge && !defenseSucceeded)
         {
@@ -112,7 +122,10 @@ public class Character : MonoBehaviour
 
     public bool RollForParry(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null) return false;
+        if (attacker == null || attacker.data == null || data == null)
+        {
+            return false;
+        }
 
         float parryChance = data.parryChance;
         float speedDiff = data.speed - attacker.data.speed;
@@ -144,7 +157,10 @@ public class Character : MonoBehaviour
 
     public bool RollForDodge(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null) return false;
+        if (attacker == null || attacker.data == null || data == null)
+        {
+            return false;
+        }
 
         float dodgeChance = data.dodgeChance;
         float speedDiff = data.speed - attacker.data.speed;
@@ -176,7 +192,10 @@ public class Character : MonoBehaviour
 
     public bool RollForBlock(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null) return false;
+        if (attacker == null || attacker.data == null || data == null)
+        {
+            return false;
+        }
 
         float blockChance = data.blockChance;
         float defenseDiff = data.defense - attacker.data.damage;
@@ -206,10 +225,11 @@ public class Character : MonoBehaviour
 
     public IEnumerator AttackAnimation(Transform targetTransform, float duration)
     {
-        if (targetTransform == null) yield break;
+        if (targetTransform == null)
+        {
+            yield break;
+        }
 
-        // Important: use the current position when the attack begins.
-        // Awake can run before CombatPreparation places the prefab on the combat grid.
         Vector3 startPos = myTransform.position;
         Vector3 targetPos = targetTransform.position;
         Vector3 direction = (targetPos - startPos).normalized;
@@ -230,6 +250,7 @@ public class Character : MonoBehaviour
         myTransform.position = forwardPos;
 
         elapsed = 0f;
+
         while (elapsed < halfDuration)
         {
             myTransform.position = Vector3.Lerp(forwardPos, startPos, elapsed / halfDuration);
@@ -238,6 +259,24 @@ public class Character : MonoBehaviour
         }
 
         myTransform.position = startPos;
+    }
+}
+
+[System.Serializable]
+public class PendingLootEntry
+{
+    public ItemData item;
+    public int quantity;
+
+    public bool dropOnceOnly;
+    public string onceOnlyDropId;
+
+    public PendingLootEntry(ItemData item, int quantity, bool dropOnceOnly, string onceOnlyDropId)
+    {
+        this.item = item;
+        this.quantity = quantity;
+        this.dropOnceOnly = dropOnceOnly;
+        this.onceOnlyDropId = onceOnlyDropId;
     }
 }
 
@@ -256,6 +295,11 @@ public class CombatManager : MonoBehaviour
     public float bufferTimePreCombat = 3f;
     public float bufferTimePostCombat = 3f;
 
+    [Header("Loot")]
+    [SerializeField] private bool giveLootOnlyOnVictory = true;
+
+    private readonly List<PendingLootEntry> pendingLoot = new();
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -270,6 +314,9 @@ public class CombatManager : MonoBehaviour
     public void StartCombat(List<Character> playerTeam, List<Character> enemyTeam)
     {
         StopAllCoroutines();
+
+        pendingLoot.Clear();
+
         StartCoroutine(StartCombatWithBuffer(playerTeam, enemyTeam));
     }
 
@@ -284,7 +331,10 @@ public class CombatManager : MonoBehaviour
 
         foreach (Character c in playerTeam)
         {
-            if (c == null || c.data == null) continue;
+            if (c == null || c.data == null)
+            {
+                continue;
+            }
 
             c.team = 0;
             c.state = "Alive";
@@ -294,7 +344,10 @@ public class CombatManager : MonoBehaviour
 
         foreach (Character c in enemyTeam)
         {
-            if (c == null || c.data == null) continue;
+            if (c == null || c.data == null)
+            {
+                continue;
+            }
 
             c.team = 1;
             c.state = "Alive";
@@ -376,9 +429,20 @@ public class CombatManager : MonoBehaviour
 
             foreach (Character c in combatants)
             {
-                if (c == null || c.state == "Dead") continue;
-                if (c.team == 0) playerTeamAlive = true;
-                if (c.team == 1) enemyTeamAlive = true;
+                if (c == null || c.state == "Dead")
+                {
+                    continue;
+                }
+
+                if (c.team == 0)
+                {
+                    playerTeamAlive = true;
+                }
+
+                if (c.team == 1)
+                {
+                    enemyTeamAlive = true;
+                }
             }
 
             if (!enemyTeamAlive)
@@ -389,11 +453,13 @@ public class CombatManager : MonoBehaviour
 
             if (!playerTeamAlive)
             {
-                Debug.Log("Player team defeated!");
+                pendingLoot.Clear();
+                Debug.Log("Player team defeated! Pending loot discarded.");
                 yield break;
             }
 
             NextTurn();
+
             yield return new WaitForSeconds(1f);
         }
     }
@@ -449,7 +515,10 @@ public class CombatManager : MonoBehaviour
 
     private void ApplyDefenseResults(Character attacker, Character defender, string defenseType)
     {
-        if (attacker == null || defender == null) return;
+        if (attacker == null || defender == null)
+        {
+            return;
+        }
 
         switch (defenseType)
         {
@@ -471,8 +540,15 @@ public class CombatManager : MonoBehaviour
 
     private void CalculateDamage(Character attacker, Character defender, string defenseContext = "None")
     {
-        if (attacker == null || attacker.data == null || defender == null || defender.data == null) return;
-        if (attacker.state == "Dead" || defender.state == "Dead") return;
+        if (attacker == null || attacker.data == null || defender == null || defender.data == null)
+        {
+            return;
+        }
+
+        if (attacker.state == "Dead" || defender.state == "Dead")
+        {
+            return;
+        }
 
         float damage = attacker.data.damage - defender.data.defense;
         damage = Mathf.Max(damage, 1f);
@@ -484,7 +560,6 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case "Counter":
-                // Current behavior: parry avoids incoming damage and deals defender's attack damage back.
                 damage = Mathf.Max(attacker.data.damage - defender.data.defense, 1f);
                 break;
 
@@ -493,9 +568,13 @@ public class CombatManager : MonoBehaviour
                 break;
         }
 
-        if (damage <= 0f) return;
+        if (damage <= 0f)
+        {
+            return;
+        }
 
         defender.health -= damage;
+
         Debug.Log($"{attacker.data.name} dealt {damage} damage to {defender.data.name}");
 
         if (defender.health <= 0f)
@@ -507,6 +586,11 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator HandleVictory()
     {
+        if (giveLootOnlyOnVictory)
+        {
+            GivePendingLootToInventory();
+        }
+
         SpawnManager spawnManager = SpawnManager.Instance;
 
         if (spawnManager != null)
@@ -514,7 +598,6 @@ public class CombatManager : MonoBehaviour
             string encounterId = spawnManager.currentEncounterId;
             string encounterAreaId = spawnManager.currentEncounterAreaId;
 
-            // Random encounters should not permanently remove fixed world encounters.
             bool isRandomEncounter = !string.IsNullOrEmpty(encounterId) && encounterId.StartsWith("random_");
 
             if (!isRandomEncounter &&
@@ -525,6 +608,7 @@ public class CombatManager : MonoBehaviour
             }
 
             Debug.Log($"Victory! Waiting {bufferTimePostCombat} seconds before returning...");
+
             yield return new WaitForSeconds(bufferTimePostCombat);
 
             spawnManager.ClearCurrentEncounter();
@@ -535,6 +619,7 @@ public class CombatManager : MonoBehaviour
     private void NextTurn()
     {
         currentTurnIndex++;
+
         if (currentTurnIndex >= combatants.Count)
         {
             currentTurnIndex = 0;
@@ -564,6 +649,8 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
+        RollDropsFrom(deadCharacter);
+
         int removedIndex = combatants.IndexOf(deadCharacter);
         combatants.Remove(deadCharacter);
 
@@ -589,5 +676,161 @@ public class CombatManager : MonoBehaviour
                 RemoveDeadCharacter(combatants[i]);
             }
         }
+    }
+
+    private void RollDropsFrom(Character defeatedCharacter)
+    {
+        if (defeatedCharacter == null)
+        {
+            return;
+        }
+
+        if (defeatedCharacter.data == null)
+        {
+            return;
+        }
+
+        if (defeatedCharacter.team != 1)
+        {
+            return;
+        }
+
+        if (defeatedCharacter.data.dropsPool == null)
+        {
+            return;
+        }
+
+        foreach (ItemDrop drop in defeatedCharacter.data.dropsPool)
+        {
+            if (drop == null)
+            {
+                continue;
+            }
+
+            if (drop.item == null)
+            {
+                continue;
+            }
+
+            string dropId = GetDropId(drop);
+
+            if (drop.dropOnceOnly &&
+                InventoryManager.Instance != null &&
+                InventoryManager.Instance.HasCollectedOnceOnlyDrop(dropId))
+            {
+                Debug.Log($"Skipping once-only drop because it was already collected: {dropId}");
+                continue;
+            }
+
+            float chance = Mathf.Clamp01(drop.dropChance);
+            bool shouldDrop = drop.isPermanentDrop || Random.value <= chance;
+
+            if (!shouldDrop)
+            {
+                Debug.Log($"Loot failed roll: {drop.item.itemName} | Chance: {chance * 100f}%");
+                continue;
+            }
+
+            int minQuantity = Mathf.Max(1, drop.minQuantity);
+            int maxQuantity = Mathf.Max(minQuantity, drop.maxQuantity);
+            int quantity = Random.Range(minQuantity, maxQuantity + 1);
+
+            AddPendingLoot(drop.item, quantity, drop.dropOnceOnly, dropId);
+
+            Debug.Log($"Loot rolled: {drop.item.itemName} x{quantity} | Chance: {chance * 100f}%");
+        }
+
+        if (!giveLootOnlyOnVictory)
+        {
+            GivePendingLootToInventory();
+        }
+    }
+
+    private string GetDropId(ItemDrop drop)
+    {
+        if (drop == null)
+        {
+            return "";
+        }
+
+        if (!string.IsNullOrWhiteSpace(drop.uniqueDropId))
+        {
+            return drop.uniqueDropId.Trim();
+        }
+
+        if (drop.item != null && !string.IsNullOrWhiteSpace(drop.item.itemId))
+        {
+            return drop.item.itemId.Trim();
+        }
+
+        if (drop.item != null)
+        {
+            return drop.item.name;
+        }
+
+        return "";
+    }
+
+    private void AddPendingLoot(ItemData item, int quantity, bool dropOnceOnly, string onceOnlyDropId)
+    {
+        if (item == null || quantity <= 0)
+        {
+            return;
+        }
+
+        foreach (PendingLootEntry entry in pendingLoot)
+        {
+            if (entry.item == item &&
+                entry.dropOnceOnly == dropOnceOnly &&
+                entry.onceOnlyDropId == onceOnlyDropId)
+            {
+                entry.quantity += quantity;
+                return;
+            }
+        }
+
+        pendingLoot.Add(new PendingLootEntry(item, quantity, dropOnceOnly, onceOnlyDropId));
+    }
+
+    private void GivePendingLootToInventory()
+    {
+        if (pendingLoot.Count == 0)
+        {
+            return;
+        }
+
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning("Cannot give loot because InventoryManager is missing.");
+            pendingLoot.Clear();
+            return;
+        }
+
+        foreach (PendingLootEntry loot in pendingLoot)
+        {
+            if (loot == null || loot.item == null || loot.quantity <= 0)
+            {
+                continue;
+            }
+
+            bool added = InventoryManager.Instance.AddItem(loot.item, loot.quantity);
+
+            if (added)
+            {
+                Debug.Log($"Added loot to inventory: {loot.item.itemName} x{loot.quantity}");
+
+                if (loot.dropOnceOnly)
+                {
+                    InventoryManager.Instance.MarkOnceOnlyDropCollected(loot.onceOnlyDropId);
+                    Debug.Log($"Marked once-only drop collected: {loot.onceOnlyDropId}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Could not fully add loot '{loot.item.itemName}' x{loot.quantity} because inventory is full.");
+            }
+        }
+
+        pendingLoot.Clear();
     }
 }

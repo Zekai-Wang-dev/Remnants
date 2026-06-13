@@ -249,6 +249,7 @@ public class PlayerController : MonoBehaviour
         {
             CheckForExits("Backward");
         }
+     
     }
 
     void UpdateAnimations()

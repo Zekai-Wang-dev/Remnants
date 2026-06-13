@@ -1,50 +1,45 @@
-using System.Diagnostics.Contracts;
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(menuName = "Game/Item")]
 public class ItemData : ScriptableObject
 {
-
     public ItemType itemType;
     public string itemId;
     public string itemName;
     public string description;
-    public Texture imageIcon; 
+    public Sprite imageIcon;
+
+    [Header("Stacking")]
+    public bool isStackable = false;
+    public int maxStackSize = 1;
 
     public WeaponData weaponData;
-    public EquipmentData equipmentData; 
+    public EquipmentData equipmentData;
     public ConsumableData consumableData;
-
 }
 
 public enum ItemType
 {
-
-    Weapon, 
-    Equipment, 
+    Weapon,
+    Equipment,
     Consumable,
     Quest,
     Special
-
 }
 
 [System.Serializable]
 public class EquipmentData
 {
-
     public float speed;
     public float maxHealth;
     public float baseDefense;
-    public float trueDefense; 
+    public float trueDefense;
     public float energyReserves;
-
 }
 
 [System.Serializable]
 public class WeaponData
 {
-
     public float damage;
     public float speed;
     public float accuracy;
@@ -52,20 +47,18 @@ public class WeaponData
     public float dodgeBypassRate;
     public float parryChance;
     public float blockChance;
-    public float energyReserves; 
-
+    public float energyReserves;
 }
 
 [System.Serializable]
 public class ConsumableData
 {
-
     public float health;
     public float healthPercentage;
     public float speed;
     public float speedPercentage;
     public float damage;
-    public float damagePercentage; 
+    public float damagePercentage;
     public float defense;
     public float defensePercentage;
     public float trueDefense;
@@ -76,7 +69,4 @@ public class ConsumableData
     public float parryChance;
     public float blockChance;
     public float dodgeChance;
-
 }
-
-

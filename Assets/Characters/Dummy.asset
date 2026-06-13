@@ -29,3 +29,25 @@ MonoBehaviour:
   attackDuration: 1
   gridLocation: 4
   characterPrefab: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+  dropsPool:
+  - item: {fileID: 11400000, guid: 7409284665e9544418c5197aeccdafb0, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: c521965c6449a74459374acb31b85bc7, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 4a22fb08686309947af0d33c4dfcafda, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1

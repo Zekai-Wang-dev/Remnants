@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 0
-  itemId: 
+  itemId: 000
   itemName: Sword
   description: 
+  imageIcon: {fileID: -9011227858493221408, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}
+  isStackable: 1
+  maxStackSize: 5
   weaponData:
     damage: 70
     speed: 10

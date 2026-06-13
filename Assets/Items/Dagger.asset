@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Dagger
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 0
-  itemId: 
+  itemId: 001
   itemName: Dagger
   description: 
+  imageIcon: {fileID: 8780202901261718726, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}
+  isStackable: 1
+  maxStackSize: 5
   weaponData:
     damage: 40
     speed: 40
