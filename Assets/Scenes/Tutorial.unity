@@ -567,6 +567,7 @@ GameObject:
   m_Component:
   - component: {fileID: 124265613}
   - component: {fileID: 124265614}
+  - component: {fileID: 124265618}
   - component: {fileID: 124265612}
   - component: {fileID: 124265611}
   - component: {fileID: 124265615}
@@ -796,6 +797,21 @@ MonoBehaviour:
     currentParryChance: 0
     currentBlockChance: 0
     currentDodgeChance: 0
+--- !u!114 &124265618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124265610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0291e8086d96954e9e8dc68f5f93495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
+  inventory: []
+  width: 5
+  height: 6
 --- !u!1 &165366697
 GameObject:
   m_ObjectHideFlags: 0

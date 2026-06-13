@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d01e18a6ee3ba41a3d405044bacb41, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemType: 0
+  itemId: 
+  itemName: Sword
+  description: 
+  weaponData:
+    damage: 70
+    speed: 10
+    accuracy: 10
+    blockBypassRate: 10
+    dodgeBypassRate: 10
+    parryChance: 5
+    blockChance: 5
+    energyReserves: 0
+  equipmentData:
+    speed: 0
+    maxHealth: 0
+    baseDefense: 0
+    trueDefense: 0
+    energyReserves: 0
+  consumableData:
+    health: 0
+    healthPercentage: 0
+    speed: 0
+    speedPercentage: 0
+    damage: 0
+    damagePercentage: 0
+    defense: 0
+    defensePercentage: 0
+    trueDefense: 0
+    accuracy: 0
+    blockBypassRate: 0
+    dodgeBypassRate: 0
+    energyReserves: 0
+    parryChance: 0
+    blockChance: 0
+    dodgeChance: 0
