@@ -16,7 +16,7 @@ MonoBehaviour:
   isPlayer: 1
   maxHealth: 200
   speed: 5
-  damage: 1000
+  damage: 100
   defense: 20
   trueDefense: 0
   accuracy: 50
@@ -29,3 +29,4 @@ MonoBehaviour:
   attackDuration: 1
   gridLocation: 4
   characterPrefab: {fileID: 8480755311966221645, guid: 4840b798cc5d7114180162ef5524e9ab, type: 3}
+  dropsPool: []
