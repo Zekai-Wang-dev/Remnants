@@ -13,6 +13,9 @@ public class ItemData : ScriptableObject
     public bool isStackable = false;
     public int maxStackSize = 1;
 
+    [Header("Equip Slot")]
+    public EquipSlotType equipSlotType = EquipSlotType.None;
+
     public WeaponData weaponData;
     public EquipmentData equipmentData;
     public ConsumableData consumableData;
@@ -25,6 +28,17 @@ public enum ItemType
     Consumable,
     Quest,
     Special
+}
+
+public enum EquipSlotType
+{
+    None,
+    Weapon,
+    Head,
+    Body,
+    Legs,
+    Hands,
+    Accessory
 }
 
 [System.Serializable]

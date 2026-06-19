@@ -93,7 +93,6 @@ public class PlayerController : MonoBehaviour
             backgroundScript.parallax(velocity);
         }
 
-        Debug.Log(velocity); 
         accumulatedDistance += movementDelta.magnitude;
         lastPosition = rb.position;
 

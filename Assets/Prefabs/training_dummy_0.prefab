@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a17a2fe057542348889d837759ccf86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTracker
-  encounterId: 000
+  encounterId: EnemySpawn1
   areaId: 000
 --- !u!212 &1772620200135044291
 SpriteRenderer:

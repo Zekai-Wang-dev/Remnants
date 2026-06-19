@@ -162,4 +162,84 @@ public class PlayerDataManager : MonoBehaviour
     {
         return playerData != null && playerData.currentHealth > 0;
     }
+
+    public void RecalculateStatsFromEquipment()
+    {
+        if (playerData == null || playerCharacterData == null)
+        {
+            return;
+        }
+
+        float oldHealth = playerData.currentHealth;
+
+        playerData.ResetToBaseStats(playerCharacterData);
+
+        ApplyEquippedItemStats();
+
+        // Optional: preserve current health instead of fully healing on every equipment change.
+        playerData.currentHealth = Mathf.Min(oldHealth, playerData.currentHealth);
+    }
+
+    private void ApplyEquippedItemStats()
+    {
+        if (InventoryManager.Instance == null)
+        {
+            return;
+        }
+
+        foreach (InventorySlotData slot in InventoryManager.Instance.inventory)
+        {
+            if (slot == null || slot.IsEmpty || slot.item == null)
+            {
+                continue;
+            }
+
+            if (!slot.equipped)
+            {
+                continue;
+            }
+
+            ItemData item = slot.item;
+
+            if (item.itemType == ItemType.Weapon)
+            {
+                ApplyWeaponStats(item.weaponData);
+            }
+            else if (item.itemType == ItemType.Equipment)
+            {
+                ApplyEquipmentStats(item.equipmentData);
+            }
+        }
+    }
+
+    private void ApplyWeaponStats(WeaponData weaponData)
+    {
+        if (weaponData == null)
+        {
+            return;
+        }
+
+        playerData.currentDamage += weaponData.damage;
+        playerData.currentSpeed += weaponData.speed;
+        playerData.currentAccuracy += weaponData.accuracy;
+        playerData.currentBlockBypassRate += weaponData.blockBypassRate;
+        playerData.currentDodgeBypassRate += weaponData.dodgeBypassRate;
+        playerData.currentParryChance += weaponData.parryChance;
+        playerData.currentBlockChance += weaponData.blockChance;
+        playerData.currentEnergyReserves += weaponData.energyReserves;
+    }
+
+    private void ApplyEquipmentStats(EquipmentData equipmentData)
+    {
+        if (equipmentData == null)
+        {
+            return;
+        }
+
+        playerData.currentSpeed += equipmentData.speed;
+        playerData.currentHealth += equipmentData.maxHealth;
+        playerData.currentBaseDefense += equipmentData.baseDefense;
+        playerData.currentTrueDefense += equipmentData.trueDefense;
+        playerData.currentEnergyReserves += equipmentData.energyReserves;
+    }
 }

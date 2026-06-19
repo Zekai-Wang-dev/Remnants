@@ -24,7 +24,7 @@ public class Character : MonoBehaviour
 
     private Transform myTransform;
 
-    void Awake()
+    private void Awake()
     {
         myTransform = transform;
     }
@@ -39,7 +39,22 @@ public class Character : MonoBehaviour
 
     public void ResetHealth()
     {
-        if (data == null) return;
+        if (isPlayer)
+        {
+            PlayerData playerData = GetPlayerData();
+
+            if (playerData != null)
+            {
+                health = Mathf.Max(0f, playerData.currentHealth);
+                state = health > 0f ? "Alive" : "Dead";
+                return;
+            }
+        }
+
+        if (data == null)
+        {
+            return;
+        }
 
         health = data.maxHealth;
 
@@ -74,15 +89,15 @@ public class Character : MonoBehaviour
 
         if (threatType == "HighestDPS")
         {
-            validTargets.Sort((a, b) => b.data.damage.CompareTo(a.data.damage));
+            validTargets.Sort((a, b) => b.GetDamage().CompareTo(a.GetDamage()));
         }
         else if (threatType == "HighestDEF")
         {
-            validTargets.Sort((a, b) => b.data.defense.CompareTo(a.data.defense));
+            validTargets.Sort((a, b) => b.GetBaseDefense().CompareTo(a.GetBaseDefense()));
         }
         else if (threatType == "HighestSpeed")
         {
-            validTargets.Sort((a, b) => b.data.speed.CompareTo(a.data.speed));
+            validTargets.Sort((a, b) => b.GetSpeed().CompareTo(a.GetSpeed()));
         }
 
         target = validTargets[0];
@@ -93,7 +108,7 @@ public class Character : MonoBehaviour
         defenseType = "";
         bool defenseSucceeded = false;
 
-        if (attacker == null || attacker.data == null || data == null)
+        if (attacker == null || !HasCombatStats() || !attacker.HasCombatStats())
         {
             return false;
         }
@@ -122,14 +137,14 @@ public class Character : MonoBehaviour
 
     public bool RollForParry(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null)
+        if (attacker == null || !HasCombatStats() || !attacker.HasCombatStats())
         {
             return false;
         }
 
-        float parryChance = data.parryChance;
-        float speedDiff = data.speed - attacker.data.speed;
-        float accuracyDiff = data.accuracy - attacker.data.accuracy;
+        float parryChance = GetParryChance();
+        float speedDiff = GetSpeed() - attacker.GetSpeed();
+        float accuracyDiff = GetAccuracy() - attacker.GetAccuracy();
 
         float speedModifier = Mathf.Log10(1f + Mathf.Abs(speedDiff)) * Mathf.Sign(speedDiff);
         float accuracyModifier = Mathf.Log10(1f + Mathf.Abs(accuracyDiff)) * Mathf.Sign(accuracyDiff);
@@ -157,14 +172,14 @@ public class Character : MonoBehaviour
 
     public bool RollForDodge(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null)
+        if (attacker == null || !HasCombatStats() || !attacker.HasCombatStats())
         {
             return false;
         }
 
-        float dodgeChance = data.dodgeChance;
-        float speedDiff = data.speed - attacker.data.speed;
-        float accuracyDiff = data.accuracy - attacker.data.accuracy;
+        float dodgeChance = GetDodgeChance();
+        float speedDiff = GetSpeed() - attacker.GetSpeed();
+        float accuracyDiff = GetAccuracy() - attacker.GetAccuracy();
 
         float speedModifier = Mathf.Log10(1f + Mathf.Abs(speedDiff)) * Mathf.Sign(speedDiff);
         float accuracyModifier = Mathf.Log10(1f + Mathf.Abs(accuracyDiff)) * Mathf.Sign(accuracyDiff);
@@ -192,13 +207,13 @@ public class Character : MonoBehaviour
 
     public bool RollForBlock(Character attacker, float attackStartTime, float attackDuration)
     {
-        if (attacker == null || attacker.data == null || data == null)
+        if (attacker == null || !HasCombatStats() || !attacker.HasCombatStats())
         {
             return false;
         }
 
-        float blockChance = data.blockChance;
-        float defenseDiff = data.defense - attacker.data.damage;
+        float blockChance = GetBlockChance();
+        float defenseDiff = GetBaseDefense() - attacker.GetDamage();
 
         float defenseModifier = Mathf.Log10(1f + Mathf.Abs(defenseDiff)) * Mathf.Sign(defenseDiff);
 
@@ -260,6 +275,198 @@ public class Character : MonoBehaviour
 
         myTransform.position = startPos;
     }
+
+    public bool HasCombatStats()
+    {
+        if (isPlayer && GetPlayerData() != null)
+        {
+            return true;
+        }
+
+        return data != null;
+    }
+
+    public string GetDisplayName()
+    {
+        if (data != null)
+        {
+            return data.name;
+        }
+
+        return gameObject.name;
+    }
+
+    public float GetAttackDuration(float fallback)
+    {
+        if (data != null && data.attackDuration > 0f)
+        {
+            return data.attackDuration;
+        }
+
+        return fallback;
+    }
+
+    public float GetDamage()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentDamage;
+        }
+
+        return data != null ? data.damage : 0f;
+    }
+
+    public float GetSpeed()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentSpeed;
+        }
+
+        return data != null ? data.speed : 0f;
+    }
+
+    public float GetBaseDefense()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentBaseDefense;
+        }
+
+        return data != null ? data.defense : 0f;
+    }
+
+    public float GetTrueDefense()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentTrueDefense;
+        }
+
+        return data != null ? data.trueDefense : 0f;
+    }
+
+    public float GetAccuracy()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentAccuracy;
+        }
+
+        return data != null ? data.accuracy : 0f;
+    }
+
+    public float GetParryChance()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentParryChance;
+        }
+
+        return data != null ? data.parryChance : 0f;
+    }
+
+    public float GetBlockChance()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentBlockChance;
+        }
+
+        return data != null ? data.blockChance : 0f;
+    }
+
+    public float GetDodgeChance()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentDodgeChance;
+        }
+
+        return data != null ? data.dodgeChance : 0f;
+    }
+
+    public float GetBlockBypassRate()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentBlockBypassRate;
+        }
+
+        return data != null ? data.blockBypassRate : 0f;
+    }
+
+    public float GetDodgeBypassRate()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentDodgeBypassRate;
+        }
+
+        return data != null ? data.dodgeBypassRate : 0f;
+    }
+
+    public float GetEnergyReserves()
+    {
+        PlayerData playerData = GetPlayerData();
+
+        if (isPlayer && playerData != null)
+        {
+            return playerData.currentEnergyReserves;
+        }
+
+        return data != null ? data.energyReserves : 0f;
+    }
+
+    public void SetCombatHealth(float value)
+    {
+        health = Mathf.Max(0f, value);
+
+        if (isPlayer)
+        {
+            PlayerData playerData = GetPlayerData();
+
+            if (playerData != null)
+            {
+                playerData.currentHealth = health;
+            }
+        }
+    }
+
+    private PlayerData GetPlayerData()
+    {
+        if (!isPlayer)
+        {
+            return null;
+        }
+
+        if (PlayerDataManager.Instance == null)
+        {
+            return null;
+        }
+
+        return PlayerDataManager.Instance.playerData;
+    }
 }
 
 [System.Serializable]
@@ -300,7 +507,7 @@ public class CombatManager : MonoBehaviour
 
     private readonly List<PendingLootEntry> pendingLoot = new();
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -331,7 +538,7 @@ public class CombatManager : MonoBehaviour
 
         foreach (Character c in playerTeam)
         {
-            if (c == null || c.data == null)
+            if (c == null || !c.HasCombatStats())
             {
                 continue;
             }
@@ -339,7 +546,11 @@ public class CombatManager : MonoBehaviour
             c.team = 0;
             c.state = "Alive";
             c.ResetHealth();
-            combatants.Add(c);
+
+            if (c.state != "Dead")
+            {
+                combatants.Add(c);
+            }
         }
 
         foreach (Character c in enemyTeam)
@@ -355,7 +566,7 @@ public class CombatManager : MonoBehaviour
             combatants.Add(c);
         }
 
-        combatants.Sort((a, b) => b.data.speed.CompareTo(a.data.speed));
+        combatants.Sort((a, b) => b.GetSpeed().CompareTo(a.GetSpeed()));
 
         foreach (Character c in combatants)
         {
@@ -386,9 +597,7 @@ public class CombatManager : MonoBehaviour
 
             if (current.target != null)
             {
-                float attackDuration = current.data.attackDuration > 0f
-                    ? current.data.attackDuration
-                    : attackAnimationDuration;
+                float attackDuration = current.GetAttackDuration(attackAnimationDuration);
 
                 float attackStartTime = Time.time;
 
@@ -419,7 +628,7 @@ public class CombatManager : MonoBehaviour
             }
             else
             {
-                Debug.Log($"{current.data.name} has no valid target. Skipping turn.");
+                Debug.Log($"{current.GetDisplayName()} has no valid target. Skipping turn.");
             }
 
             RemoveAllDeadCharacters();
@@ -455,6 +664,7 @@ public class CombatManager : MonoBehaviour
             {
                 pendingLoot.Clear();
                 Debug.Log("Player team defeated! Pending loot discarded.");
+                SavePlayerIfPossible();
                 yield break;
             }
 
@@ -523,16 +733,16 @@ public class CombatManager : MonoBehaviour
         switch (defenseType)
         {
             case "Dodge":
-                Debug.Log($"{defender.data.name} dodged the attack!");
+                Debug.Log($"{defender.GetDisplayName()} dodged the attack!");
                 break;
 
             case "Parry":
-                Debug.Log($"{defender.data.name} parried the attack!");
+                Debug.Log($"{defender.GetDisplayName()} parried the attack!");
                 CalculateDamage(defender, attacker, "Counter");
                 break;
 
             case "Block":
-                Debug.Log($"{defender.data.name} blocked the attack!");
+                Debug.Log($"{defender.GetDisplayName()} blocked the attack!");
                 CalculateDamage(attacker, defender, "Blocked");
                 break;
         }
@@ -540,7 +750,12 @@ public class CombatManager : MonoBehaviour
 
     private void CalculateDamage(Character attacker, Character defender, string defenseContext = "None")
     {
-        if (attacker == null || attacker.data == null || defender == null || defender.data == null)
+        if (attacker == null || defender == null)
+        {
+            return;
+        }
+
+        if (!attacker.HasCombatStats() || !defender.HasCombatStats())
         {
             return;
         }
@@ -550,7 +765,7 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        float damage = attacker.data.damage - defender.data.defense;
+        float damage = attacker.GetDamage() - defender.GetBaseDefense();
         damage = Mathf.Max(damage, 1f);
 
         switch (defenseContext)
@@ -560,7 +775,7 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case "Counter":
-                damage = Mathf.Max(attacker.data.damage - defender.data.defense, 1f);
+                damage = Mathf.Max(attacker.GetDamage() - defender.GetBaseDefense(), 1f);
                 break;
 
             case "Dodge":
@@ -573,15 +788,17 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        defender.health -= damage;
+        defender.SetCombatHealth(defender.health - damage);
 
-        Debug.Log($"{attacker.data.name} dealt {damage} damage to {defender.data.name}");
+        Debug.Log($"{attacker.GetDisplayName()} dealt {damage} damage to {defender.GetDisplayName()}");
 
         if (defender.health <= 0f)
         {
             defender.state = "Dead";
-            Debug.Log($"{defender.data.name} died!");
+            Debug.Log($"{defender.GetDisplayName()} died!");
         }
+
+        SavePlayerIfPossible();
     }
 
     private IEnumerator HandleVictory()
@@ -590,6 +807,8 @@ public class CombatManager : MonoBehaviour
         {
             GivePendingLootToInventory();
         }
+
+        SavePlayerIfPossible();
 
         SpawnManager spawnManager = SpawnManager.Instance;
 
@@ -664,7 +883,7 @@ public class CombatManager : MonoBehaviour
             Destroy(deadCharacter.gameObject);
         }
 
-        Debug.Log($"{deadCharacter.data.name} removed from combat.");
+        Debug.Log($"{deadCharacter.GetDisplayName()} removed from combat.");
     }
 
     private void RemoveAllDeadCharacters()
@@ -832,5 +1051,15 @@ public class CombatManager : MonoBehaviour
         }
 
         pendingLoot.Clear();
+    }
+
+    private void SavePlayerIfPossible()
+    {
+        if (PlayerDataManager.Instance == null)
+        {
+            return;
+        }
+
+        PlayerDataManager.Instance.SavePlayer();
     }
 }

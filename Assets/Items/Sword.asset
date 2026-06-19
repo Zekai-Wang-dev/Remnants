@@ -17,8 +17,9 @@ MonoBehaviour:
   itemName: Sword
   description: 
   imageIcon: {fileID: -9011227858493221408, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}
-  isStackable: 1
+  isStackable: 0
   maxStackSize: 5
+  equipSlotType: 1
   weaponData:
     damage: 70
     speed: 10

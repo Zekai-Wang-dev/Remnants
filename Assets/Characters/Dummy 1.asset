@@ -28,4 +28,12 @@ MonoBehaviour:
   dodgeChance: 0
   attackDuration: 1
   gridLocation: 0
-  characterPrefab: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+  characterPrefab: {fileID: 4024246200929757137, guid: b6e9809f41488aa47885ce9ef027805d, type: 3}
+  dropsPool:
+  - item: {fileID: 11400000, guid: 7409284665e9544418c5197aeccdafb0, type: 2}
+    dropChance: 1
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1

@@ -17,8 +17,9 @@ MonoBehaviour:
   itemName: Dagger
   description: 
   imageIcon: {fileID: 8780202901261718726, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}
-  isStackable: 1
+  isStackable: 0
   maxStackSize: 5
+  equipSlotType: 1
   weaponData:
     damage: 40
     speed: 40
