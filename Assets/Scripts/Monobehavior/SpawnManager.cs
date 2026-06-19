@@ -30,6 +30,13 @@ public class SpawnManager : MonoBehaviour
     public string currentEncounterAreaId;
     public string currentEncounterId;
 
+    [Header("Encounter Cooldown")]
+    [SerializeField] private float postCombatRandomEncounterCooldown = 3f;
+
+    private float randomEncounterCooldownEndTime = 0f;
+    private bool isSceneTransitioning = false;
+    private bool startCooldownAfterSceneLoad = false;
+
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
 
@@ -72,6 +79,43 @@ public class SpawnManager : MonoBehaviour
     {
         currentEncounterAreaId = "";
         currentEncounterId = "";
+    }
+
+    public bool IsRandomEncounterCooldownActive()
+    {
+        return Time.time < randomEncounterCooldownEndTime;
+    }
+
+    public float GetRandomEncounterCooldownRemaining()
+    {
+        return Mathf.Max(0f, randomEncounterCooldownEndTime - Time.time);
+    }
+
+    public bool CanStartRandomEncounter()
+    {
+        if (isSceneTransitioning)
+        {
+            return false;
+        }
+
+        if (IsRandomEncounterCooldownActive())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void StartPostCombatRandomEncounterCooldown()
+    {
+        randomEncounterCooldownEndTime = Time.time + postCombatRandomEncounterCooldown;
+        Debug.Log($"Random encounters disabled for {postCombatRandomEncounterCooldown} seconds after combat.");
+    }
+
+    private bool IsCurrentEncounterRandom()
+    {
+        return !string.IsNullOrEmpty(currentEncounterId) &&
+               currentEncounterId.StartsWith("random_");
     }
 
     public int FindSceneIndex(string sceneId)
@@ -144,6 +188,12 @@ public class SpawnManager : MonoBehaviour
 
     public void NextArea(string direction)
     {
+        if (isSceneTransitioning)
+        {
+            Debug.LogWarning("Blocked area transition because a scene transition is already happening.");
+            return;
+        }
+
         StoreCurrentAreaPosition();
 
         previousAreaIndex = currentAreaIndex;
@@ -154,12 +204,15 @@ public class SpawnManager : MonoBehaviour
             case "Left":
                 currentAreaIndex.x--;
                 break;
+
             case "Right":
                 currentAreaIndex.x++;
                 break;
+
             case "Forward":
                 currentAreaIndex.y++;
                 break;
+
             case "Backward":
                 currentAreaIndex.y--;
                 break;
@@ -172,6 +225,26 @@ public class SpawnManager : MonoBehaviour
 
     public void NextScene(string direction)
     {
+        if (direction == "Combat")
+        {
+            if (isSceneTransitioning)
+            {
+                Debug.LogWarning("Blocked combat scene transition because a scene transition is already happening.");
+                return;
+            }
+
+            if (IsCurrentEncounterRandom() && !CanStartRandomEncounter())
+            {
+                Debug.LogWarning($"Blocked random encounter because cooldown is active. Remaining: {GetRandomEncounterCooldownRemaining():0.00}s");
+                return;
+            }
+        }
+        else if (isSceneTransitioning)
+        {
+            Debug.LogWarning("Blocked scene transition because a scene transition is already happening.");
+            return;
+        }
+
         StoreCurrentAreaPosition();
 
         if (currentSceneId != "001")
@@ -187,24 +260,32 @@ public class SpawnManager : MonoBehaviour
             case "Left":
                 currentSceneIndex.x--;
                 break;
+
             case "Right":
                 currentSceneIndex.x++;
                 break;
+
             case "Forward":
                 currentSceneIndex.y++;
                 break;
+
             case "Backward":
                 currentSceneIndex.y--;
                 break;
+
             case "Combat":
                 currentSceneIndex = new Vector2(1, 0);
                 currentAreaIndex = new Vector2(0, 0);
                 SetPlayerVisibility(false);
                 break;
+
             case "CombatOver":
                 currentSceneIndex = previousSceneIndex;
                 currentAreaIndex = previousAreaIndex;
                 SetPlayerVisibility(true);
+
+                // Cooldown starts after the original area finishes loading.
+                startCooldownAfterSceneLoad = true;
                 break;
         }
 
@@ -303,23 +384,38 @@ public class SpawnManager : MonoBehaviour
             return;
         }
 
+        isSceneTransitioning = true;
+
         SceneManager.LoadSceneAsync(sceneToLoad.sceneName).completed += (_) =>
         {
             spawnPointRegistry = Object.FindFirstObjectByType<SpawnPointRegistry>();
             if (spawnPointRegistry == null)
             {
                 Debug.LogError("SpawnPointRegistry missing after scene load!");
+                isSceneTransitioning = false;
                 return;
             }
 
             GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null) return;
+            if (player == null)
+            {
+                isSceneTransitioning = false;
+                return;
+            }
 
             Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
-            if (playerRb == null) return;
+            if (playerRb == null)
+            {
+                isSceneTransitioning = false;
+                return;
+            }
 
             SpawnPointRegistry.SpawnPoint spawnPoints = spawnPointRegistry.Get(areaId);
-            if (spawnPoints == null) return;
+            if (spawnPoints == null)
+            {
+                isSceneTransitioning = false;
+                return;
+            }
 
             UpdateParallaxArea(areaData);
 
@@ -340,6 +436,14 @@ public class SpawnManager : MonoBehaviour
 
             SpawnEnemies(areaData, spawnPoints);
             CleanupDefeatedEncounters(areaId);
+
+            isSceneTransitioning = false;
+
+            if (startCooldownAfterSceneLoad)
+            {
+                startCooldownAfterSceneLoad = false;
+                StartPostCombatRandomEncounterCooldown();
+            }
         };
     }
 
