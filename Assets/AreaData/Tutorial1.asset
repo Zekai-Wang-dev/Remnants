@@ -22,3 +22,6 @@ MonoBehaviour:
   randomEncounterPool: []
   randomEncounterChance: 0.1
   minDistanceBetweenEncounters: 5
+  interactables:
+  - interactableData: {fileID: 11400000, guid: 9ffb2a429af6c2e4db0383c4b961be39, type: 2}
+    spawnPointId: Test

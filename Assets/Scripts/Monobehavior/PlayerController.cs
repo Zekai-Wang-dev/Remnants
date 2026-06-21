@@ -11,18 +11,23 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 lastPosition;
     private bool isBlocked = false;
-    private bool canMove = true; 
+    private bool canMove = true;
 
+    [Header("Interaction / Detection")]
     public float InteractRadius;
     public float ExitRadius;
 
+    private WorldInteractable currentHighlightedInteractable;
+
+    [Header("Area Transition")]
     public float areaTransitionCooldown = 0.5f;
     private float lastTransitionTime = -10f;
     private bool isTransitioning = false;
 
     public AreaData currentArea;
 
-    private float randomCheckInterval = 0.5f; // Check every 0.5 seconds.
+    [Header("Random Encounters")]
+    private float randomCheckInterval = 0.5f;
     private float nextRandomCheckTime = 0f;
     public float accumulatedDistance;
 
@@ -97,11 +102,14 @@ public class PlayerController : MonoBehaviour
         lastPosition = rb.position;
 
         CheckForEncounters();
+        CheckForInteractables();
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector2(ExitRadius, ExitRadius));
+
+        Gizmos.DrawWireSphere(transform.position, InteractRadius);
     }
 
     void ResetDistanceTracking()
@@ -124,6 +132,7 @@ public class PlayerController : MonoBehaviour
     {
         velocity = Vector2.zero;
         canMove = false;
+        ClearHighlightedInteractable();
     }
 
     public void EnableMovement()
@@ -159,8 +168,10 @@ public class PlayerController : MonoBehaviour
 
             Debug.Log($"Random encounter triggered: {enemy.name}");
 
+            ClearHighlightedInteractable();
+
             spawnManager.SetCurrentEncounter(area.areaId, "random_" + enemy.name);
-            ResetDistanceTracking(); 
+            ResetDistanceTracking();
             spawnManager.NextScene("Combat");
         }
     }
@@ -183,11 +194,100 @@ public class PlayerController : MonoBehaviour
         {
             if (hit.CompareTag(direction))
             {
+                ClearHighlightedInteractable();
+
                 spawnManager.NextArea(direction);
                 Debug.Log("Exit " + direction + " detected, changing area...");
+
                 GetCurrentArea();
                 ResetDistanceTracking();
             }
+        }
+    }
+
+    void CheckForInteractables()
+    {
+        if (spawnManager == null)
+        {
+            ClearHighlightedInteractable();
+            Debug.LogError("SpawnManager not found.");
+            return;
+        }
+
+        if (spawnManager.currentSceneId == "001")
+        {
+            ClearHighlightedInteractable();
+            Debug.Log("In scene 001, skipping interactable check.");
+            return;
+        }
+
+        if (!canMove)
+        {
+            ClearHighlightedInteractable();
+            Debug.Log("Movement disabled, skipping interactable check.");
+            return;
+        }
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            transform.position,
+            InteractRadius,
+            LayerMask.GetMask("Interactable"));
+
+        WorldInteractable closestInteractable = null;
+        float closestDistanceSqr = float.MaxValue;
+
+        foreach (Collider2D hit in hits)
+        {
+
+            if (!hit.CompareTag("Interactable"))
+            {
+                Debug.LogWarning("Collider detected in Interactable layer that does not have Interactable tag.");
+                continue;
+            }
+
+            Debug.Log($"Found interactable candidate: {hit.name}");
+
+            WorldInteractable interactable = hit.GetComponent<WorldInteractable>();
+
+            if (interactable == null)
+            {
+                Debug.LogWarning("Interactable collider has Interactable tag but no WorldInteractable component.");
+                continue;
+            }
+
+            float distanceSqr = ((Vector2)hit.transform.position - rb.position).sqrMagnitude;
+
+            if (distanceSqr < closestDistanceSqr)
+            {
+                closestDistanceSqr = distanceSqr;
+                closestInteractable = interactable;
+            }
+        }
+
+        if (currentHighlightedInteractable == closestInteractable)
+        {
+            return;
+        }
+
+        if (currentHighlightedInteractable != null)
+        {
+            currentHighlightedInteractable.Unhighlight();
+        }
+
+        currentHighlightedInteractable = closestInteractable;
+
+        if (currentHighlightedInteractable != null)
+        {
+            currentHighlightedInteractable.Highlight();
+        }
+    }
+
+    private void ClearHighlightedInteractable()
+    {
+        if (currentHighlightedInteractable != null)
+        {
+            currentHighlightedInteractable.Unhighlight();
+            currentHighlightedInteractable = null;
         }
     }
 
@@ -206,6 +306,7 @@ public class PlayerController : MonoBehaviour
             if (hit.CompareTag("Encounter"))
             {
                 EncounterTrigger trigger = hit.GetComponent<EncounterTrigger>();
+
                 if (trigger != null)
                 {
                     spawnManager.SetCurrentEncounter(trigger.areaId, trigger.encounterId);
@@ -216,8 +317,12 @@ public class PlayerController : MonoBehaviour
                 }
 
                 Debug.Log("Enemy detected, triggering encounter...");
+
+                ClearHighlightedInteractable();
+
                 Destroy(hit.gameObject);
                 ResetDistanceTracking();
+
                 spawnManager.NextScene("Combat");
                 return;
             }
@@ -229,8 +334,18 @@ public class PlayerController : MonoBehaviour
         velocity.x = 0;
 
         if (spawnManager == null) return;
-        if (!canMove) return;
-        if (spawnManager.currentSceneId == "001") return;
+
+        if (!canMove)
+        {
+            ClearHighlightedInteractable();
+            return;
+        }
+
+        if (spawnManager.currentSceneId == "001")
+        {
+            ClearHighlightedInteractable();
+            return;
+        }
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -248,7 +363,16 @@ public class PlayerController : MonoBehaviour
         {
             CheckForExits("Backward");
         }
-     
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (currentHighlightedInteractable != null)
+            {
+                currentHighlightedInteractable.Interact();
+
+                // The object may destroy itself after interaction.
+                currentHighlightedInteractable = null;
+            }
+        }
     }
 
     void UpdateAnimations()
@@ -291,6 +415,8 @@ public class PlayerController : MonoBehaviour
 
     void ExecuteAreaTransition(string direction)
     {
+        ClearHighlightedInteractable();
+
         Vector2 offset = Vector2.zero;
 
         if (direction == "Left")

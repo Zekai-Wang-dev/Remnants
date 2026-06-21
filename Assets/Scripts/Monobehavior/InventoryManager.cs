@@ -420,6 +420,36 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    public void ClearInventory(bool clearOnceOnlyDrops = true)
+    {
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            if (inventory[i] == null)
+            {
+                inventory[i] = new InventorySlotData();
+            }
+
+            inventory[i].Clear();
+        }
+
+        if (clearOnceOnlyDrops)
+        {
+            collectedOnceOnlyDropIds.Clear();
+            PlayerPrefs.DeleteKey("CollectedOnceOnlyDrops");
+            PlayerPrefs.Save();
+        }
+
+        NotifyInventoryChanged();
+        NotifyAllEquipmentChanged();
+
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.RecalculateStatsFromEquipment();
+        }
+
+        Debug.Log("Inventory runtime data cleared.");
+    }
+
     public void ClearSlot(int index)
     {
         InventorySlotData slot = GetSlot(index);

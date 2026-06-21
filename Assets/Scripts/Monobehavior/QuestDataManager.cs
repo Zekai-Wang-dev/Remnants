@@ -124,6 +124,22 @@ public class QuestDataManager : MonoBehaviour
         NotifyQuestsChanged(true);
     }
 
+    public void ClearRuntimeQuestData()
+    {
+        isLoadingFromSave = true;
+
+        ongoingQuests.Clear();
+        completedQuestIds.Clear();
+        rewardClaimedQuestIds.Clear();
+        savedQuestStateById.Clear();
+
+        isLoadingFromSave = false;
+
+        NotifyQuestsChanged(false);
+
+        Debug.Log("Quest runtime data cleared.");
+    }
+
     public void ReportEnemyDefeated(string enemyId, int amount = 1)
     {
         if (string.IsNullOrWhiteSpace(enemyId) || amount <= 0)

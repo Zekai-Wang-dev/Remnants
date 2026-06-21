@@ -17,6 +17,8 @@ public class AreaData : ScriptableObject
     public float randomEncounterChance = 0.1f; // Base chance per movement check.
     public float minDistanceBetweenEncounters = 5f; // Minimum distance before another can spawn.
 
+    public List<InteractableEntry> interactables = new();
+
     /// <summary>
     /// Picks one valid random enemy using weights.
     /// Keeps the old no-argument call working, but also supports level/flag filtering later.
@@ -135,6 +137,13 @@ public class AreaData : ScriptableObject
 
         return null;
     }
+}
+
+[System.Serializable]
+public class InteractableEntry
+{
+    public InteractableData interactableData;
+    public string spawnPointId; // Matches SpawnPointRegistry.InteractableSpawn.spawnPointId.
 }
 
 [System.Serializable]

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25d8ca51eac9470468a64f049e92ed87, type: 3}
+  m_Name: Something
+  m_EditorClassIdentifier: Assembly-CSharp::InteractableData
+  interactableId: Test
+  displayName: Test
+  interactablePrefab: {fileID: 2868209051854855979, guid: 4c0f40eae9c2ca24d8800b002a9e9250, type: 3}
+  interactionPrompt: Press "E" buddy
+  canOnlyInteractOnce: 1
+  requiredFlags: []
+  flagsToSet: []
+  itemInteraction:
+    loot:
+    - {fileID: 11400000, guid: c9de9bfcbefe99841ae5d9417065b5d0, type: 2}
+  sceneInteraction:
+    scene: {fileID: 0}
+  questInteraction:
+    questData: {fileID: 0}
+    objectiveId: 
+    completeQuest: 0
+  combatInteraction:
+    enemies: []

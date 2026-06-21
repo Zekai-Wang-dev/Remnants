@@ -13,10 +13,18 @@ public class SpawnPointRegistry : MonoBehaviour
         public Transform leftBorder;
         public Transform rightBorder;
         public List<EnemySpawn> enemySpawns = new();
+        public List<InteractableSpawn> interactableSpawns = new();
     }
 
     [System.Serializable]
     public class EnemySpawn
+    {
+        public string spawnPointId;
+        public Transform transform;
+    }
+
+    [System.Serializable]
+    public class InteractableSpawn
     {
         public string spawnPointId;
         public Transform transform;

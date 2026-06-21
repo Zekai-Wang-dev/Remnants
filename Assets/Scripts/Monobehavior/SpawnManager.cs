@@ -26,6 +26,7 @@ public class SpawnManager : MonoBehaviour
     private readonly Dictionary<string, Vector2> areaPositions = new();
     private SpawnPointRegistry spawnPointRegistry;
     private readonly Dictionary<string, HashSet<string>> defeatedEncounters = new();
+    private readonly Dictionary<string, HashSet<string>> claimedInteractables = new();
 
     public string currentEncounterAreaId;
     public string currentEncounterId;
@@ -56,6 +57,7 @@ public class SpawnManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         _instance = this;
         LoadDefeatedEncounters();
+        LoadClaimedInteractables();
     }
 
     private void Start()
@@ -220,6 +222,7 @@ public class SpawnManager : MonoBehaviour
 
         UpdateCurrentIdInfo();
         LoadArea(currentSceneId, currentAreaId);
+
         GetCameraController()?.changeBorders();
     }
 
@@ -300,13 +303,55 @@ public class SpawnManager : MonoBehaviour
         if (player == null) return;
 
         SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
-        if (sr != null) sr.enabled = visible;
+        if (sr != null)
+        {
+            sr.enabled = visible;
+        }
 
+        // Do NOT disable the player's Collider2D here.
+        // Interactable OverlapCircle checks can still work without it,
+        // but borders and cinematic triggers need the player collider enabled.
         Collider2D col = player.GetComponent<Collider2D>();
-        if (col != null) col.enabled = visible;
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.simulated = true;
+        }
 
         PlayerController pc = player.GetComponent<PlayerController>();
-        if (pc != null) pc.enabled = visible;
+        if (pc != null)
+        {
+            pc.enabled = true;
+        }
+    }
+
+    private void ForceEnablePlayerPhysics()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        Collider2D col = player.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.simulated = true;
+        }
+
+        PlayerController pc = player.GetComponent<PlayerController>();
+        if (pc != null)
+        {
+            pc.enabled = true;
+        }
     }
 
     private void StoreCurrentAreaPosition()
@@ -331,6 +376,8 @@ public class SpawnManager : MonoBehaviour
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null) return;
+
+        ForceEnablePlayerPhysics();
 
         Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
         if (playerRb == null) return;
@@ -365,7 +412,10 @@ public class SpawnManager : MonoBehaviour
         }
 
         SpawnEnemies(areaData, spawnPoints);
+        SpawnInteractables(areaData, spawnPoints);
+
         CleanupDefeatedEncounters(areaId);
+        CleanupClaimedInteractables(areaId);
 
         QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
     }
@@ -405,6 +455,8 @@ public class SpawnManager : MonoBehaviour
                 return;
             }
 
+            ForceEnablePlayerPhysics();
+
             Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
             if (playerRb == null)
             {
@@ -437,7 +489,11 @@ public class SpawnManager : MonoBehaviour
             }
 
             SpawnEnemies(areaData, spawnPoints);
+            SpawnInteractables(areaData, spawnPoints);
+
             CleanupDefeatedEncounters(areaId);
+            CleanupClaimedInteractables(areaId);
+
             QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
 
             isSceneTransitioning = false;
@@ -461,6 +517,86 @@ public class SpawnManager : MonoBehaviour
             {
                 backgroundManager.currentParallaxArea = parallaxArea;
                 break;
+            }
+        }
+    }
+
+    private void SpawnInteractables(AreaData areaData, SpawnPointRegistry.SpawnPoint spawnPoints)
+    {
+        foreach (GameObject interactable in GameObject.FindGameObjectsWithTag("Interactable"))
+        {
+            Destroy(interactable);
+        }
+
+        if (areaData == null || areaData.interactables == null)
+        {
+            return;
+        }
+
+        if (spawnPoints == null || spawnPoints.interactableSpawns == null)
+        {
+            return;
+        }
+
+        foreach (InteractableEntry interactableEntry in areaData.interactables)
+        {
+            if (interactableEntry == null)
+            {
+                continue;
+            }
+
+            if (interactableEntry.interactableData == null)
+            {
+                Debug.LogWarning($"Interactable entry in area {areaData.areaId} has no InteractableData.");
+                continue;
+            }
+
+            string interactableSaveId = GetInteractableSaveId(interactableEntry);
+
+            if (string.IsNullOrEmpty(interactableSaveId))
+            {
+                Debug.LogWarning($"Interactable entry in area {areaData.areaId} has no valid save ID.");
+                continue;
+            }
+
+            if (IsInteractableClaimed(areaData.areaId, interactableSaveId))
+            {
+                Debug.Log($"Skipping claimed interactable {interactableSaveId} in area {areaData.areaId}");
+                continue;
+            }
+
+            SpawnPointRegistry.InteractableSpawn interactableSpawn = spawnPoints.interactableSpawns
+                .Find(i => i.spawnPointId == interactableEntry.spawnPointId);
+
+            if (interactableSpawn == null || interactableSpawn.transform == null)
+            {
+                Debug.LogWarning($"No interactable spawn point found for ID {interactableEntry.spawnPointId} in area {areaData.areaId}");
+                continue;
+            }
+
+            if (interactableEntry.interactableData.interactablePrefab == null)
+            {
+                Debug.LogWarning($"InteractableData {interactableEntry.interactableData.name} has no prefab.");
+                continue;
+            }
+
+            GameObject interactableObject = Instantiate(
+                interactableEntry.interactableData.interactablePrefab,
+                interactableSpawn.transform.position,
+                Quaternion.identity);
+
+            WorldInteractable worldInteractable = interactableObject.GetComponent<WorldInteractable>();
+
+            if (worldInteractable != null)
+            {
+                worldInteractable.Initialize(
+                    interactableEntry.interactableData,
+                    areaData.areaId,
+                    interactableSaveId);
+            }
+            else
+            {
+                Debug.LogWarning($"Spawned interactable {interactableObject.name} has no WorldInteractable component.");
             }
         }
     }
@@ -504,6 +640,28 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    private void CleanupClaimedInteractables(string areaId)
+    {
+        if (string.IsNullOrEmpty(areaId)) return;
+        if (!claimedInteractables.ContainsKey(areaId)) return;
+
+        WorldInteractable[] interactables = Object.FindObjectsByType<WorldInteractable>(FindObjectsSortMode.None);
+
+        foreach (WorldInteractable interactable in interactables)
+        {
+            if (interactable == null) continue;
+
+            string interactableSaveId = interactable.GetInteractableSaveId();
+
+            if (!string.IsNullOrEmpty(interactableSaveId) &&
+                claimedInteractables[areaId].Contains(interactableSaveId))
+            {
+                Debug.Log($"Destroying claimed interactable: {interactableSaveId}");
+                Destroy(interactable.gameObject);
+            }
+        }
+    }
+
     private void CleanupDefeatedEncounters(string areaId)
     {
         if (!defeatedEncounters.ContainsKey(areaId)) return;
@@ -519,6 +677,101 @@ public class SpawnManager : MonoBehaviour
                 Destroy(trigger.gameObject);
             }
         }
+    }
+
+    private string GetInteractableSaveId(InteractableEntry interactableEntry)
+    {
+        if (interactableEntry == null) return "";
+
+        if (!string.IsNullOrEmpty(interactableEntry.spawnPointId))
+        {
+            return interactableEntry.spawnPointId;
+        }
+
+        if (interactableEntry.interactableData != null &&
+            !string.IsNullOrEmpty(interactableEntry.interactableData.interactableId))
+        {
+            return interactableEntry.interactableData.interactableId;
+        }
+
+        return "";
+    }
+
+    public bool IsInteractableClaimed(string areaId, string interactableId)
+    {
+        if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(interactableId))
+        {
+            return false;
+        }
+
+        return claimedInteractables.ContainsKey(areaId) &&
+               claimedInteractables[areaId].Contains(interactableId);
+    }
+
+    public void MarkInteractableClaimed(string areaId, string interactableId)
+    {
+        if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(interactableId))
+        {
+            return;
+        }
+
+        if (!claimedInteractables.ContainsKey(areaId))
+        {
+            claimedInteractables[areaId] = new HashSet<string>();
+        }
+
+        claimedInteractables[areaId].Add(interactableId);
+        SaveClaimedInteractables();
+
+        Debug.Log($"Interactable {interactableId} in area {areaId} marked as claimed.");
+    }
+
+    private void LoadClaimedInteractables()
+    {
+        string claimedString = PlayerPrefs.GetString("ClaimedInteractables", "");
+        if (string.IsNullOrEmpty(claimedString)) return;
+
+        string[] entries = claimedString.Split(';');
+
+        foreach (string entry in entries)
+        {
+            string[] parts = entry.Split(':');
+            if (parts.Length != 2) continue;
+
+            string areaId = parts[0];
+            string interactableIds = parts[1];
+
+            if (!claimedInteractables.ContainsKey(areaId))
+            {
+                claimedInteractables[areaId] = new HashSet<string>();
+            }
+
+            string[] ids = interactableIds.Split(',');
+
+            foreach (string id in ids)
+            {
+                if (!string.IsNullOrEmpty(id))
+                {
+                    claimedInteractables[areaId].Add(id);
+                }
+            }
+        }
+    }
+
+    private void SaveClaimedInteractables()
+    {
+        List<string> entries = new();
+
+        foreach (KeyValuePair<string, HashSet<string>> kvp in claimedInteractables)
+        {
+            string areaId = kvp.Key;
+            string interactableIds = string.Join(",", kvp.Value);
+            entries.Add($"{areaId}:{interactableIds}");
+        }
+
+        string claimedString = string.Join(";", entries);
+        PlayerPrefs.SetString("ClaimedInteractables", claimedString);
+        PlayerPrefs.Save();
     }
 
     public void MarkEncounterDefeated(string areaId, string encounterId)
@@ -611,5 +864,18 @@ public class SpawnManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void ClearRuntimeSavedState()
+    {
+        defeatedEncounters.Clear();
+        claimedInteractables.Clear();
+
+        currentEncounterAreaId = "";
+        currentEncounterId = "";
+
+        areaPositions.Clear();
+
+        Debug.Log("SpawnManager runtime saved state cleared.");
     }
 }

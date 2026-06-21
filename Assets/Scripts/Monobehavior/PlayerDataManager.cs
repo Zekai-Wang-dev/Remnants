@@ -22,6 +22,22 @@ public class SaveSystem
 
         return null;
     }
+
+    public static void DeletePlayerData()
+    {
+        string path = Application.persistentDataPath + "/playerData.json";
+
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+            Debug.Log($"Deleted player data file at: {path}");
+        }
+        else
+        {
+            Debug.Log($"No player data file found to delete at: {path}");
+        }
+    }
+
 }
 
 [System.Serializable]
@@ -241,5 +257,29 @@ public class PlayerDataManager : MonoBehaviour
         playerData.currentBaseDefense += equipmentData.baseDefense;
         playerData.currentTrueDefense += equipmentData.trueDefense;
         playerData.currentEnergyReserves += equipmentData.energyReserves;
+    }
+
+    public void ClearPlayerData(bool deleteSaveFile = true)
+    {
+        if (playerCharacterData == null)
+        {
+            Debug.LogWarning("Cannot clear player data because playerCharacterData is not assigned.");
+            playerData = null;
+            return;
+        }
+
+        playerData = new PlayerData
+        {
+            characterDataName = playerCharacterData.name
+        };
+
+        playerData.ResetToBaseStats(playerCharacterData);
+
+        if (deleteSaveFile)
+        {
+            SaveSystem.DeletePlayerData();
+        }
+
+        Debug.Log("Player runtime data cleared and reset to base stats.");
     }
 }

@@ -26,12 +26,22 @@ public class GameSaveManager : MonoBehaviour
     [SerializeField] private bool autosaveEnabled = true;
     [SerializeField] private float autosaveInterval = 5f;
 
+    [Header("Reset Settings")]
+    [SerializeField] private string resetSceneId = "002";
+    [SerializeField] private string resetAreaId = "001";
+
     private bool hasLoaded;
     private bool isQuitting;
+    private Coroutine autosaveCoroutine;
 
     public bool HasLoaded => hasLoaded;
 
     private string SavePath => Path.Combine(Application.persistentDataPath, "save.json");
+
+    // PlayerPrefs save keys used by other systems.
+    private const string DefeatedEncountersKey = "DefeatedEncounters";
+    private const string ClaimedInteractablesKey = "ClaimedInteractables";
+    private const string CollectedOnceOnlyDropsKey = "CollectedOnceOnlyDrops";
 
     private void Awake()
     {
@@ -72,7 +82,7 @@ public class GameSaveManager : MonoBehaviour
 
         if (autosaveEnabled)
         {
-            StartCoroutine(AutoSaveLoop());
+            autosaveCoroutine = StartCoroutine(AutoSaveLoop());
         }
     }
 
@@ -182,6 +192,74 @@ public class GameSaveManager : MonoBehaviour
         {
             File.Delete(SavePath);
             Debug.Log($"Deleted save file at: {SavePath}");
+        }
+    }
+
+    public void DeleteAllSavedData()
+    {
+        // Prevent autosave / quit-save from immediately recreating save.json.
+        hasLoaded = false;
+
+        if (autosaveCoroutine != null)
+        {
+            StopCoroutine(autosaveCoroutine);
+            autosaveCoroutine = null;
+        }
+
+        DeleteSaveFile();
+
+        PlayerPrefs.DeleteKey(DefeatedEncountersKey);
+        PlayerPrefs.DeleteKey(ClaimedInteractablesKey);
+        PlayerPrefs.DeleteKey(CollectedOnceOnlyDropsKey);
+        PlayerPrefs.Save();
+
+        if (QuestDataManager.Instance != null)
+        {
+            QuestDataManager.Instance.ClearRuntimeQuestData();
+        }
+
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.ClearInventory();
+        }
+
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.ClearPlayerData(true);
+        }
+
+        StoryFlagManager.ClearFlags();
+
+        if (SpawnManager.Instance != null)
+        {
+            SpawnManager.Instance.ClearRuntimeSavedState();
+
+            SpawnManager.Instance.currentSceneId = resetSceneId;
+            SpawnManager.Instance.currentAreaId = resetAreaId;
+
+            SpawnManager.Instance.LoadScene(resetSceneId, resetAreaId);
+        }
+
+        hasLoaded = true;
+
+        if (autosaveEnabled && autosaveCoroutine == null)
+        {
+            autosaveCoroutine = StartCoroutine(AutoSaveLoop());
+        }
+
+        Debug.Log("Deleted all saved game data and reset runtime state.");
+    }
+
+    private void DeleteSaveFile()
+    {
+        if (File.Exists(SavePath))
+        {
+            File.Delete(SavePath);
+            Debug.Log($"Deleted save file at: {SavePath}");
+        }
+        else
+        {
+            Debug.Log($"No save file found to delete at: {SavePath}");
         }
     }
 
