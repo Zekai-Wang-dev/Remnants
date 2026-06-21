@@ -416,8 +416,6 @@ public class QuestDataManager : MonoBehaviour
 
         SaveRuntimeQuestState(quest);
 
-        TryAddChainedQuest(quest);
-
         if (quest.autoClaimRewards)
         {
             ClaimQuestRewards(index);
@@ -486,6 +484,7 @@ public class QuestDataManager : MonoBehaviour
         }
 
         SaveRuntimeQuestState(currentQuest);
+        TryAddChainedQuest(currentQuest);
 
         NotifyQuestsChanged(true);
     }
