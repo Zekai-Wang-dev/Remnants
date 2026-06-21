@@ -57,6 +57,26 @@ public class QuestDataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void AddQuest(QuestData questData, bool autoClaimRewards = false)
+    {
+        if (questData == null)
+        {
+            return;
+        }
+
+        OngoingQuestData newQuest = new OngoingQuestData
+        {
+            questData = questData,
+            currentProgress = 0,
+            maxProgress = GetRequiredProgress(questData),
+            autoClaimRewards = autoClaimRewards,
+            isCompleted = false,
+            rewardClaimed = false
+        };
+
+        AddQuest(newQuest);
+    }
+
     public void AddQuest(OngoingQuestData newQuest)
     {
         if (newQuest == null || newQuest.questData == null)
@@ -111,8 +131,15 @@ public class QuestDataManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < ongoingQuests.Count; i++)
+        int questCount = ongoingQuests.Count;
+
+        for (int i = 0; i < questCount; i++)
         {
+            if (!IsValidQuestIndex(i))
+            {
+                continue;
+            }
+
             OngoingQuestData quest = ongoingQuests[i];
 
             if (!CanProgressQuest(quest))
@@ -158,8 +185,15 @@ public class QuestDataManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < ongoingQuests.Count; i++)
+        int questCount = ongoingQuests.Count;
+
+        for (int i = 0; i < questCount; i++)
         {
+            if (!IsValidQuestIndex(i))
+            {
+                continue;
+            }
+
             OngoingQuestData quest = ongoingQuests[i];
 
             if (!CanProgressQuest(quest))
@@ -195,8 +229,15 @@ public class QuestDataManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < ongoingQuests.Count; i++)
+        int questCount = ongoingQuests.Count;
+
+        for (int i = 0; i < questCount; i++)
         {
+            if (!IsValidQuestIndex(i))
+            {
+                continue;
+            }
+
             OngoingQuestData quest = ongoingQuests[i];
 
             if (!CanProgressQuest(quest))
@@ -243,8 +284,15 @@ public class QuestDataManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < ongoingQuests.Count; i++)
+        int questCount = ongoingQuests.Count;
+
+        for (int i = 0; i < questCount; i++)
         {
+            if (!IsValidQuestIndex(i))
+            {
+                continue;
+            }
+
             OngoingQuestData quest = ongoingQuests[i];
 
             if (!CanProgressQuest(quest))
@@ -368,6 +416,8 @@ public class QuestDataManager : MonoBehaviour
 
         SaveRuntimeQuestState(quest);
 
+        TryAddChainedQuest(quest);
+
         if (quest.autoClaimRewards)
         {
             ClaimQuestRewards(index);
@@ -438,6 +488,40 @@ public class QuestDataManager : MonoBehaviour
         SaveRuntimeQuestState(currentQuest);
 
         NotifyQuestsChanged(true);
+    }
+
+    private void TryAddChainedQuest(OngoingQuestData completedQuest)
+    {
+        if (completedQuest == null || completedQuest.questData == null)
+        {
+            return;
+        }
+
+        QuestData completedQuestData = completedQuest.questData;
+
+        if (!completedQuestData.isChained)
+        {
+            return;
+        }
+
+        if (completedQuestData.newQuest == null)
+        {
+            Debug.LogWarning($"Quest '{completedQuestData.name}' is marked as chained, but no newQuest is assigned.");
+            return;
+        }
+
+        string completedQuestId = GetQuestId(completedQuestData);
+        string newQuestId = GetQuestId(completedQuestData.newQuest);
+
+        if (!string.IsNullOrWhiteSpace(completedQuestId) &&
+            !string.IsNullOrWhiteSpace(newQuestId) &&
+            completedQuestId == newQuestId)
+        {
+            Debug.LogWarning($"Quest '{completedQuestData.name}' cannot chain into itself.");
+            return;
+        }
+
+        AddQuest(completedQuestData.newQuest, completedQuestData.newQuestAutoClaimRewards);
     }
 
     public QuestSaveData CreateSaveData()

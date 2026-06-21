@@ -17,6 +17,16 @@ public class QuestData : ScriptableObject
     public string questName;
     public QuestType questType;
 
+    [Header("Quest Chain")]
+    [Tooltip("If true, completing this quest will immediately add newQuest.")]
+    public bool isChained;
+
+    [Tooltip("Quest added automatically when this quest completes.")]
+    public QuestData newQuest;
+
+    [Tooltip("Whether the chained quest should auto-claim its own rewards when it completes.")]
+    public bool newQuestAutoClaimRewards;
+
     [Header("Requirement")]
     public QuestRequirementType questRequirementType;
 
