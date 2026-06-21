@@ -1,11 +1,13 @@
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class GameSaveData
 {
     public InventorySaveData inventory;
+    public QuestSaveData quests;
 }
 
 public class GameSaveManager : MonoBehaviour
@@ -14,6 +16,7 @@ public class GameSaveManager : MonoBehaviour
 
     [Header("Databases")]
     [SerializeField] private ItemDatabase itemDatabase;
+    [SerializeField] private QuestDatabase questDatabase;
 
     [Header("Save Settings")]
     [SerializeField] private bool loadOnStart = true;
@@ -25,6 +28,8 @@ public class GameSaveManager : MonoBehaviour
 
     private bool hasLoaded;
     private bool isQuitting;
+
+    public bool HasLoaded => hasLoaded;
 
     private string SavePath => Path.Combine(Application.persistentDataPath, "save.json");
 
@@ -43,16 +48,26 @@ public class GameSaveManager : MonoBehaviour
         {
             itemDatabase.Initialize();
         }
+
+        if (questDatabase != null)
+        {
+            questDatabase.Initialize();
+        }
     }
 
     private IEnumerator Start()
     {
-        // Wait one frame so InventoryManager, PlayerDataManager, SpawnManager, etc. can finish Awake().
+        // Wait one frame so InventoryManager, QuestDataManager, PlayerDataManager,
+        // SpawnManager, etc. can finish Awake().
         yield return null;
 
         if (loadOnStart)
         {
             LoadGame();
+        }
+        else
+        {
+            hasLoaded = true;
         }
 
         if (autosaveEnabled)
@@ -74,6 +89,16 @@ public class GameSaveManager : MonoBehaviour
         }
     }
 
+    public void RequestSave()
+    {
+        if (!hasLoaded)
+        {
+            return;
+        }
+
+        SaveGame();
+    }
+
     public void SaveGame()
     {
         GameSaveData saveData = new GameSaveData();
@@ -81,6 +106,11 @@ public class GameSaveManager : MonoBehaviour
         if (InventoryManager.Instance != null)
         {
             saveData.inventory = InventoryManager.Instance.CreateSaveData();
+        }
+
+        if (QuestDataManager.Instance != null)
+        {
+            saveData.quests = QuestDataManager.Instance.CreateSaveData();
         }
 
         string json = JsonUtility.ToJson(saveData, true);
@@ -91,14 +121,15 @@ public class GameSaveManager : MonoBehaviour
 
     public void LoadGame()
     {
-        if (itemDatabase == null)
+        if (itemDatabase != null)
         {
-            Debug.LogError("GameSaveManager cannot load because itemDatabase is not assigned.");
-            hasLoaded = true;
-            return;
+            itemDatabase.Initialize();
         }
 
-        itemDatabase.Initialize();
+        if (questDatabase != null)
+        {
+            questDatabase.Initialize();
+        }
 
         if (!File.Exists(SavePath))
         {
@@ -119,7 +150,26 @@ public class GameSaveManager : MonoBehaviour
 
         if (InventoryManager.Instance != null && saveData.inventory != null)
         {
-            InventoryManager.Instance.LoadFromSaveData(saveData.inventory, itemDatabase);
+            if (itemDatabase == null)
+            {
+                Debug.LogWarning("Cannot load inventory because itemDatabase is not assigned.");
+            }
+            else
+            {
+                InventoryManager.Instance.LoadFromSaveData(saveData.inventory, itemDatabase);
+            }
+        }
+
+        if (QuestDataManager.Instance != null && saveData.quests != null)
+        {
+            if (questDatabase == null)
+            {
+                Debug.LogWarning("Cannot load quests because questDatabase is not assigned.");
+            }
+            else
+            {
+                QuestDataManager.Instance.LoadFromSaveData(saveData.quests, questDatabase);
+            }
         }
 
         hasLoaded = true;
@@ -147,8 +197,15 @@ public class GameSaveManager : MonoBehaviour
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        if (!saveOnPause) return;
-        if (!hasLoaded) return;
+        if (!saveOnPause)
+        {
+            return;
+        }
+
+        if (!hasLoaded)
+        {
+            return;
+        }
 
         if (pauseStatus)
         {
@@ -158,9 +215,20 @@ public class GameSaveManager : MonoBehaviour
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        if (!saveOnFocusLost) return;
-        if (!hasLoaded) return;
-        if (isQuitting) return;
+        if (!saveOnFocusLost)
+        {
+            return;
+        }
+
+        if (!hasLoaded)
+        {
+            return;
+        }
+
+        if (isQuitting)
+        {
+            return;
+        }
 
         if (!hasFocus)
         {

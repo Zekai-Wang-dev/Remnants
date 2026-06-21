@@ -10,7 +10,7 @@ public class FilmSceneManager : MonoBehaviour
     public GameObject defaultSpeechBubblePrefab;
     public float defaultCharactersPerSecond = 30f;
     public KeyCode defaultContinueKey = KeyCode.Space;
-
+    private string currentFilmSceneId;
     public bool inCinematic;
 
     private void Awake()
@@ -45,6 +45,7 @@ public class FilmSceneManager : MonoBehaviour
     private IEnumerator PlayCinematic(SceneData filmScene)
     {
         inCinematic = true;
+        currentFilmSceneId = filmScene.sceneId;
 
         if (PlayerController.Instance != null)
         {
@@ -63,7 +64,13 @@ public class FilmSceneManager : MonoBehaviour
             PlayerController.Instance.EnableMovement();
         }
 
+        if (filmScene.newQuest != null)
+        {
+            QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+        }
+
         inCinematic = false;
+        currentFilmSceneId = "";
     }
 
     private IEnumerator PlayAction(SceneAction action)
@@ -189,12 +196,15 @@ public class FilmSceneManager : MonoBehaviour
             speaker
         ));
 
+        QuestDataManager.Instance?.ReportTalkToNPC(beat.actorId, currentFilmSceneId);
+
         PlayAnimationAfterLine(speaker, beat);
 
         if (beat.waitAfterLine > 0f)
         {
             yield return new WaitForSeconds(beat.waitAfterLine);
         }
+
     }
 
     private IEnumerator PlayOldDialogueLine(SceneAction action, DialogueLine line)
@@ -493,6 +503,13 @@ public class FilmSceneManager : MonoBehaviour
 
                 case SceneEndActorCommand.EndBehavior.Destroy:
                     Destroy(actor.gameObject);
+                    break;
+
+                case SceneEndActorCommand.EndBehavior.Quest:
+                    if (filmScene.newQuest != null)
+                    {
+                        QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+                    }
                     break;
             }
         }

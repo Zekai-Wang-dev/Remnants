@@ -12,5 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd2772d6df6b384d8327eff9e8a22be, type: 3}
   m_Name: QuestData
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
-  questName: Kill 5 wolves
-  questType: 4
+  questId: 000
+  questName: Kill 1 dummy
+  questType: 0
+  questRequirementType: 1
+  enemyDefeatRequirement:
+    enemyId: dummy
+    requiredAmount: 4
+  itemCollectionRequirement:
+    itemId: 
+    requiredAmount: 1
+  locationVisitRequirement:
+    sceneId: 
+    areaId: 
+    requiredAmount: 1
+  talkToNPCRequirement:
+    npcId: 
+    sceneId: 
+    requiredAmount: 1
+  questRewards:
+  - item: {fileID: 11400000, guid: c9de9bfcbefe99841ae5d9417065b5d0, type: 2}
+    quantity: 3

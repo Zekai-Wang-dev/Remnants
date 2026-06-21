@@ -74,7 +74,7 @@ public class QuestUI : MonoBehaviour
         {
             OngoingQuestData quest = manager.ongoingQuests[i];
 
-            if (quest == null || quest.questData == null)
+            if (quest == null || quest.questData == null || quest.rewardClaimed)
             {
                 continue;
             }

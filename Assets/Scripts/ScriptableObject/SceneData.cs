@@ -14,6 +14,7 @@ public class SceneData : ScriptableObject
 
     [Header("After Scene Ends")]
     public List<SceneEndActorCommand> endCommands = new();
+    public OngoingQuestData newQuest; 
 }
 
 [System.Serializable]
@@ -103,6 +104,7 @@ public class SceneEndActorCommand
     {
         None,
         Disable,
-        Destroy
+        Destroy,
+        Quest
     }
 }

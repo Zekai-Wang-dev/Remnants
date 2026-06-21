@@ -366,6 +366,8 @@ public class SpawnManager : MonoBehaviour
 
         SpawnEnemies(areaData, spawnPoints);
         CleanupDefeatedEncounters(areaId);
+
+        QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
     }
 
     public void LoadScene(string sceneId, string areaId)
@@ -436,6 +438,7 @@ public class SpawnManager : MonoBehaviour
 
             SpawnEnemies(areaData, spawnPoints);
             CleanupDefeatedEncounters(areaId);
+            QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
 
             isSceneTransitioning = false;
 

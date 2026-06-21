@@ -878,6 +878,15 @@ public class CombatManager : MonoBehaviour
             currentTurnIndex--;
         }
 
+        if (deadCharacter != null && deadCharacter.team == 1 && deadCharacter.data != null)
+        {
+            string defeatedEnemyId = !string.IsNullOrWhiteSpace(deadCharacter.data.name)
+                ? deadCharacter.data.name
+                : deadCharacter.GetDisplayName();
+
+            QuestDataManager.Instance?.ReportEnemyDefeated(defeatedEnemyId);
+        }
+
         if (deadCharacter.gameObject != null)
         {
             Destroy(deadCharacter.gameObject);
@@ -1033,6 +1042,7 @@ public class CombatManager : MonoBehaviour
             }
 
             bool added = InventoryManager.Instance.AddItem(loot.item, loot.quantity);
+            QuestDataManager.Instance?.ReportItemCollected(loot.item, loot.quantity);
 
             if (added)
             {

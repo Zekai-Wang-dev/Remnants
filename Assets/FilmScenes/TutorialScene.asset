@@ -87,3 +87,12 @@ MonoBehaviour:
   endCommands:
   - actorId: Dummy
     endBehavior: 2
+  - actorId: Dummy
+    endBehavior: 3
+  newQuest:
+    questData: {fileID: 11400000, guid: 3a167290e56292f4193e4ce536fd7b21, type: 2}
+    currentProgress: 0
+    maxProgress: 0
+    autoClaimRewards: 1
+    isCompleted: 0
+    rewardClaimed: 0
