@@ -10,8 +10,11 @@ public class FilmSceneManager : MonoBehaviour
     public GameObject defaultSpeechBubblePrefab;
     public float defaultCharactersPerSecond = 30f;
     public KeyCode defaultContinueKey = KeyCode.Space;
+
     private string currentFilmSceneId;
     public bool inCinematic;
+
+    private readonly HashSet<string> activatedSceneIds = new HashSet<string>();
 
     private void Awake()
     {
@@ -27,37 +30,53 @@ public class FilmSceneManager : MonoBehaviour
 
     public void StartCinematic(SceneData filmScene)
     {
+        TryStartCinematic(filmScene);
+    }
+
+    public bool TryStartCinematic(SceneData filmScene)
+    {
         if (filmScene == null)
         {
             Debug.LogWarning("Tried to start null cinematic.");
-            return;
+            return false;
         }
 
         if (inCinematic)
         {
             Debug.LogWarning("Already in cinematic.");
-            return;
+            return false;
+        }
+
+        if (IsCinematicActivated(filmScene))
+        {
+            Debug.Log($"Cinematic '{GetCinematicId(filmScene)}' has already been activated.");
+            return false;
         }
 
         StartCoroutine(PlayCinematic(filmScene));
+        return true;
     }
 
     private IEnumerator PlayCinematic(SceneData filmScene)
     {
         inCinematic = true;
-        currentFilmSceneId = filmScene.sceneId;
+        currentFilmSceneId = GetCinematicId(filmScene);
 
         if (PlayerController.Instance != null)
         {
             PlayerController.Instance.DisableMovement();
         }
 
-        foreach (SceneAction action in filmScene.actions)
+        if (filmScene.actions != null)
         {
-            yield return StartCoroutine(PlayAction(action));
+            foreach (SceneAction action in filmScene.actions)
+            {
+                yield return StartCoroutine(PlayAction(action));
+            }
         }
 
         ApplyEndCommands(filmScene);
+        MarkCinematicActivated(filmScene);
 
         if (PlayerController.Instance != null)
         {
@@ -114,7 +133,6 @@ public class FilmSceneManager : MonoBehaviour
             yield break;
         }
 
-        // New preferred workflow: one Dialogue action can contain many inline dialogue beats.
         if (action.dialogueBeats != null && action.dialogueBeats.Count > 0)
         {
             foreach (DialogueBeat beat in action.dialogueBeats)
@@ -130,7 +148,6 @@ public class FilmSceneManager : MonoBehaviour
             yield break;
         }
 
-        // Old workflow is still supported so your existing DialogueLine assets do not instantly break.
         DialogueLine oldLine = GetOldDialogueLine(action);
 
         if (oldLine == null)
@@ -204,7 +221,6 @@ public class FilmSceneManager : MonoBehaviour
         {
             yield return new WaitForSeconds(beat.waitAfterLine);
         }
-
     }
 
     private IEnumerator PlayOldDialogueLine(SceneAction action, DialogueLine line)
@@ -472,7 +488,7 @@ public class FilmSceneManager : MonoBehaviour
 
     private void ApplyEndCommands(SceneData filmScene)
     {
-        if (filmScene.endCommands == null)
+        if (filmScene == null || filmScene.endCommands == null)
         {
             return;
         }
@@ -513,5 +529,178 @@ public class FilmSceneManager : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public bool IsCinematicActivated(SceneData filmScene)
+    {
+        if (filmScene == null)
+        {
+            return false;
+        }
+
+        if (!filmScene.isPermanent)
+        {
+            return false;
+        }
+
+        string cinematicId = GetCinematicId(filmScene);
+
+        if (string.IsNullOrWhiteSpace(cinematicId))
+        {
+            return false;
+        }
+
+        return activatedSceneIds.Contains(cinematicId);
+    }
+
+    private void MarkCinematicActivated(SceneData filmScene)
+    {
+        if (filmScene == null)
+        {
+            return;
+        }
+
+        if (!filmScene.isPermanent)
+        {
+            return;
+        }
+
+        string cinematicId = GetCinematicId(filmScene);
+
+        if (string.IsNullOrWhiteSpace(cinematicId))
+        {
+            Debug.LogWarning($"Permanent cinematic '{filmScene.name}' has no sceneId.");
+            return;
+        }
+
+        filmScene.isActivated = true;
+
+        if (activatedSceneIds.Add(cinematicId))
+        {
+            GameSaveManager.Instance?.RequestSave();
+            RefreshCinematicWorldState();
+
+            Debug.Log($"Permanent cinematic activated: {cinematicId}");
+        }
+    }
+
+    public CinematicSaveData CreateSaveData()
+    {
+        CinematicSaveData saveData = new CinematicSaveData();
+
+        foreach (string sceneId in activatedSceneIds)
+        {
+            if (!string.IsNullOrWhiteSpace(sceneId))
+            {
+                saveData.activatedSceneIds.Add(sceneId);
+            }
+        }
+
+        return saveData;
+    }
+
+    public void LoadFromSaveData(CinematicSaveData saveData)
+    {
+        activatedSceneIds.Clear();
+
+        if (saveData != null && saveData.activatedSceneIds != null)
+        {
+            foreach (string sceneId in saveData.activatedSceneIds)
+            {
+                string normalizedId = NormalizeCinematicId(sceneId);
+
+                if (!string.IsNullOrWhiteSpace(normalizedId))
+                {
+                    activatedSceneIds.Add(normalizedId);
+                }
+            }
+        }
+
+        RefreshCinematicWorldState();
+
+        Debug.Log($"Loaded {activatedSceneIds.Count} activated cinematics.");
+    }
+
+    public void ClearRuntimeCinematicData()
+    {
+        StopAllCoroutines();
+
+        activatedSceneIds.Clear();
+        currentFilmSceneId = "";
+        inCinematic = false;
+
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.EnableMovement();
+        }
+
+        RefreshCinematicWorldState();
+
+        Debug.Log("Cinematic runtime data cleared.");
+    }
+
+    public void RefreshCinematicWorldState()
+    {
+        if (SceneCharacterRegistry.Instance != null)
+        {
+            SceneCharacterRegistry.Instance.SendMessage(
+                "RefreshAfterCinematicStateChanged",
+                SendMessageOptions.DontRequireReceiver
+            );
+        }
+
+        CinematicsActivator[] activators =
+            FindObjectsByType<CinematicsActivator>(FindObjectsSortMode.None);
+
+        foreach (CinematicsActivator activator in activators)
+        {
+            if (activator == null)
+            {
+                continue;
+            }
+
+            activator.SendMessage(
+                "RefreshActivationState",
+                SendMessageOptions.DontRequireReceiver
+            );
+        }
+
+        PersistentCinematicObject[] cinematicObjects =
+            FindObjectsByType<PersistentCinematicObject>(FindObjectsSortMode.None);
+
+        foreach (PersistentCinematicObject cinematicObject in cinematicObjects)
+        {
+            if (cinematicObject == null)
+            {
+                continue;
+            }
+
+            cinematicObject.RefreshCinematicObjectState();
+        }
+    }
+
+    private string GetCinematicId(SceneData filmScene)
+    {
+        if (filmScene == null)
+        {
+            return "";
+        }
+
+        if (!string.IsNullOrWhiteSpace(filmScene.sceneId))
+        {
+            return NormalizeCinematicId(filmScene.sceneId);
+        }
+
+        return NormalizeCinematicId(filmScene.name);
+    }
+
+    private string NormalizeCinematicId(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "";
+        }
+
+        return value.Trim().ToLowerInvariant();
     }
 }

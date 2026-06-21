@@ -3823,6 +3823,11 @@ Transform:
   - {fileID: 18788831}
   m_Father: {fileID: 87750235}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &355919216 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+  m_PrefabInstance: {fileID: 1464929719}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &357686786
 GameObject:
   m_ObjectHideFlags: 0
@@ -13542,7 +13547,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 100
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -16151,13 +16156,31 @@ PrefabInstance:
     - {fileID: 498983413942026884, guid: d606e03af610a04478eddc878585f4f6, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 1464929723}
   m_SourcePrefab: {fileID: 100100000, guid: d606e03af610a04478eddc878585f4f6, type: 3}
 --- !u!4 &1464929720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8410581118868622105, guid: d606e03af610a04478eddc878585f4f6, type: 3}
   m_PrefabInstance: {fileID: 1464929719}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1464929723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355919216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03375e8afab549e4088f93cac49b2156, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PersistentCinematicObject
+  hideIfCinematicActivated: {fileID: 11400000, guid: eb888e172f1615241988ab58d6efa730, type: 2}
+  disableWhenActivated: 0
+  destroyWhenActivated: 1
 --- !u!1 &1497987920
 GameObject:
   m_ObjectHideFlags: 0
@@ -16742,6 +16765,9 @@ MonoBehaviour:
   characters:
   - actorId: Dummy
     characterTransform: {fileID: 1464929720}
+    hideIfCinematicActivated: {fileID: 0}
+    disableWhenCinematicActivated: 1
+    destroyWhenCinematicActivated: 0
 --- !u!4 &1606760367
 Transform:
   m_ObjectHideFlags: 0

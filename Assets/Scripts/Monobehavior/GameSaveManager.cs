@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -8,6 +9,13 @@ public class GameSaveData
 {
     public InventorySaveData inventory;
     public QuestSaveData quests;
+    public CinematicSaveData cinematics;
+}
+
+[Serializable]
+public class CinematicSaveData
+{
+    public List<string> activatedSceneIds = new List<string>();
 }
 
 public class GameSaveManager : MonoBehaviour
@@ -38,7 +46,6 @@ public class GameSaveManager : MonoBehaviour
 
     private string SavePath => Path.Combine(Application.persistentDataPath, "save.json");
 
-    // PlayerPrefs save keys used by other systems.
     private const string DefeatedEncountersKey = "DefeatedEncounters";
     private const string ClaimedInteractablesKey = "ClaimedInteractables";
     private const string CollectedOnceOnlyDropsKey = "CollectedOnceOnlyDrops";
@@ -68,7 +75,7 @@ public class GameSaveManager : MonoBehaviour
     private IEnumerator Start()
     {
         // Wait one frame so InventoryManager, QuestDataManager, PlayerDataManager,
-        // SpawnManager, etc. can finish Awake().
+        // SpawnManager, FilmSceneManager, etc. can finish Awake().
         yield return null;
 
         if (loadOnStart)
@@ -123,6 +130,11 @@ public class GameSaveManager : MonoBehaviour
             saveData.quests = QuestDataManager.Instance.CreateSaveData();
         }
 
+        if (FilmSceneManager.Instance != null)
+        {
+            saveData.cinematics = FilmSceneManager.Instance.CreateSaveData();
+        }
+
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(SavePath, json);
 
@@ -145,6 +157,12 @@ public class GameSaveManager : MonoBehaviour
         {
             Debug.Log($"No save file found at: {SavePath}. Starting new save.");
             hasLoaded = true;
+
+            if (FilmSceneManager.Instance != null)
+            {
+                FilmSceneManager.Instance.RefreshCinematicWorldState();
+            }
+
             return;
         }
 
@@ -182,22 +200,22 @@ public class GameSaveManager : MonoBehaviour
             }
         }
 
+        if (FilmSceneManager.Instance != null)
+        {
+            FilmSceneManager.Instance.LoadFromSaveData(saveData.cinematics);
+        }
+
         hasLoaded = true;
         Debug.Log("Game loaded.");
     }
 
     public void DeleteSave()
     {
-        if (File.Exists(SavePath))
-        {
-            File.Delete(SavePath);
-            Debug.Log($"Deleted save file at: {SavePath}");
-        }
+        DeleteSaveFile();
     }
 
     public void DeleteAllSavedData()
     {
-        // Prevent autosave / quit-save from immediately recreating save.json.
         hasLoaded = false;
 
         if (autosaveCoroutine != null)
@@ -226,6 +244,11 @@ public class GameSaveManager : MonoBehaviour
         if (PlayerDataManager.Instance != null)
         {
             PlayerDataManager.Instance.ClearPlayerData(true);
+        }
+
+        if (FilmSceneManager.Instance != null)
+        {
+            FilmSceneManager.Instance.ClearRuntimeCinematicData();
         }
 
         StoryFlagManager.ClearFlags();
