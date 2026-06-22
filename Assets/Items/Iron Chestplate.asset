@@ -15,7 +15,7 @@ MonoBehaviour:
   itemType: 1
   itemId: 003
   itemName: Iron Chestplate
-  description: 
+  description: A very sturdy armor made by a competent blacksmith
   imageIcon: {fileID: -2588823126644354792, guid: 012bc1a882aee2242b8c5b257d549db4, type: 3}
   isStackable: 0
   maxStackSize: 1

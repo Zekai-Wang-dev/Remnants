@@ -1,13 +1,27 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventorySlotUI : MonoBehaviour
+[Serializable]
+public class ItemDataEvent : UnityEvent<ItemData> { }
+
+public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public static event System.Action<ItemData, bool> AnyItemHovered;
+    public static event System.Action AnyItemHoverExited;
+
     [Header("UI")]
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text quantityText;
     [SerializeField] private Image equipIconImage;
+
+    [Header("Events")]
+    [SerializeField] private ItemDataEvent onItemHovered = new ItemDataEvent();
+
+    public event Action<ItemData> ItemHovered;
 
     private int slotIndex;
     private Button button;
@@ -33,6 +47,48 @@ public class InventorySlotUI : MonoBehaviour
     public void Setup(int index)
     {
         slotIndex = index;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (InventoryManager.Instance == null)
+        {
+            return;
+        }
+
+        InventorySlotData slot = InventoryManager.Instance.GetSlot(slotIndex);
+
+        if (slot == null || slot.IsEmpty || slot.item == null)
+        {
+            return;
+        }
+
+        ItemHovered?.Invoke(slot.item);
+        onItemHovered?.Invoke(slot.item);
+
+        AnyItemHovered?.Invoke(slot.item, slot.equipped);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        AnyItemHoverExited?.Invoke();
+    }
+
+    private ItemData GetCurrentItemData()
+    {
+        if (InventoryManager.Instance == null)
+        {
+            return null;
+        }
+
+        InventorySlotData slot = InventoryManager.Instance.GetSlot(slotIndex);
+
+        if (slot == null || slot.IsEmpty || slot.item == null)
+        {
+            return null;
+        }
+
+        return slot.item;
     }
 
     public void OnSlotClicked()
@@ -62,6 +118,21 @@ public class InventorySlotUI : MonoBehaviour
         {
             InventoryManager.Instance.EquipSlot(slotIndex);
         }
+
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.RecalculateStatsFromEquipment();
+        }
+
+        InventorySlotData updatedSlot = InventoryManager.Instance.GetSlot(slotIndex);
+
+        if (updatedSlot == null || updatedSlot.IsEmpty || updatedSlot.item == null)
+        {
+            AnyItemHoverExited?.Invoke();
+            return;
+        }
+
+        AnyItemHovered?.Invoke(updatedSlot.item, updatedSlot.equipped);
     }
 
     public void SetSlot(InventorySlotData slot)

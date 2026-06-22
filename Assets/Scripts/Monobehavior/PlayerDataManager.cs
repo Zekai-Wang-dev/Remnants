@@ -46,6 +46,8 @@ public class PlayerData
     public string characterDataName;
 
     public float currentHealth;
+    public float currentMaxHealth;
+
     public float currentSpeed;
     public float currentDamage;
     public float currentBaseDefense;
@@ -62,7 +64,9 @@ public class PlayerData
     {
         if (characterData == null) return;
 
+        currentMaxHealth = characterData.maxHealth;
         currentHealth = characterData.maxHealth;
+
         currentSpeed = characterData.speed;
         currentDamage = characterData.damage;
         currentBaseDefense = characterData.defense;
@@ -134,11 +138,12 @@ public class PlayerDataManager : MonoBehaviour
 
     public void HealPlayer(float amount)
     {
-        if (playerCharacterData == null || playerData == null) return;
+        if (playerData == null) return;
 
         playerData.currentHealth = Mathf.Min(
-            playerCharacterData.maxHealth,
-            playerData.currentHealth + amount);
+            playerData.currentMaxHealth,
+            playerData.currentHealth + amount
+        );
     }
 
     public void DamagePlayer(float damage)
@@ -170,8 +175,12 @@ public class PlayerDataManager : MonoBehaviour
 
     public float GetHealthPercentage()
     {
-        if (playerCharacterData == null || playerData == null) return 0f;
-        return playerData.currentHealth / playerCharacterData.maxHealth;
+        if (playerData == null || playerData.currentMaxHealth <= 0f)
+        {
+            return 0f;
+        }
+
+        return playerData.currentHealth / playerData.currentMaxHealth;
     }
 
     public bool IsPlayerAlive()
@@ -186,14 +195,13 @@ public class PlayerDataManager : MonoBehaviour
             return;
         }
 
-        float oldHealth = playerData.currentHealth;
+        float oldCurrentHealth = playerData.currentHealth;
 
         playerData.ResetToBaseStats(playerCharacterData);
 
         ApplyEquippedItemStats();
 
-        // Optional: preserve current health instead of fully healing on every equipment change.
-        playerData.currentHealth = Mathf.Min(oldHealth, playerData.currentHealth);
+        playerData.currentHealth = Mathf.Min(oldCurrentHealth, playerData.currentMaxHealth);
     }
 
     private void ApplyEquippedItemStats()
@@ -253,7 +261,7 @@ public class PlayerDataManager : MonoBehaviour
         }
 
         playerData.currentSpeed += equipmentData.speed;
-        playerData.currentHealth += equipmentData.maxHealth;
+        playerData.currentMaxHealth += equipmentData.maxHealth;
         playerData.currentBaseDefense += equipmentData.baseDefense;
         playerData.currentTrueDefense += equipmentData.trueDefense;
         playerData.currentEnergyReserves += equipmentData.energyReserves;
