@@ -67,6 +67,56 @@ public class InventoryManager : MonoBehaviour
         LoadCollectedOnceOnlyDrops();
     }
 
+    public static bool IsConsumableItem(ItemData item)
+    {
+        return item != null && item.itemType == ItemType.Consumable;
+    }
+
+    public bool UseConsumableSlot(int index)
+    {
+        InventorySlotData slot = GetSlot(index);
+
+        if (slot == null || slot.IsEmpty || slot.item == null)
+        {
+            return false;
+        }
+
+        ItemData item = slot.item;
+
+        if (!IsConsumableItem(item))
+        {
+            return false;
+        }
+
+        ConsumableData consumableData = item.consumableData;
+
+        if (consumableData == null)
+        {
+            Debug.LogWarning($"{item.itemName} has no consumable data.");
+            return false;
+        }
+
+        if (PlayerDataManager.Instance == null)
+        {
+            Debug.LogWarning("Cannot use consumable because PlayerDataManager is missing.");
+            return false;
+        }
+
+        bool usedSuccessfully = PlayerDataManager.Instance.TryHealPlayer(
+            consumableData.health,
+            consumableData.healthPercentage
+        );
+
+        if (!usedSuccessfully)
+        {
+            Debug.Log($"{item.itemName} was not used because it would not restore health.");
+            return false;
+        }
+
+        RemoveItem(index, 1);
+
+        return true;
+    }
     private void InitializeInventoryData()
     {
         int inventorySize = InventorySize;
@@ -399,25 +449,64 @@ public class InventoryManager : MonoBehaviour
         }
 
         EquipSlotType oldEquippedType = EquipSlotType.None;
+        bool wasEquipped = false;
 
         if (slot.equipped && slot.item != null)
         {
             oldEquippedType = GetEquipSlotType(slot.item);
+            wasEquipped = true;
         }
 
         slot.quantity -= amount;
 
-        if (slot.quantity <= 0)
+        bool becameEmpty = slot.quantity <= 0;
+
+        if (becameEmpty)
         {
             slot.Clear();
+            CompactInventory();
         }
 
         NotifyInventoryChanged();
 
-        if (oldEquippedType != EquipSlotType.None && slot.IsEmpty)
+        if (becameEmpty && oldEquippedType != EquipSlotType.None)
         {
             NotifyEquipmentChanged(oldEquippedType);
         }
+
+        if (becameEmpty && wasEquipped && PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.RecalculateStatsFromEquipment();
+        }
+    }
+
+    private void CompactInventory()
+    {
+        List<InventorySlotData> compactedInventory = new List<InventorySlotData>();
+
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            InventorySlotData slot = inventory[i];
+
+            if (slot == null || slot.IsEmpty || slot.item == null)
+            {
+                continue;
+            }
+
+            compactedInventory.Add(slot);
+        }
+
+        while (compactedInventory.Count < InventorySize)
+        {
+            compactedInventory.Add(new InventorySlotData());
+        }
+
+        while (compactedInventory.Count > InventorySize)
+        {
+            compactedInventory.RemoveAt(compactedInventory.Count - 1);
+        }
+
+        inventory = compactedInventory;
     }
 
     public void ClearInventory(bool clearOnceOnlyDrops = true)
@@ -460,19 +549,28 @@ public class InventoryManager : MonoBehaviour
         }
 
         EquipSlotType oldEquippedType = EquipSlotType.None;
+        bool wasEquipped = false;
 
         if (slot.equipped && slot.item != null)
         {
             oldEquippedType = GetEquipSlotType(slot.item);
+            wasEquipped = true;
         }
 
         slot.Clear();
+
+        CompactInventory();
 
         NotifyInventoryChanged();
 
         if (oldEquippedType != EquipSlotType.None)
         {
             NotifyEquipmentChanged(oldEquippedType);
+        }
+
+        if (wasEquipped && PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.RecalculateStatsFromEquipment();
         }
     }
 
@@ -601,6 +699,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         FixInvalidEquippedSlots();
+        CompactInventory();
 
         collectedOnceOnlyDropIds.Clear();
 

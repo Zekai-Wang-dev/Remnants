@@ -11,7 +11,20 @@ public class PlayerStatsUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnPlayerStatsChanged += Refresh;
+        }
+
         Refresh();
+    }
+
+    private void OnDisable()
+    {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnPlayerStatsChanged -= Refresh;
+        }
     }
 
     public void Refresh()
@@ -31,6 +44,7 @@ public class PlayerStatsUI : MonoBehaviour
         ClearRows();
 
         AddStat("Health", data.currentHealth);
+        AddStat("Max Health", data.currentMaxHealth);
         AddStat("Speed", data.currentSpeed);
         AddStat("Damage", data.currentDamage);
         AddStat("Base Defense", data.currentBaseDefense);

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 [Serializable]
 public class ItemDataEvent : UnityEvent<ItemData> { }
 
-public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public static event System.Action<ItemData, bool> AnyItemHovered;
     public static event System.Action AnyItemHoverExited;
@@ -47,6 +47,42 @@ public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void Setup(int index)
     {
         slotIndex = index;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Right)
+        {
+            return;
+        }
+
+        DeleteSlotItem();
+    }
+
+    private void DeleteSlotItem()
+    {
+        if (InventoryManager.Instance == null)
+        {
+            return;
+        }
+
+        InventorySlotData slot = InventoryManager.Instance.GetSlot(slotIndex);
+
+        if (slot == null || slot.IsEmpty || slot.item == null)
+        {
+            return;
+        }
+
+        InventoryManager.Instance.ClearSlot(slotIndex);
+
+        if (GameSaveManager.Instance != null)
+        {
+            GameSaveManager.Instance.RequestSave();
+        }
+
+        AnyItemHoverExited?.Invoke();
+
+        Debug.Log($"Deleted item from inventory slot {slotIndex}.");
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -105,7 +141,21 @@ public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
             return;
         }
 
-        if (!InventoryManager.IsEquippableItem(slot.item))
+        ItemData clickedItem = slot.item;
+
+        if (InventoryManager.IsConsumableItem(clickedItem))
+        {
+            bool used = InventoryManager.Instance.UseConsumableSlot(slotIndex);
+
+            if (used)
+            {
+                RefreshHoverAfterSlotChanged();
+            }
+
+            return;
+        }
+
+        if (!InventoryManager.IsEquippableItem(clickedItem))
         {
             return;
         }
@@ -119,9 +169,15 @@ public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
             InventoryManager.Instance.EquipSlot(slotIndex);
         }
 
-        if (PlayerDataManager.Instance != null)
+        RefreshHoverAfterSlotChanged();
+    }
+
+    private void RefreshHoverAfterSlotChanged()
+    {
+        if (InventoryManager.Instance == null)
         {
-            PlayerDataManager.Instance.RecalculateStatsFromEquipment();
+            AnyItemHoverExited?.Invoke();
+            return;
         }
 
         InventorySlotData updatedSlot = InventoryManager.Instance.GetSlot(slotIndex);

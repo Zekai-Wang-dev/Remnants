@@ -51,3 +51,10 @@ MonoBehaviour:
     uniqueDropId: 
     minQuantity: 1
     maxQuantity: 1
+  - item: {fileID: 11400000, guid: 41dacb3e350f28c48ad361545adbdacb, type: 2}
+    dropChance: 1
+    isPermanentDrop: 1
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 5

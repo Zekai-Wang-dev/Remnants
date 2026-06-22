@@ -145,6 +145,61 @@ public class HoverStatUI : MonoBehaviour
         }
     }
 
+    private int TryCreateConsumableHealthRow(
+    string statName,
+    float currentHealth,
+    float maxHealth,
+    float flatHealAmount,
+    float maxHealthPercentage)
+    {
+        if (maxHealth <= 0f)
+        {
+            return 0;
+        }
+
+        float percentageHealAmount = maxHealth * maxHealthPercentage;
+        float totalHealAmount = flatHealAmount + percentageHealAmount;
+
+        if (totalHealAmount <= 0f)
+        {
+            return 0;
+        }
+
+        float afterValue = Mathf.Min(maxHealth, currentHealth + totalHealAmount);
+
+        if (Mathf.Approximately(afterValue, currentHealth))
+        {
+            return 0;
+        }
+
+        string beforeText = FormatStat(currentHealth);
+        string afterText = ColorAfterStat(afterValue, currentHealth);
+
+        CreateRow(statName, beforeText, afterText);
+        return 1;
+    }
+
+    private int CreateConsumableRows(ConsumableData consumableData, PlayerData playerData)
+    {
+        if (consumableData == null)
+        {
+            CreateRow("Info", "", "No consumable data");
+            return 1;
+        }
+
+        int count = 0;
+
+        count += TryCreateConsumableHealthRow(
+            "Health",
+            playerData.currentHealth,
+            playerData.currentMaxHealth,
+            consumableData.health,
+            consumableData.healthPercentage
+        );
+
+        return count;
+    }
+
     private int CreateStatRows(ItemData item, PlayerData playerData, bool hoveredSlotEquipped)
     {
         ItemData currentlyEquippedItem = GetCurrentlyEquippedItemInSameSlot(item, hoveredSlotEquipped);
@@ -262,40 +317,6 @@ public class HoverStatUI : MonoBehaviour
         count += TryCreateStatRow("Base Defense", playerData.currentBaseDefense, hoveredEquipmentData.baseDefense, currentlyEquippedEquipmentData != null ? currentlyEquippedEquipmentData.baseDefense : 0f, hoveredSlotEquipped);
         count += TryCreateStatRow("True Defense", playerData.currentTrueDefense, hoveredEquipmentData.trueDefense, currentlyEquippedEquipmentData != null ? currentlyEquippedEquipmentData.trueDefense : 0f, hoveredSlotEquipped);
         count += TryCreateStatRow("Energy", playerData.currentEnergyReserves, hoveredEquipmentData.energyReserves, currentlyEquippedEquipmentData != null ? currentlyEquippedEquipmentData.energyReserves : 0f, hoveredSlotEquipped);
-
-        return count;
-    }
-
-    private int CreateConsumableRows(ConsumableData consumableData, PlayerData playerData)
-    {
-        if (consumableData == null)
-        {
-            CreateRow("Info", "", "No consumable data");
-            return 1;
-        }
-
-        int count = 0;
-
-        count += TryCreateConsumableStatRow("Health", playerData.currentHealth, consumableData.health);
-        count += TryCreateConsumablePercentageStatRow("Health", playerData.currentHealth, consumableData.healthPercentage);
-
-        count += TryCreateConsumableStatRow("Speed", playerData.currentSpeed, consumableData.speed);
-        count += TryCreateConsumablePercentageStatRow("Speed", playerData.currentSpeed, consumableData.speedPercentage);
-
-        count += TryCreateConsumableStatRow("Damage", playerData.currentDamage, consumableData.damage);
-        count += TryCreateConsumablePercentageStatRow("Damage", playerData.currentDamage, consumableData.damagePercentage);
-
-        count += TryCreateConsumableStatRow("Base Defense", playerData.currentBaseDefense, consumableData.defense);
-        count += TryCreateConsumablePercentageStatRow("Base Defense", playerData.currentBaseDefense, consumableData.defensePercentage);
-
-        count += TryCreateConsumableStatRow("True Defense", playerData.currentTrueDefense, consumableData.trueDefense);
-        count += TryCreateConsumableStatRow("Accuracy", playerData.currentAccuracy, consumableData.accuracy);
-        count += TryCreateConsumableStatRow("Block Bypass", playerData.currentBlockBypassRate, consumableData.blockBypassRate);
-        count += TryCreateConsumableStatRow("Dodge Bypass", playerData.currentDodgeBypassRate, consumableData.dodgeBypassRate);
-        count += TryCreateConsumableStatRow("Energy", playerData.currentEnergyReserves, consumableData.energyReserves);
-        count += TryCreateConsumableStatRow("Parry Chance", playerData.currentParryChance, consumableData.parryChance);
-        count += TryCreateConsumableStatRow("Block Chance", playerData.currentBlockChance, consumableData.blockChance);
-        count += TryCreateConsumableStatRow("Dodge Chance", playerData.currentDodgeChance, consumableData.dodgeChance);
 
         return count;
     }

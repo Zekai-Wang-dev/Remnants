@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.IO;
-
+using System; 
 public class SaveSystem
 {
     public static void SavePlayerData(PlayerData data)
@@ -96,6 +96,8 @@ public class PlayerDataManager : MonoBehaviour
     [Header("Runtime Data")]
     public PlayerData playerData;
 
+    public event Action OnPlayerStatsChanged;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -108,6 +110,11 @@ public class PlayerDataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         InitializePlayerData();
+    }
+
+    private void NotifyPlayerStatsChanged()
+    {
+        OnPlayerStatsChanged?.Invoke();
     }
 
     void InitializePlayerData()
@@ -138,24 +145,68 @@ public class PlayerDataManager : MonoBehaviour
 
     public void HealPlayer(float amount)
     {
-        if (playerData == null) return;
+        TryHealPlayer(amount, 0f);
+    }
+
+    public bool TryHealPlayer(float flatHealAmount, float maxHealthPercentage)
+    {
+        if (playerData == null)
+        {
+            return false;
+        }
+
+        if (playerData.currentMaxHealth <= 0f)
+        {
+            return false;
+        }
+
+        float percentageHealAmount = playerData.currentMaxHealth * maxHealthPercentage;
+        float totalHealAmount = flatHealAmount + percentageHealAmount;
+
+        if (totalHealAmount <= 0f)
+        {
+            return false;
+        }
+
+        float oldHealth = playerData.currentHealth;
 
         playerData.currentHealth = Mathf.Min(
             playerData.currentMaxHealth,
-            playerData.currentHealth + amount
+            playerData.currentHealth + totalHealAmount
         );
+
+        bool healthChanged = !Mathf.Approximately(oldHealth, playerData.currentHealth);
+
+        if (healthChanged)
+        {
+            SavePlayer();
+
+            // Keep this only if you added the event from earlier.
+            NotifyPlayerStatsChanged();
+        }
+
+        return healthChanged;
     }
 
     public void DamagePlayer(float damage)
     {
         if (playerData == null) return;
+
+        float oldHealth = playerData.currentHealth;
         playerData.TakeDamage(damage);
+
+        if (!Mathf.Approximately(oldHealth, playerData.currentHealth))
+        {
+            NotifyPlayerStatsChanged();
+        }
     }
 
     public void ResetPlayerToBaseStats()
     {
         if (playerData == null || playerCharacterData == null) return;
+
         playerData.ResetToBaseStats(playerCharacterData);
+        NotifyPlayerStatsChanged();
     }
 
     public void SavePlayer()
@@ -202,6 +253,8 @@ public class PlayerDataManager : MonoBehaviour
         ApplyEquippedItemStats();
 
         playerData.currentHealth = Mathf.Min(oldCurrentHealth, playerData.currentMaxHealth);
+
+        NotifyPlayerStatsChanged();
     }
 
     private void ApplyEquippedItemStats()
