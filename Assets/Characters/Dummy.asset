@@ -15,8 +15,8 @@ MonoBehaviour:
   charType: Enemy
   isPlayer: 0
   maxHealth: 300
-  speed: 1
-  damage: 5
+  speed: 100
+  damage: 50
   defense: 0
   trueDefense: 0
   accuracy: 30

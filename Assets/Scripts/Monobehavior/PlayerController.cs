@@ -11,7 +11,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 lastPosition;
     private bool isBlocked = false;
-    private bool canMove = true;
+    [SerializeField] private bool canMove = true;
+    [SerializeField] private bool movementDisabledByCombat = false;
+
+    public bool CanMove => canMove;
+    public bool MovementDisabledByCombat => movementDisabledByCombat;
 
     [Header("Interaction / Detection")]
     public float InteractRadius;
@@ -101,6 +105,11 @@ public class PlayerController : MonoBehaviour
         accumulatedDistance += movementDelta.magnitude;
         lastPosition = rb.position;
 
+        if (!canMove)
+        {
+            return;
+        }
+
         CheckForEncounters();
         CheckForInteractables();
     }
@@ -135,9 +144,48 @@ public class PlayerController : MonoBehaviour
         ClearHighlightedInteractable();
     }
 
+    public void DisableMovementForCombat()
+    {
+        movementDisabledByCombat = true;
+        DisableMovement();
+    }
+
     public void EnableMovement()
     {
+        movementDisabledByCombat = false;
+        ForceEnableMovement("EnableMovement");
+    }
+
+    public void EnableMovementAfterCombat()
+    {
+        movementDisabledByCombat = false;
+        ForceEnableMovement("CombatOver");
+    }
+
+    public void ForceEnableMovement(string reason = "Manual")
+    {
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody2D>();
+        }
+
+        if (spawnManager == null)
+        {
+            spawnManager = SpawnManager.Instance;
+        }
+
         canMove = true;
+        isBlocked = false;
+        isTransitioning = false;
+        velocity = Vector2.zero;
+
+        GetCurrentArea();
+        ResetDistanceTracking();
+        ClearHighlightedInteractable();
+
+        nextRandomCheckTime = Time.time + randomCheckInterval;
+
+        Debug.Log($"Player movement enabled. Reason: {reason}. Current scene: {(spawnManager != null ? spawnManager.currentSceneId : "No SpawnManager")}");
     }
 
     void CheckForRandomEncounters()
@@ -293,6 +341,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckForEncounters()
     {
+        if (!canMove) return;
         if (spawnManager == null) return;
         if (spawnManager.currentSceneId == "001") return;
 

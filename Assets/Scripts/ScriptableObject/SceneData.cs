@@ -14,7 +14,7 @@ public class SceneData : ScriptableObject
 
     [Header("After Scene Ends")]
     public List<SceneEndActorCommand> endCommands = new();
-    public OngoingQuestData newQuest; 
+    public OngoingQuestData newQuest;
 }
 
 [System.Serializable]
@@ -100,11 +100,16 @@ public class SceneEndActorCommand
     public string actorId;
     public EndBehavior endBehavior;
 
+    [Header("Combat End Command")]
+    [Tooltip("Used only when endBehavior is Combat. This gives the cinematic its own enemy pool instead of using the area's fixed/random encounter data.")]
+    public CombatInteraction combatInteraction = new();
+
     public enum EndBehavior
     {
         None,
         Disable,
         Destroy,
-        Quest
+        Quest,
+        Combat
     }
 }

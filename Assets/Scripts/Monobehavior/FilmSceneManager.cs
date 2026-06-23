@@ -75,13 +75,8 @@ public class FilmSceneManager : MonoBehaviour
             }
         }
 
-        ApplyEndCommands(filmScene);
+        bool startedCombat = ApplyEndCommands(filmScene);
         MarkCinematicActivated(filmScene);
-
-        if (PlayerController.Instance != null)
-        {
-            PlayerController.Instance.EnableMovement();
-        }
 
         if (filmScene.newQuest != null)
         {
@@ -90,6 +85,11 @@ public class FilmSceneManager : MonoBehaviour
 
         inCinematic = false;
         currentFilmSceneId = "";
+
+        if (!startedCombat && PlayerController.Instance != null)
+        {
+            PlayerController.Instance.EnableMovement();
+        }
     }
 
     private IEnumerator PlayAction(SceneAction action)
@@ -486,11 +486,11 @@ public class FilmSceneManager : MonoBehaviour
         }
     }
 
-    private void ApplyEndCommands(SceneData filmScene)
+    private bool ApplyEndCommands(SceneData filmScene)
     {
         if (filmScene == null || filmScene.endCommands == null)
         {
-            return;
+            return false;
         }
 
         foreach (SceneEndActorCommand command in filmScene.endCommands)
@@ -500,25 +500,17 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
-            Transform actor = GetActor(command.actorId);
-
-            if (actor == null)
-            {
-                Debug.LogWarning($"End command could not find actor '{command.actorId}'.");
-                continue;
-            }
-
             switch (command.endBehavior)
             {
                 case SceneEndActorCommand.EndBehavior.None:
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Disable:
-                    actor.gameObject.SetActive(false);
+                    ApplyActorEndCommand(command, disable: true);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Destroy:
-                    Destroy(actor.gameObject);
+                    ApplyActorEndCommand(command, disable: false);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Quest:
@@ -527,8 +519,89 @@ public class FilmSceneManager : MonoBehaviour
                         QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
                     }
                     break;
+
+                case SceneEndActorCommand.EndBehavior.Combat:
+                    if (StartCombatEndCommand(filmScene, command))
+                    {
+                        return true;
+                    }
+                    break;
             }
         }
+
+        return false;
+    }
+
+    private void ApplyActorEndCommand(SceneEndActorCommand command, bool disable)
+    {
+        if (command == null)
+        {
+            return;
+        }
+
+        Transform actor = GetActor(command.actorId);
+
+        if (actor == null)
+        {
+            Debug.LogWarning($"End command could not find actor '{command.actorId}'.");
+            return;
+        }
+
+        if (disable)
+        {
+            actor.gameObject.SetActive(false);
+        }
+        else
+        {
+            Destroy(actor.gameObject);
+        }
+    }
+
+    private bool StartCombatEndCommand(SceneData filmScene, SceneEndActorCommand command)
+    {
+        if (command == null || command.combatInteraction == null)
+        {
+            Debug.LogWarning("Combat end command has no CombatInteraction data.");
+            return false;
+        }
+
+        if (command.combatInteraction.enemies == null || command.combatInteraction.enemies.Count == 0)
+        {
+            Debug.LogWarning($"Combat end command on cinematic '{GetCinematicId(filmScene)}' has no enemies assigned.");
+            return false;
+        }
+
+        if (SpawnManager.Instance == null)
+        {
+            Debug.LogWarning("Cannot start scene-end combat because SpawnManager is missing.");
+            return false;
+        }
+
+        string combatId = !string.IsNullOrWhiteSpace(command.combatInteraction.combatId)
+            ? command.combatInteraction.combatId.Trim()
+            : BuildSceneEndCombatId(filmScene, command);
+
+        bool started = SpawnManager.Instance.StartCombatFromEnemyPool(
+            command.combatInteraction.enemies,
+            combatId
+        );
+
+        if (started)
+        {
+            Debug.Log($"Cinematic end command started combat: {combatId}");
+        }
+
+        return started;
+    }
+
+    private string BuildSceneEndCombatId(SceneData filmScene, SceneEndActorCommand command)
+    {
+        string sceneId = filmScene != null ? GetCinematicId(filmScene) : "unknown_scene";
+        string actorId = command != null && !string.IsNullOrWhiteSpace(command.actorId)
+            ? command.actorId.Trim()
+            : "no_actor";
+
+        return $"cinematic_{sceneId}_{actorId}";
     }
 
     public bool IsCinematicActivated(SceneData filmScene)

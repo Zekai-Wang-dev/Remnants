@@ -240,7 +240,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator AttackAnimation(Transform targetTransform, float duration)
     {
-        if (targetTransform == null)
+        if (myTransform == null || targetTransform == null)
         {
             yield break;
         }
@@ -250,6 +250,11 @@ public class Character : MonoBehaviour
         Vector3 direction = (targetPos - startPos).normalized;
         float distance = Vector3.Distance(startPos, targetPos);
 
+        if (direction == Vector3.zero)
+        {
+            yield break;
+        }
+
         Vector3 forwardPos = startPos + direction * (distance * 0.7f);
 
         float elapsed = 0f;
@@ -257,9 +262,19 @@ public class Character : MonoBehaviour
 
         while (elapsed < halfDuration)
         {
+            if (myTransform == null)
+            {
+                yield break;
+            }
+
             myTransform.position = Vector3.Lerp(startPos, forwardPos, elapsed / halfDuration);
             elapsed += Time.deltaTime;
             yield return null;
+        }
+
+        if (myTransform == null)
+        {
+            yield break;
         }
 
         myTransform.position = forwardPos;
@@ -268,12 +283,20 @@ public class Character : MonoBehaviour
 
         while (elapsed < halfDuration)
         {
+            if (myTransform == null)
+            {
+                yield break;
+            }
+
             myTransform.position = Vector3.Lerp(forwardPos, startPos, elapsed / halfDuration);
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        myTransform.position = startPos;
+        if (myTransform != null)
+        {
+            myTransform.position = startPos;
+        }
     }
 
     public bool HasCombatStats()
@@ -503,9 +526,18 @@ public class CombatManager : MonoBehaviour
     public float bufferTimePostCombat = 3f;
 
     [Header("Loot")]
+    [SerializeField] private bool enableLootDrops = false;
     [SerializeField] private bool giveLootOnlyOnVictory = true;
 
+    [Header("Defense Result Settings")]
+    [SerializeField] private bool parryCounterAttacks = false;
+    [SerializeField] private bool blockTakesReducedDamage = true;
+    [SerializeField, Range(0f, 1f)] private float blockDamageMultiplier = 0.5f;
+
     private readonly List<PendingLootEntry> pendingLoot = new();
+    private readonly List<Character> activePlayerTeam = new();
+
+    private bool combatEnding = false;
 
     private void Awake()
     {
@@ -522,7 +554,11 @@ public class CombatManager : MonoBehaviour
     {
         StopAllCoroutines();
 
+        PlayerController.Instance?.DisableMovementForCombat();
+
+        combatEnding = false;
         pendingLoot.Clear();
+        activePlayerTeam.Clear();
 
         StartCoroutine(StartCombatWithBuffer(playerTeam, enemyTeam));
     }
@@ -546,6 +582,11 @@ public class CombatManager : MonoBehaviour
             c.team = 0;
             c.state = "Alive";
             c.ResetHealth();
+
+            if (!activePlayerTeam.Contains(c))
+            {
+                activePlayerTeam.Add(c);
+            }
 
             if (c.state != "Dead")
             {
@@ -573,13 +614,25 @@ public class CombatManager : MonoBehaviour
             c.threatLevel = 0;
         }
 
-        StartCoroutine(CombatLoop());
+        if (TryGetCombatEndResult(out bool playerWonBeforeFirstTurn))
+        {
+            yield return StartCoroutine(HandleCombatEnd(playerWonBeforeFirstTurn));
+            yield break;
+        }
+
+        yield return StartCoroutine(CombatLoop());
     }
 
     public IEnumerator CombatLoop()
     {
-        while (combatants.Count > 0)
+        while (!combatEnding && combatants.Count > 0)
         {
+            if (TryGetCombatEndResult(out bool playerWonBeforeTurn))
+            {
+                yield return StartCoroutine(HandleCombatEnd(playerWonBeforeTurn));
+                yield break;
+            }
+
             if (currentTurnIndex >= combatants.Count)
             {
                 currentTurnIndex = 0;
@@ -587,44 +640,18 @@ public class CombatManager : MonoBehaviour
 
             Character current = combatants[currentTurnIndex];
 
-            if (current == null || current.state == "Dead")
+            if (!IsValidActiveCombatant(current))
             {
                 RemoveDeadCharacter(current);
                 continue;
             }
 
             current.BeginTurn(GetOpponentTeam(current));
+            Character defender = current.target;
 
-            if (current.target != null)
+            if (IsValidActiveCombatant(defender))
             {
-                float attackDuration = current.GetAttackDuration(attackAnimationDuration);
-
-                float attackStartTime = Time.time;
-
-                StartCoroutine(current.AttackAnimation(current.target.transform, attackDuration));
-
-                bool defenseSucceeded = false;
-                string defenseType = "";
-
-                yield return StartCoroutine(HandleDefenseWindow(
-                    current,
-                    current.target,
-                    attackStartTime,
-                    attackDuration,
-                    (success, type) =>
-                    {
-                        defenseSucceeded = success;
-                        defenseType = type;
-                    }));
-
-                if (!defenseSucceeded)
-                {
-                    CalculateDamage(current, current.target, "None");
-                }
-                else
-                {
-                    ApplyDefenseResults(current, current.target, defenseType);
-                }
+                yield return StartCoroutine(HandleAttackSequence(current, defender));
             }
             else
             {
@@ -633,44 +660,66 @@ public class CombatManager : MonoBehaviour
 
             RemoveAllDeadCharacters();
 
-            bool playerTeamAlive = false;
-            bool enemyTeamAlive = false;
-
-            foreach (Character c in combatants)
+            if (TryGetCombatEndResult(out bool playerWonAfterTurn))
             {
-                if (c == null || c.state == "Dead")
-                {
-                    continue;
-                }
-
-                if (c.team == 0)
-                {
-                    playerTeamAlive = true;
-                }
-
-                if (c.team == 1)
-                {
-                    enemyTeamAlive = true;
-                }
-            }
-
-            if (!enemyTeamAlive)
-            {
-                yield return StartCoroutine(HandleVictory());
-                yield break;
-            }
-
-            if (!playerTeamAlive)
-            {
-                pendingLoot.Clear();
-                Debug.Log("Player team defeated! Pending loot discarded.");
-                SavePlayerIfPossible();
+                yield return StartCoroutine(HandleCombatEnd(playerWonAfterTurn));
                 yield break;
             }
 
             NextTurn();
 
             yield return new WaitForSeconds(1f);
+        }
+    }
+
+    private IEnumerator HandleAttackSequence(Character attacker, Character defender)
+    {
+        if (!IsValidActiveCombatant(attacker) || !IsValidActiveCombatant(defender))
+        {
+            yield break;
+        }
+
+        float attackDuration = attacker.GetAttackDuration(attackAnimationDuration);
+        float attackStartTime = Time.time;
+
+        bool defenseSucceeded = false;
+        string defenseType = "";
+
+        Coroutine attackAnimationCoroutine = null;
+
+        if (defender != null)
+        {
+            attackAnimationCoroutine = StartCoroutine(attacker.AttackAnimation(defender.transform, attackDuration));
+        }
+
+        yield return StartCoroutine(HandleDefenseWindow(
+            attacker,
+            defender,
+            attackStartTime,
+            attackDuration,
+            (success, type) =>
+            {
+                defenseSucceeded = success;
+                defenseType = type;
+            }));
+
+        if (attackAnimationCoroutine != null)
+        {
+            yield return attackAnimationCoroutine;
+        }
+
+        if (!IsValidActiveCombatant(attacker) || !IsValidActiveCombatant(defender))
+        {
+            yield break;
+        }
+
+        if (!defenseSucceeded)
+        {
+            CalculateDamage(attacker, defender, "None");
+        }
+        else
+        {
+            ApplyDefenseResults(attacker, defender, defenseType);
         }
     }
 
@@ -684,7 +733,7 @@ public class CombatManager : MonoBehaviour
         bool defenseSucceeded = false;
         string defenseType = "";
 
-        if (attacker == null || defender == null)
+        if (!IsValidActiveCombatant(attacker) || !IsValidActiveCombatant(defender))
         {
             onComplete?.Invoke(false, "");
             yield break;
@@ -692,22 +741,30 @@ public class CombatManager : MonoBehaviour
 
         if (defender.isPlayer)
         {
-            while (Time.time - attackStartTime < attackDuration && !defenseSucceeded)
+            while (!combatEnding && Time.time - attackStartTime < attackDuration)
             {
-                if (Input.GetKeyDown(KeyCode.LeftShift))
+                if (!IsValidActiveCombatant(attacker) || !IsValidActiveCombatant(defender))
                 {
-                    defenseSucceeded = defender.RollForDodge(attacker, attackStartTime, attackDuration);
-                    if (defenseSucceeded) defenseType = "Dodge";
+                    break;
                 }
-                else if (Input.GetKeyDown(KeyCode.Space))
+
+                if (!defenseSucceeded)
                 {
-                    defenseSucceeded = defender.RollForParry(attacker, attackStartTime, attackDuration);
-                    if (defenseSucceeded) defenseType = "Parry";
-                }
-                else if (Input.GetMouseButtonDown(1))
-                {
-                    defenseSucceeded = defender.RollForBlock(attacker, attackStartTime, attackDuration);
-                    if (defenseSucceeded) defenseType = "Block";
+                    if (Input.GetKeyDown(KeyCode.LeftShift))
+                    {
+                        defenseSucceeded = defender.RollForDodge(attacker, attackStartTime, attackDuration);
+                        if (defenseSucceeded) defenseType = "Dodge";
+                    }
+                    else if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        defenseSucceeded = defender.RollForParry(attacker, attackStartTime, attackDuration);
+                        if (defenseSucceeded) defenseType = "Parry";
+                    }
+                    else if (Input.GetMouseButtonDown(1))
+                    {
+                        defenseSucceeded = defender.RollForBlock(attacker, attackStartTime, attackDuration);
+                        if (defenseSucceeded) defenseType = "Block";
+                    }
                 }
 
                 yield return null;
@@ -716,10 +773,23 @@ public class CombatManager : MonoBehaviour
         else
         {
             defenseSucceeded = defender.AttemptDefense(attacker, attackStartTime, attackDuration, out defenseType);
-            yield return null;
+
+            while (!combatEnding && Time.time - attackStartTime < attackDuration)
+            {
+                if (!IsValidActiveCombatant(attacker) || !IsValidActiveCombatant(defender))
+                {
+                    break;
+                }
+
+                yield return null;
+            }
         }
 
-        defender.lastDefenseUsed = defenseType;
+        if (defender != null)
+        {
+            defender.lastDefenseUsed = defenseType;
+        }
+
         onComplete?.Invoke(defenseSucceeded, defenseType);
     }
 
@@ -733,17 +803,29 @@ public class CombatManager : MonoBehaviour
         switch (defenseType)
         {
             case "Dodge":
-                Debug.Log($"{defender.GetDisplayName()} dodged the attack!");
+                Debug.Log($"{defender.GetDisplayName()} dodged the attack. No damage taken.");
                 break;
 
             case "Parry":
-                Debug.Log($"{defender.GetDisplayName()} parried the attack!");
-                CalculateDamage(defender, attacker, "Counter");
+                Debug.Log($"{defender.GetDisplayName()} parried the attack. No damage taken.");
+
+                if (parryCounterAttacks)
+                {
+                    CalculateDamage(defender, attacker, "Counter");
+                }
                 break;
 
             case "Block":
-                Debug.Log($"{defender.GetDisplayName()} blocked the attack!");
-                CalculateDamage(attacker, defender, "Blocked");
+                Debug.Log($"{defender.GetDisplayName()} blocked the attack.");
+
+                if (blockTakesReducedDamage)
+                {
+                    CalculateDamage(attacker, defender, "Blocked");
+                }
+                break;
+
+            default:
+                CalculateDamage(attacker, defender, "None");
                 break;
         }
     }
@@ -771,7 +853,7 @@ public class CombatManager : MonoBehaviour
         switch (defenseContext)
         {
             case "Blocked":
-                damage *= 0.5f;
+                damage *= blockDamageMultiplier;
                 break;
 
             case "Counter":
@@ -801,23 +883,244 @@ public class CombatManager : MonoBehaviour
         SavePlayerIfPossible();
     }
 
-    private IEnumerator HandleVictory()
+    private bool IsValidActiveCombatant(Character character)
     {
-        if (giveLootOnlyOnVictory)
+        return character != null && character.state != "Dead" && character.HasCombatStats();
+    }
+
+    private bool TryGetCombatEndResult(out bool playerWon)
+    {
+        bool playerTeamAlive = false;
+        bool enemyTeamAlive = false;
+
+        foreach (Character c in combatants)
         {
-            GivePendingLootToInventory();
+            if (!IsValidActiveCombatant(c))
+            {
+                continue;
+            }
+
+            if (c.team == 0)
+            {
+                playerTeamAlive = true;
+            }
+            else if (c.team == 1)
+            {
+                enemyTeamAlive = true;
+            }
         }
+
+        if (!playerTeamAlive && !enemyTeamAlive)
+        {
+            playerWon = false;
+            return true;
+        }
+
+        if (!enemyTeamAlive)
+        {
+            playerWon = true;
+            return true;
+        }
+
+        if (!playerTeamAlive)
+        {
+            playerWon = false;
+            return true;
+        }
+
+        playerWon = false;
+        return false;
+    }
+
+    private void RestorePlayerTeamAfterDefeat()
+    {
+        foreach (Character playerCharacter in activePlayerTeam)
+        {
+            if (playerCharacter == null || !playerCharacter.isPlayer)
+            {
+                continue;
+            }
+
+            playerCharacter.state = "Alive";
+            playerCharacter.target = null;
+            playerCharacter.SetCombatHealth(1f);
+        }
+
+        if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.playerData != null)
+        {
+            PlayerDataManager.Instance.playerData.currentHealth = 1f;
+        }
+    }
+
+
+    private void RestorePlayerTeamAfterCombat(bool playerWon)
+    {
+        foreach (Character playerCharacter in activePlayerTeam)
+        {
+            if (playerCharacter == null || !playerCharacter.isPlayer)
+            {
+                continue;
+            }
+
+            playerCharacter.target = null;
+            playerCharacter.lastDefenseUsed = "";
+
+            if (playerWon && playerCharacter.state != "Dead")
+            {
+                playerCharacter.state = "Alive";
+            }
+        }
+    }
+
+    private void RestorePlayerControlAfterCombat()
+    {
+        // Directly unlock the persistent overworld player first. This is the
+        // important part for combat launched by a film end command, because
+        // the film system may have disabled PlayerController.canMove before
+        // combat started.
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.EnableMovementAfterCombat();
+        }
+
+        GameObject playerObject = null;
+
+        if (PlayerController.Instance != null)
+        {
+            playerObject = PlayerController.Instance.gameObject;
+        }
+
+        if (playerObject == null)
+        {
+            foreach (Character playerCharacter in activePlayerTeam)
+            {
+                if (playerCharacter != null && playerCharacter.isPlayer)
+                {
+                    playerObject = playerCharacter.gameObject;
+                    break;
+                }
+            }
+        }
+
+        if (playerObject == null)
+        {
+            playerObject = GameObject.FindGameObjectWithTag("Player");
+        }
+
+        if (playerObject == null)
+        {
+            return;
+        }
+
+        MonoBehaviour[] behaviours = playerObject.GetComponents<MonoBehaviour>();
+
+        foreach (MonoBehaviour behaviour in behaviours)
+        {
+            if (behaviour == null)
+            {
+                continue;
+            }
+
+            TrySetBoolMember(behaviour, "canMove", true);
+            TrySetBoolMember(behaviour, "CanMove", true);
+            TrySetBoolMember(behaviour, "movementEnabled", true);
+            TrySetBoolMember(behaviour, "MovementEnabled", true);
+            TrySetBoolMember(behaviour, "movementDisabledByCombat", false);
+            TrySetBoolMember(behaviour, "isMovementDisabled", false);
+            TrySetBoolMember(behaviour, "movementDisabled", false);
+            TrySetBoolMember(behaviour, "disableMovement", false);
+            TrySetBoolMember(behaviour, "isInCombat", false);
+            TrySetBoolMember(behaviour, "InCombat", false);
+        }
+    }
+
+    private void TrySetBoolMember(MonoBehaviour targetBehaviour, string memberName, bool value)
+    {
+        if (targetBehaviour == null || string.IsNullOrEmpty(memberName))
+        {
+            return;
+        }
+
+        System.Type type = targetBehaviour.GetType();
+
+        System.Reflection.FieldInfo field = type.GetField(
+            memberName,
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.Public |
+            System.Reflection.BindingFlags.NonPublic);
+
+        if (field != null && field.FieldType == typeof(bool))
+        {
+            field.SetValue(targetBehaviour, value);
+            return;
+        }
+
+        System.Reflection.PropertyInfo property = type.GetProperty(
+            memberName,
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.Public |
+            System.Reflection.BindingFlags.NonPublic);
+
+        if (property != null && property.PropertyType == typeof(bool) && property.CanWrite)
+        {
+            property.SetValue(targetBehaviour, value);
+        }
+    }
+
+    private IEnumerator HandleCombatEnd(bool playerWon)
+    {
+        if (combatEnding)
+        {
+            yield break;
+        }
+
+        combatEnding = true;
+
+        if (playerWon)
+        {
+            Debug.Log("Enemy team defeated. Returning from combat.");
+
+            if (enableLootDrops && giveLootOnlyOnVictory)
+            {
+                GivePendingLootToInventory();
+            }
+            else
+            {
+                pendingLoot.Clear();
+                Debug.Log("Loot discarded because loot rewards are disabled for now.");
+            }
+        }
+        else
+        {
+            pendingLoot.Clear();
+            Debug.Log("Player team defeated. Returning from combat without loot.");
+        }
+
+        if (!playerWon)
+        {
+            RestorePlayerTeamAfterDefeat();
+        }
+
+        RestorePlayerTeamAfterCombat(playerWon);
+        RestorePlayerControlAfterCombat();
 
         SavePlayerIfPossible();
 
         SpawnManager spawnManager = SpawnManager.Instance;
 
-        if (spawnManager != null)
+        if (spawnManager == null)
+        {
+            Debug.LogWarning("Cannot return from combat because SpawnManager is missing.");
+            yield break;
+        }
+
+        if (playerWon)
         {
             string encounterId = spawnManager.currentEncounterId;
             string encounterAreaId = spawnManager.currentEncounterAreaId;
 
-            bool isRandomEncounter = !string.IsNullOrEmpty(encounterId) && encounterId.StartsWith("random_");
+            bool isRandomEncounter = !string.IsNullOrEmpty(encounterId) &&
+                                     encounterId.StartsWith("random_");
 
             if (!isRandomEncounter &&
                 !string.IsNullOrEmpty(encounterAreaId) &&
@@ -825,14 +1128,26 @@ public class CombatManager : MonoBehaviour
             {
                 spawnManager.MarkEncounterDefeated(encounterAreaId, encounterId);
             }
-
-            Debug.Log($"Victory! Waiting {bufferTimePostCombat} seconds before returning...");
-
-            yield return new WaitForSeconds(bufferTimePostCombat);
-
-            spawnManager.ClearCurrentEncounter();
-            spawnManager.NextScene("CombatOver");
         }
+
+        Debug.Log($"Combat ended. Waiting {bufferTimePostCombat} seconds before returning...");
+
+        yield return new WaitForSeconds(bufferTimePostCombat);
+
+        spawnManager.ClearCurrentEncounter();
+        spawnManager.NextScene("CombatOver");
+
+        // Wait through scene/SpawnManager return logic, then unlock again.
+        // This prevents a film end command or scene-return callback from
+        // re-disabling movement after the first unlock.
+        yield return null;
+        RestorePlayerControlAfterCombat();
+
+        yield return new WaitForEndOfFrame();
+        RestorePlayerControlAfterCombat();
+
+        combatants.Clear();
+        currentTurnIndex = 0;
     }
 
     private void NextTurn()
@@ -868,6 +1183,9 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
+        string removedName = deadCharacter.GetDisplayName();
+        bool wasPlayer = deadCharacter.isPlayer;
+
         RollDropsFrom(deadCharacter);
 
         int removedIndex = combatants.IndexOf(deadCharacter);
@@ -878,21 +1196,23 @@ public class CombatManager : MonoBehaviour
             currentTurnIndex--;
         }
 
-        if (deadCharacter != null && deadCharacter.team == 1 && deadCharacter.data != null)
+        if (deadCharacter.team == 1 && deadCharacter.data != null)
         {
             string defeatedEnemyId = !string.IsNullOrWhiteSpace(deadCharacter.data.name)
                 ? deadCharacter.data.name
-                : deadCharacter.GetDisplayName();
+                : removedName;
 
             QuestDataManager.Instance?.ReportEnemyDefeated(defeatedEnemyId);
         }
 
-        if (deadCharacter.gameObject != null)
+        // Never destroy the player object here. SpawnManager and camera return logic
+        // can still need the player's Transform after a defeat.
+        if (!wasPlayer && deadCharacter.gameObject != null)
         {
             Destroy(deadCharacter.gameObject);
         }
 
-        Debug.Log($"{deadCharacter.GetDisplayName()} removed from combat.");
+        Debug.Log($"{removedName} removed from combat.");
     }
 
     private void RemoveAllDeadCharacters()
@@ -908,6 +1228,11 @@ public class CombatManager : MonoBehaviour
 
     private void RollDropsFrom(Character defeatedCharacter)
     {
+        if (!enableLootDrops)
+        {
+            return;
+        }
+
         if (defeatedCharacter == null)
         {
             return;

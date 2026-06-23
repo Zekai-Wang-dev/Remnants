@@ -17,6 +17,7 @@ MonoBehaviour:
   interactablePrefab: {fileID: 2868209051854855979, guid: 4c0f40eae9c2ca24d8800b002a9e9250, type: 3}
   interactionPrompt: Press "E" buddy
   canOnlyInteractOnce: 1
+  canRefresh: 1
   requiredFlags: []
   flagsToSet: []
   itemInteraction:
@@ -29,4 +30,6 @@ MonoBehaviour:
     objectiveId: 
     completeQuest: 0
   combatInteraction:
-    enemies: []
+    combatId: Dummy
+    enemies:
+    - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}

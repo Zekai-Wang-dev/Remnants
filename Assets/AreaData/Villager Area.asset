@@ -10,20 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
-  m_Name: Tutorial3
+  m_Name: Villager Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 002
-  areaName: Tutorial 3
-  areaIndex: {x: 0, y: 1}
-  enemies:
-  - enemyData: {fileID: 11400000, guid: b244c2045e64a6447aab547abe42645a, type: 2}
-    spawnPointId: EnemyS1
+  areaId: 001
+  areaName: Villager Area
+  areaIndex: {x: 1, y: 0}
+  enemies: []
   enableRandomEncounters: 0
-  randomEncounterPool:
-  - enemyData: {fileID: 0}
-    weight: 0
-    minPlayerLevel: 0
-    maxPlayerLevel: 0
-    requiredFlags: []
+  randomEncounterPool: []
   randomEncounterChance: 0.1
   minDistanceBetweenEncounters: 5
+  interactables: []

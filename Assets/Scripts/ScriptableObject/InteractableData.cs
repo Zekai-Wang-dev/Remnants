@@ -12,6 +12,7 @@ public class InteractableData : ScriptableObject
     public string interactionPrompt;
 
     public bool canOnlyInteractOnce = true;
+    public bool canRefresh = false;
 
     public List<string> requiredFlags = new();
     public List<string> flagsToSet = new();
@@ -45,5 +46,9 @@ public class QuestInteraction
 [System.Serializable]
 public class CombatInteraction
 {
+    [Tooltip("Optional. If empty, one will be generated from the interactable or cinematic scene.")]
+    public string combatId;
+
+    [Tooltip("Enemy pool used for this custom combat interaction. These enemies are used directly instead of AreaData fixed/random encounters.")]
     public List<CharacterData> enemies = new();
 }

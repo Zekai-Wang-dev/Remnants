@@ -31,6 +31,8 @@ public class SpawnManager : MonoBehaviour
     public string currentEncounterAreaId;
     public string currentEncounterId;
 
+    private readonly List<CharacterData> pendingCustomCombatEnemies = new();
+
     [Header("Encounter Cooldown")]
     [SerializeField] private float postCombatRandomEncounterCooldown = 3f;
 
@@ -81,6 +83,70 @@ public class SpawnManager : MonoBehaviour
     {
         currentEncounterAreaId = "";
         currentEncounterId = "";
+        pendingCustomCombatEnemies.Clear();
+    }
+
+    public bool StartCombatFromEnemyPool(List<CharacterData> enemies, string encounterId = "", string encounterAreaId = "")
+    {
+        if (isSceneTransitioning)
+        {
+            Debug.LogWarning("Cannot start custom combat because a scene transition is already happening.");
+            return false;
+        }
+
+        pendingCustomCombatEnemies.Clear();
+
+        if (enemies != null)
+        {
+            foreach (CharacterData enemy in enemies)
+            {
+                if (enemy != null)
+                {
+                    pendingCustomCombatEnemies.Add(enemy);
+                }
+            }
+        }
+
+        if (pendingCustomCombatEnemies.Count == 0)
+        {
+            Debug.LogWarning("Cannot start custom combat because no valid enemies were assigned.");
+            return false;
+        }
+
+        currentEncounterId = !string.IsNullOrWhiteSpace(encounterId)
+            ? encounterId.Trim()
+            : $"custom_{Time.frameCount}";
+
+        // Custom combat uses the pending enemy pool directly, so it does not need an AreaData lookup.
+        // Leaving this empty also prevents custom interactable/cinematic fights from being saved as defeated fixed encounters.
+        currentEncounterAreaId = !string.IsNullOrWhiteSpace(encounterAreaId)
+            ? encounterAreaId.Trim()
+            : "";
+
+        NextScene("Combat");
+        return true;
+    }
+
+    public bool HasPendingCustomCombatEnemyPool()
+    {
+        return pendingCustomCombatEnemies.Count > 0;
+    }
+
+    public List<CharacterData> ConsumePendingCustomCombatEnemyPool()
+    {
+        List<CharacterData> result = new();
+
+        foreach (CharacterData enemy in pendingCustomCombatEnemies)
+        {
+            if (enemy != null)
+            {
+                result.Add(enemy);
+            }
+        }
+
+        pendingCustomCombatEnemies.Clear();
+
+        return result;
     }
 
     public bool IsRandomEncounterCooldownActive()
@@ -559,7 +625,13 @@ public class SpawnManager : MonoBehaviour
                 continue;
             }
 
-            if (IsInteractableClaimed(areaData.areaId, interactableSaveId))
+            bool canRefresh = CanInteractableRefresh(interactableEntry);
+
+            if (canRefresh)
+            {
+                RemoveClaimedInteractable(areaData.areaId, interactableSaveId, false);
+            }
+            else if (IsInteractableClaimed(areaData.areaId, interactableSaveId))
             {
                 Debug.Log($"Skipping claimed interactable {interactableSaveId} in area {areaData.areaId}");
                 continue;
@@ -653,12 +725,91 @@ public class SpawnManager : MonoBehaviour
 
             string interactableSaveId = interactable.GetInteractableSaveId();
 
-            if (!string.IsNullOrEmpty(interactableSaveId) &&
-                claimedInteractables[areaId].Contains(interactableSaveId))
+            if (string.IsNullOrEmpty(interactableSaveId))
             {
-                Debug.Log($"Destroying claimed interactable: {interactableSaveId}");
-                Destroy(interactable.gameObject);
+                continue;
             }
+
+            if (!claimedInteractables[areaId].Contains(interactableSaveId))
+            {
+                continue;
+            }
+
+            if (IsRefreshableInteractable(areaId, interactableSaveId))
+            {
+                RemoveClaimedInteractable(areaId, interactableSaveId, false);
+                Debug.Log($"Keeping refreshable interactable: {interactableSaveId}");
+                continue;
+            }
+
+            Debug.Log($"Destroying claimed interactable: {interactableSaveId}");
+            Destroy(interactable.gameObject);
+        }
+
+        SaveClaimedInteractables();
+    }
+
+    private bool CanInteractableRefresh(InteractableEntry interactableEntry)
+    {
+        return interactableEntry != null &&
+               interactableEntry.interactableData != null &&
+               interactableEntry.interactableData.canRefresh;
+    }
+
+    private bool IsRefreshableInteractable(string areaId, string interactableId)
+    {
+        if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(interactableId))
+        {
+            return false;
+        }
+
+        AreaData areaData = GetAreaDataById(areaId);
+
+        if (areaData == null || areaData.interactables == null)
+        {
+            return false;
+        }
+
+        foreach (InteractableEntry interactableEntry in areaData.interactables)
+        {
+            if (interactableEntry == null)
+            {
+                continue;
+            }
+
+            string saveId = GetInteractableSaveId(interactableEntry);
+
+            if (saveId == interactableId)
+            {
+                return CanInteractableRefresh(interactableEntry);
+            }
+        }
+
+        return false;
+    }
+
+    private void RemoveClaimedInteractable(string areaId, string interactableId, bool saveAfterRemove)
+    {
+        if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(interactableId))
+        {
+            return;
+        }
+
+        if (!claimedInteractables.ContainsKey(areaId))
+        {
+            return;
+        }
+
+        bool removed = claimedInteractables[areaId].Remove(interactableId);
+
+        if (claimedInteractables[areaId].Count <= 0)
+        {
+            claimedInteractables.Remove(areaId);
+        }
+
+        if (removed && saveAfterRemove)
+        {
+            SaveClaimedInteractables();
         }
     }
 
@@ -712,6 +863,13 @@ public class SpawnManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(areaId) || string.IsNullOrEmpty(interactableId))
         {
+            return;
+        }
+
+        if (IsRefreshableInteractable(areaId, interactableId))
+        {
+            RemoveClaimedInteractable(areaId, interactableId, true);
+            Debug.Log($"Interactable {interactableId} in area {areaId} can refresh, so it was not permanently marked as claimed.");
             return;
         }
 
@@ -873,6 +1031,7 @@ public class SpawnManager : MonoBehaviour
 
         currentEncounterAreaId = "";
         currentEncounterId = "";
+        pendingCustomCombatEnemies.Clear();
 
         areaPositions.Clear();
 

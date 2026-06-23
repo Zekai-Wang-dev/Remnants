@@ -10,12 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
-  m_Name: Tutorial4
+  m_Name: Alleryway Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaName: Tutorial 4
-  areaId: 003
-  areaType: Tutorial
-  areaIndex: {x: 0, y: -1}
-  spawnArea: {fileID: 0}
-  leftBorder: {fileID: 0}
-  rightBorder: {fileID: 0}
+  areaId: 004
+  areaName: Alleyway Area
+  areaIndex: {x: 3, y: 1}
+  enemies: []
+  enableRandomEncounters: 0
+  randomEncounterPool: []
+  randomEncounterChance: 0.1
+  minDistanceBetweenEncounters: 5
+  interactables: []

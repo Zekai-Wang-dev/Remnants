@@ -10,18 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
-  m_Name: Tutorial1
+  m_Name: Random Wolves Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 000
-  areaName: Tutorial 1
-  areaIndex: {x: 0, y: 0}
+  areaId: 002
+  areaName: Wolves Area
+  areaIndex: {x: 2, y: 0}
   enemies:
-  - enemyData: {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
-    spawnPointId: EnemySpawn1
+  - enemyData: {fileID: 11400000, guid: b244c2045e64a6447aab547abe42645a, type: 2}
+    spawnPointId: EnemyS1
   enableRandomEncounters: 0
-  randomEncounterPool: []
+  randomEncounterPool:
+  - enemyData: {fileID: 0}
+    weight: 0
+    minPlayerLevel: 0
+    maxPlayerLevel: 0
+    requiredFlags: []
   randomEncounterChance: 0.1
   minDistanceBetweenEncounters: 5
-  interactables:
-  - interactableData: {fileID: 11400000, guid: 9ffb2a429af6c2e4db0383c4b961be39, type: 2}
-    spawnPointId: Test
+  interactables: []

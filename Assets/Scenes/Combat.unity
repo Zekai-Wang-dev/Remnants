@@ -1055,6 +1055,11 @@ MonoBehaviour:
   attackAnimationDuration: 0.5
   bufferTimePreCombat: 3
   bufferTimePostCombat: 3
+  enableLootDrops: 1
+  giveLootOnlyOnVictory: 1
+  parryCounterAttacks: 0
+  blockTakesReducedDamage: 1
+  blockDamageMultiplier: 0.5
 --- !u!4 &1427927934
 Transform:
   m_ObjectHideFlags: 0
@@ -1198,6 +1203,7 @@ MonoBehaviour:
     leftBorder: {fileID: 0}
     rightBorder: {fileID: 0}
     enemySpawns: []
+    interactableSpawns: []
 --- !u!4 &2015038332
 Transform:
   m_ObjectHideFlags: 0

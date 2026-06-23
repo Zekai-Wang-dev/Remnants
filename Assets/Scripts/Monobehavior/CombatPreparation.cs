@@ -154,6 +154,26 @@ public class CombatPreparation : MonoBehaviour
             return;
         }
 
+        if (spawnManager.HasPendingCustomCombatEnemyPool())
+        {
+            List<CharacterData> customEnemies = spawnManager.ConsumePendingCustomCombatEnemyPool();
+
+            foreach (CharacterData enemy in customEnemies)
+            {
+                if (enemy != null)
+                {
+                    data.Add(enemy);
+                }
+            }
+
+            if (customEnemies.Count == 0)
+            {
+                Debug.LogWarning("Custom combat enemy pool existed but contained no valid enemies.");
+            }
+
+            return;
+        }
+
         AreaData encounterArea = spawnManager.GetAreaDataById(spawnManager.currentEncounterAreaId);
         if (encounterArea == null)
         {

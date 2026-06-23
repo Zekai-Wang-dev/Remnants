@@ -173,13 +173,88 @@ public class WorldInteractable : MonoBehaviour
         ExecuteItemInteraction();
         ExecuteQuestInteraction();
 
-        // Scene/cinematic and combat interaction are intentionally disabled here.
-        // Do NOT auto-search managers or call cinematic methods through reflection from this script.
-        // Add those later with direct calls to your exact CinematicManager / CombatManager methods.
+        // Direct cinematic/combat calls are now enabled.
+        // If an interactable starts a cinematic that itself ends in combat, leave combatInteraction empty here.
+        ExecuteSceneInteraction();
+        ExecuteCombatInteraction();
 
         GameSaveManager.Instance?.RequestSave();
 
         Debug.Log($"Interacted with {interactableData.interactableId}");
+    }
+
+    private void ExecuteSceneInteraction()
+    {
+        SceneInteraction sceneInteraction = interactableData.sceneInteraction;
+
+        if (sceneInteraction == null || sceneInteraction.scene == null)
+        {
+            return;
+        }
+
+        if (FilmSceneManager.Instance == null)
+        {
+            Debug.LogWarning($"Cannot start interactable scene '{sceneInteraction.scene.name}' because FilmSceneManager is missing.");
+            return;
+        }
+
+        bool started = FilmSceneManager.Instance.TryStartCinematic(sceneInteraction.scene);
+
+        if (started)
+        {
+            Debug.Log($"Interactable started cinematic: {sceneInteraction.scene.sceneId}");
+        }
+    }
+
+    private void ExecuteCombatInteraction()
+    {
+        CombatInteraction combatInteraction = interactableData.combatInteraction;
+
+        if (combatInteraction == null ||
+            combatInteraction.enemies == null ||
+            combatInteraction.enemies.Count == 0)
+        {
+            return;
+        }
+
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager == null)
+        {
+            Debug.LogWarning("Cannot start interactable combat because SpawnManager is missing.");
+            return;
+        }
+
+        string combatId = !string.IsNullOrWhiteSpace(combatInteraction.combatId)
+            ? combatInteraction.combatId.Trim()
+            : BuildInteractableCombatId();
+
+        bool started = spawnManager.StartCombatFromEnemyPool(
+            combatInteraction.enemies,
+            combatId
+        );
+
+        if (started)
+        {
+            Debug.Log($"Interactable started combat: {combatId}");
+        }
+    }
+
+    private string BuildInteractableCombatId()
+    {
+        string id = !string.IsNullOrWhiteSpace(interactableSaveId)
+            ? interactableSaveId
+            : interactableData != null && !string.IsNullOrWhiteSpace(interactableData.interactableId)
+                ? interactableData.interactableId
+                : name;
+
+        string sourceAreaId = !string.IsNullOrWhiteSpace(areaId)
+            ? areaId
+            : SpawnManager.Instance != null
+                ? SpawnManager.Instance.currentAreaId
+                : "unknown_area";
+
+        return $"interactable_{sourceAreaId}_{id}";
     }
 
     private void ExecuteFlagInteraction()
