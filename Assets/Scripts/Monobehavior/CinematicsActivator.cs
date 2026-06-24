@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CinematicsActivator : MonoBehaviour
@@ -5,11 +6,36 @@ public class CinematicsActivator : MonoBehaviour
     public SceneData sceneData;
     public bool destroyAfterUse = true;
 
+    [Header("Opening / Auto Start")]
+    [Tooltip("Use this for the demo opening cinematic instead of relying on the player spawning inside a trigger.")]
+    public bool startOnSceneStart = false;
+
+    [Tooltip("Prevents the cinematic from starting before GameSaveManager finishes its one-frame load/refresh pass.")]
+    public bool waitForGameSaveLoad = true;
+
+    [Tooltip("Small delay to let SpawnManager, save/load, and scene registries finish refreshing.")]
+    public float startDelay = 0.05f;
+
+    private Collider2D cachedCollider;
+    private bool startPending;
+    private bool hasTriggered;
+
+    private void Awake()
+    {
+        cachedCollider = GetComponent<Collider2D>();
+    }
+
     private void Start()
     {
         if (ShouldBeDisabledBecauseAlreadyActivated())
         {
             DisableOrDestroyActivator();
+            return;
+        }
+
+        if (startOnSceneStart)
+        {
+            RequestStartCinematic();
         }
     }
 
@@ -20,29 +46,82 @@ public class CinematicsActivator : MonoBehaviour
             return;
         }
 
+        RequestStartCinematic();
+    }
+
+    public void RefreshActivationState()
+    {
+        if (ShouldBeDisabledBecauseAlreadyActivated())
+        {
+            DisableOrDestroyActivator();
+        }
+    }
+
+    private void RequestStartCinematic()
+    {
+        if (hasTriggered || startPending)
+        {
+            return;
+        }
+
         if (sceneData == null)
         {
             Debug.LogWarning($"{name} has no SceneData assigned.");
             return;
         }
 
-        if (FilmSceneManager.Instance == null)
+        StartCoroutine(StartCinematicWhenReady());
+    }
+
+    private IEnumerator StartCinematicWhenReady()
+    {
+        startPending = true;
+        hasTriggered = true;
+
+        if (startDelay > 0f)
         {
-            Debug.LogError("FilmSceneManager is missing from the scene.");
-            return;
+            yield return new WaitForSeconds(startDelay);
+        }
+
+        while (FilmSceneManager.Instance == null)
+        {
+            yield return null;
+        }
+
+        while (waitForGameSaveLoad && GameSaveManager.Instance != null && !GameSaveManager.Instance.HasLoaded)
+        {
+            yield return null;
+        }
+
+        while (FilmSceneManager.Instance != null && FilmSceneManager.Instance.IsRefreshingWorldState)
+        {
+            yield return null;
+        }
+
+        // One extra frame prevents same-frame save/load refreshes from fighting the cinematic start.
+        yield return null;
+
+        if (sceneData == null || FilmSceneManager.Instance == null)
+        {
+            startPending = false;
+            hasTriggered = false;
+            yield break;
         }
 
         if (FilmSceneManager.Instance.IsCinematicActivated(sceneData))
         {
             DisableOrDestroyActivator();
-            return;
+            yield break;
         }
 
         bool started = FilmSceneManager.Instance.TryStartCinematic(sceneData);
 
+        startPending = false;
+
         if (!started)
         {
-            return;
+            hasTriggered = false;
+            yield break;
         }
 
         if (destroyAfterUse)
@@ -73,16 +152,24 @@ public class CinematicsActivator : MonoBehaviour
 
     private void DisableOrDestroyActivator()
     {
+        StopAllCoroutines();
+        startPending = false;
+        hasTriggered = true;
+
         if (destroyAfterUse)
         {
             Destroy(gameObject);
             return;
         }
 
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null)
+        if (cachedCollider == null)
         {
-            col.enabled = false;
+            cachedCollider = GetComponent<Collider2D>();
+        }
+
+        if (cachedCollider != null)
+        {
+            cachedCollider.enabled = false;
         }
 
         enabled = false;

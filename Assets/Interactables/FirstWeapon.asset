@@ -10,26 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25d8ca51eac9470468a64f049e92ed87, type: 3}
-  m_Name: Something
+  m_Name: FirstWeapon
   m_EditorClassIdentifier: Assembly-CSharp::InteractableData
-  interactableId: Test
-  displayName: Test
+  interactableId: FirstWeapon
+  displayName: FirstWeapon
   interactablePrefab: {fileID: 2868209051854855979, guid: 4c0f40eae9c2ca24d8800b002a9e9250, type: 3}
-  interactionPrompt: Press "E" buddy
+  interactionPrompt: "Press \"E\" \n"
   canOnlyInteractOnce: 1
-  canRefresh: 1
+  canRefresh: 0
   requiredFlags: []
   flagsToSet: []
   itemInteraction:
     loot:
-    - {fileID: 11400000, guid: c9de9bfcbefe99841ae5d9417065b5d0, type: 2}
+    - {fileID: 11400000, guid: 4a22fb08686309947af0d33c4dfcafda, type: 2}
   sceneInteraction:
-    scene: {fileID: 0}
+    scene: {fileID: 11400000, guid: d6da597ae93434a4d9825fb027d47962, type: 2}
   questInteraction:
     questData: {fileID: 0}
     objectiveId: 
     completeQuest: 0
   combatInteraction:
-    combatId: Dummy
-    enemies:
-    - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
+    combatId: 
+    enemies: []

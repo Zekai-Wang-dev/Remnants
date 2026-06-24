@@ -143,6 +143,13 @@ public class GameSaveManager : MonoBehaviour
 
     public void LoadGame()
     {
+        hasLoaded = false;
+
+        if (FilmSceneManager.Instance != null)
+        {
+            FilmSceneManager.Instance.CancelActiveCinematic("GameLoadStarted", true);
+        }
+
         if (itemDatabase != null)
         {
             itemDatabase.Initialize();
@@ -173,6 +180,12 @@ public class GameSaveManager : MonoBehaviour
         {
             Debug.LogWarning("Save file could not be parsed.");
             hasLoaded = true;
+
+            if (FilmSceneManager.Instance != null)
+            {
+                FilmSceneManager.Instance.RefreshCinematicWorldState();
+            }
+
             return;
         }
 

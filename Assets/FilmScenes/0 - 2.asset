@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13ea08d1017a4bc4c9102e6c7e204734, type: 3}
-  m_Name: TutorialScene
+  m_Name: 0 - 2
   m_EditorClassIdentifier: Assembly-CSharp::SceneData
-  sceneId: Tutorial_Scene
-  sceneName: Tutorial Scene
+  sceneId: 0-2
+  sceneName: WolfEncounter
   actions:
-  - actionName: Introduction
+  - actionName: Question
     type: 3
     actorCommands: []
     dialogueBeats:
     - actorId: Player
-      line: What is this?
+      line: 'An Echo Beast? '
       speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
-      charactersPerSecond: 10
+      charactersPerSecond: 30
       waitForPlayerInputAfterLine: 1
       continueKey: 32
       speakingAnimationClip: {fileID: 0}
@@ -30,76 +30,61 @@ MonoBehaviour:
       animationStateAfterLine: 
       waitAfterLine: 0
     waitAfterAction: 0
-  - actionName: Move towards dummy
-    type: 1
-    actorCommands:
-    - actorId: Player
-      moveDirection: {x: 1, y: 0}
-      moveDistance: 1.5
-      moveSpeed: 5
-      dialogueLine: {fileID: 0}
-      animationClip: {fileID: 0}
-    dialogueBeats: []
-    waitAfterAction: 1
-  - actionName: Dummy talks
+  - actionName: Question
     type: 3
     actorCommands: []
     dialogueBeats:
-    - actorId: Dummy
-      line: BOO!
+    - actorId: Wolf
+      line: Grr...
       speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
-      charactersPerSecond: 10
-      waitForPlayerInputAfterLine: 0
-      continueKey: 0
-      speakingAnimationClip: {fileID: 0}
-      speakingAnimationStateName: 
-      animationStateAfterLine: 
-      waitAfterLine: 0
-    waitAfterAction: 0
-  - actionName: Player scared
-    type: 3
-    actorCommands: []
-    dialogueBeats:
-    - actorId: Player
-      line: WOAH! DIE!
-      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
-      charactersPerSecond: 10
-      waitForPlayerInputAfterLine: 0
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
       continueKey: 32
       speakingAnimationClip: {fileID: 0}
       speakingAnimationStateName: 
       animationStateAfterLine: 
       waitAfterLine: 0
     waitAfterAction: 0
-  - actionName: Player kill dummy
+  - actionName: Question
     type: 1
     actorCommands:
-    - actorId: Player
-      moveDirection: {x: 1, y: 0}
-      moveDistance: 2
+    - actorId: Wolf
+      moveDirection: {x: -1, y: 0}
+      moveDistance: 5
       moveSpeed: 15
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
-    dialogueBeats: []
+    dialogueBeats:
+    - actorId: Wolf
+      line: Grr...
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
     waitAfterAction: 0
   isPermanent: 1
   isActivated: 1
   endCommands:
-  - actorId: Dummy
+  - actorId: Wolf
     endBehavior: 4
     combatInteraction:
-      combatId: What
+      combatId: Wolf
       enemies:
       - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
-  - actorId: Dummy
-    endBehavior: 0
+  - actorId: Wolf
+    endBehavior: 2
     combatInteraction:
-      combatId: 
-      enemies: []
+      combatId: Wolf
+      enemies:
+      - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
   newQuest:
-    questData: {fileID: 11400000, guid: 3a167290e56292f4193e4ce536fd7b21, type: 2}
+    questData: {fileID: 0}
     currentProgress: 0
     maxProgress: 0
-    autoClaimRewards: 1
+    autoClaimRewards: 0
     isCompleted: 0
     rewardClaimed: 0

@@ -14,6 +14,20 @@ public class FilmSceneManager : MonoBehaviour
     private string currentFilmSceneId;
     public bool inCinematic;
 
+    private Coroutine activeCinematicCoroutine;
+    private bool isRefreshingWorldState;
+
+    public bool IsRefreshingWorldState => isRefreshingWorldState;
+
+    public bool IsReadyToStartCinematic
+    {
+        get
+        {
+            bool saveLoaded = GameSaveManager.Instance == null || GameSaveManager.Instance.HasLoaded;
+            return saveLoaded && !isRefreshingWorldState;
+        }
+    }
+
     private readonly HashSet<string> activatedSceneIds = new HashSet<string>();
 
     private void Awake()
@@ -26,6 +40,17 @@ public class FilmSceneManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this)
+        {
+            return;
+        }
+
+        CancelActiveCinematic("FilmSceneManager destroyed", true);
+        Instance = null;
     }
 
     public void StartCinematic(SceneData filmScene)
@@ -41,7 +66,13 @@ public class FilmSceneManager : MonoBehaviour
             return false;
         }
 
-        if (inCinematic)
+        if (!IsReadyToStartCinematic)
+        {
+            Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' tried to start before save/load world refresh finished.");
+            return false;
+        }
+
+        if (inCinematic || activeCinematicCoroutine != null)
         {
             Debug.LogWarning("Already in cinematic.");
             return false;
@@ -53,42 +84,102 @@ public class FilmSceneManager : MonoBehaviour
             return false;
         }
 
-        StartCoroutine(PlayCinematic(filmScene));
+        activeCinematicCoroutine = StartCoroutine(PlayCinematic(filmScene));
         return true;
     }
 
     private IEnumerator PlayCinematic(SceneData filmScene)
     {
+        bool cleanupNeeded = true;
+        bool startedCombat = false;
+        string cinematicId = GetCinematicId(filmScene);
+
         inCinematic = true;
-        currentFilmSceneId = GetCinematicId(filmScene);
+        currentFilmSceneId = cinematicId;
 
         if (PlayerController.Instance != null)
         {
             PlayerController.Instance.DisableMovement();
         }
 
-        if (filmScene.actions != null)
+        try
         {
-            foreach (SceneAction action in filmScene.actions)
+            if (filmScene.actions != null)
             {
-                yield return StartCoroutine(PlayAction(action));
+                foreach (SceneAction action in filmScene.actions)
+                {
+                    yield return StartCoroutine(PlayAction(action));
+                }
+            }
+
+            startedCombat = ApplyEndCommands(filmScene);
+            MarkCinematicActivated(filmScene);
+
+            if (filmScene.newQuest != null)
+            {
+                QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+            }
+
+            cleanupNeeded = false;
+            FinishCinematic(startedCombat, $"CinematicFinished:{cinematicId}", true);
+        }
+        finally
+        {
+            if (cleanupNeeded)
+            {
+                FinishCinematic(false, $"CinematicInterrupted:{cinematicId}", true);
             }
         }
+    }
 
-        bool startedCombat = ApplyEndCommands(filmScene);
-        MarkCinematicActivated(filmScene);
-
-        if (filmScene.newQuest != null)
+    public void CancelActiveCinematic(string reason = "Cancelled", bool enablePlayerMovement = true)
+    {
+        if (!inCinematic && activeCinematicCoroutine == null)
         {
-            QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+            return;
         }
 
+        StopAllCoroutines();
+        activeCinematicCoroutine = null;
+
+        DestroyActiveSpeechBubbles();
+        FinishCinematic(false, reason, enablePlayerMovement);
+    }
+
+    private void FinishCinematic(bool startedCombat, string reason, bool enablePlayerMovement)
+    {
+        activeCinematicCoroutine = null;
         inCinematic = false;
         currentFilmSceneId = "";
 
-        if (!startedCombat && PlayerController.Instance != null)
+        if (!enablePlayerMovement || startedCombat)
         {
-            PlayerController.Instance.EnableMovement();
+            return;
+        }
+
+        if (PlayerController.Instance == null)
+        {
+            return;
+        }
+
+        if (PlayerController.Instance.MovementDisabledByCombat)
+        {
+            return;
+        }
+
+        PlayerController.Instance.ForceEnableMovement(reason);
+    }
+
+    private void DestroyActiveSpeechBubbles()
+    {
+        SpeechBubbleUI[] bubbles = FindObjectsByType<SpeechBubbleUI>(FindObjectsSortMode.None);
+
+        foreach (SpeechBubbleUI bubble in bubbles)
+        {
+            if (bubble != null)
+            {
+                Destroy(bubble.gameObject);
+            }
         }
     }
 
@@ -674,6 +765,8 @@ public class FilmSceneManager : MonoBehaviour
 
     public void LoadFromSaveData(CinematicSaveData saveData)
     {
+        CancelActiveCinematic("CinematicSaveDataLoaded", true);
+
         activatedSceneIds.Clear();
 
         if (saveData != null && saveData.activatedSceneIds != null)
@@ -696,7 +789,7 @@ public class FilmSceneManager : MonoBehaviour
 
     public void ClearRuntimeCinematicData()
     {
-        StopAllCoroutines();
+        CancelActiveCinematic("CinematicRuntimeDataCleared", true);
 
         activatedSceneIds.Clear();
         currentFilmSceneId = "";
@@ -704,7 +797,7 @@ public class FilmSceneManager : MonoBehaviour
 
         if (PlayerController.Instance != null)
         {
-            PlayerController.Instance.EnableMovement();
+            PlayerController.Instance.ForceEnableMovement("CinematicRuntimeDataCleared");
         }
 
         RefreshCinematicWorldState();
@@ -714,41 +807,47 @@ public class FilmSceneManager : MonoBehaviour
 
     public void RefreshCinematicWorldState()
     {
-        if (SceneCharacterRegistry.Instance != null)
-        {
-            SceneCharacterRegistry.Instance.SendMessage(
-                "RefreshAfterCinematicStateChanged",
-                SendMessageOptions.DontRequireReceiver
-            );
-        }
+        isRefreshingWorldState = true;
 
-        CinematicsActivator[] activators =
-            FindObjectsByType<CinematicsActivator>(FindObjectsSortMode.None);
-
-        foreach (CinematicsActivator activator in activators)
+        try
         {
-            if (activator == null)
+            if (SceneCharacterRegistry.Instance != null)
             {
-                continue;
+                SceneCharacterRegistry.Instance.SendMessage(
+                    "RefreshAfterCinematicStateChanged",
+                    SendMessageOptions.DontRequireReceiver
+                );
             }
 
-            activator.SendMessage(
-                "RefreshActivationState",
-                SendMessageOptions.DontRequireReceiver
-            );
-        }
+            CinematicsActivator[] activators =
+                FindObjectsByType<CinematicsActivator>(FindObjectsSortMode.None);
 
-        PersistentCinematicObject[] cinematicObjects =
-            FindObjectsByType<PersistentCinematicObject>(FindObjectsSortMode.None);
-
-        foreach (PersistentCinematicObject cinematicObject in cinematicObjects)
-        {
-            if (cinematicObject == null)
+            foreach (CinematicsActivator activator in activators)
             {
-                continue;
+                if (activator == null)
+                {
+                    continue;
+                }
+
+                activator.RefreshActivationState();
             }
 
-            cinematicObject.RefreshCinematicObjectState();
+            PersistentCinematicObject[] cinematicObjects =
+                FindObjectsByType<PersistentCinematicObject>(FindObjectsSortMode.None);
+
+            foreach (PersistentCinematicObject cinematicObject in cinematicObjects)
+            {
+                if (cinematicObject == null)
+                {
+                    continue;
+                }
+
+                cinematicObject.RefreshCinematicObjectState();
+            }
+        }
+        finally
+        {
+            isRefreshingWorldState = false;
         }
     }
 

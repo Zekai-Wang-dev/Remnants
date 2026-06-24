@@ -887,6 +887,8 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   animator: {fileID: 124265611}
   backgroundScript: {fileID: 0}
+  canMove: 1
+  movementDisabledByCombat: 0
   InteractRadius: 2
   ExitRadius: 2
   areaTransitionCooldown: 0.5
@@ -1033,7 +1035,7 @@ Transform:
   m_GameObject: {fileID: 152846446}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.42, y: -0.3, z: 0}
+  m_LocalPosition: {x: -7.07, y: -0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13720,6 +13722,102 @@ Transform:
   m_Children: []
   m_Father: {fileID: 255624299}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &909711417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 909711420}
+  - component: {fileID: 909711419}
+  - component: {fileID: 909711418}
+  m_Layer: 7
+  m_Name: CinematicsActivator (1)
+  m_TagString: Cinematics
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &909711418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909711417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d66c6314ee1339408f7b13d3f9dada6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinematicsActivator
+  sceneData: {fileID: 11400000, guid: 73cdc9d0650e8774c935527fc7b925ed, type: 2}
+  destroyAfterUse: 1
+  startOnSceneStart: 0
+  waitForGameSaveLoad: 0
+  startDelay: 0.05
+--- !u!61 &909711419
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909711417}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!4 &909711420
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909711417}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.67, y: -1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &939555158
 GameObject:
   m_ObjectHideFlags: 0
@@ -15408,7 +15506,7 @@ Transform:
   m_GameObject: {fileID: 1212960092}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.78142, y: -1.5, z: 0}
+  m_LocalPosition: {x: -4.34, y: -1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15426,8 +15524,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d66c6314ee1339408f7b13d3f9dada6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinematicsActivator
-  sceneData: {fileID: 11400000, guid: eb888e172f1615241988ab58d6efa730, type: 2}
+  sceneData: {fileID: 11400000, guid: db87ae3b9a0af1a458b172c2e45872f1, type: 2}
   destroyAfterUse: 1
+  startOnSceneStart: 0
+  waitForGameSaveLoad: 1
+  startDelay: 0.05
 --- !u!1 &1225500799
 GameObject:
   m_ObjectHideFlags: 0
@@ -17108,7 +17209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8410581118868622105, guid: d606e03af610a04478eddc878585f4f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.15554
+      value: 5.88
       objectReference: {fileID: 0}
     - target: {fileID: 8410581118868622105, guid: d606e03af610a04478eddc878585f4f6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -17757,7 +17858,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneCharacterRegistry
   characters:
-  - actorId: Dummy
+  - actorId: Wolf
     characterTransform: {fileID: 1464929720}
     hideIfCinematicActivated: {fileID: 0}
     disableWhenCinematicActivated: 1
@@ -18041,11 +18142,9 @@ MonoBehaviour:
     playerSpawn: {fileID: 2108056023}
     leftBorder: {fileID: 1534660279}
     rightBorder: {fileID: 1193672677}
-    enemySpawns:
-    - spawnPointId: EnemySpawn1
-      transform: {fileID: 1430046553}
+    enemySpawns: []
     interactableSpawns:
-    - spawnPointId: Test
+    - spawnPointId: FirstWeapon
       transform: {fileID: 152846447}
   - areaId: 001
     playerSpawn: {fileID: 1006676153}
@@ -20666,6 +20765,7 @@ SceneRoots:
   - {fileID: 1679360837}
   - {fileID: 817711812}
   - {fileID: 1212960094}
+  - {fileID: 909711420}
   - {fileID: 1770991888}
   - {fileID: 1606760367}
   - {fileID: 1464929719}

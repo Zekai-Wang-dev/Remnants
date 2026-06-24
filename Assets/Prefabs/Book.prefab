@@ -108,9 +108,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldInteractable
   interactableData: {fileID: 11400000, guid: 9ffb2a429af6c2e4db0383c4b961be39, type: 2}
   areaId: 000
-  interactableSaveId: Test
+  interactableSaveId: FirstWeapon
   canInteract: 0
-  outlineColor: {r: 0.6830188, g: 0.5848654, b: 0, a: 1}
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
   outlineScale: 1.08
 --- !u!61 &-498175336057194020
 BoxCollider2D:
@@ -142,7 +142,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
