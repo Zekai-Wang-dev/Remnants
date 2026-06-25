@@ -10,7 +10,9 @@ public class QuestDataEditor : Editor
     private SerializedProperty questType;
 
     private SerializedProperty isChained;
+    private SerializedProperty triggerCinematicOnComplete;
     private SerializedProperty newQuest;
+    private SerializedProperty cinematicOnComplete;
     private SerializedProperty newQuestAutoClaimRewards;
 
     private SerializedProperty questRequirementType;
@@ -29,7 +31,10 @@ public class QuestDataEditor : Editor
         questType = serializedObject.FindProperty("questType");
 
         isChained = serializedObject.FindProperty("isChained");
+        triggerCinematicOnComplete = serializedObject.FindProperty("triggerCinematicOnComplete");
+
         newQuest = serializedObject.FindProperty("newQuest");
+        cinematicOnComplete = serializedObject.FindProperty("cinematicOnComplete");
         newQuestAutoClaimRewards = serializedObject.FindProperty("newQuestAutoClaimRewards");
 
         questRequirementType = serializedObject.FindProperty("questRequirementType");
@@ -47,7 +52,7 @@ public class QuestDataEditor : Editor
         serializedObject.Update();
 
         DrawQuestInfoSection();
-        DrawChainSection();
+        DrawCompletionActionsSection();
         DrawRequirementSection();
         DrawRewardsSection();
 
@@ -63,30 +68,65 @@ public class QuestDataEditor : Editor
         DrawOptionalProperty(questType);
     }
 
-    private void DrawChainSection()
+    private void DrawCompletionActionsSection()
     {
         EditorGUILayout.Space(8);
-        EditorGUILayout.LabelField("Quest Chain", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Completion Actions", EditorStyles.boldLabel);
 
-        DrawOptionalProperty(isChained);
+        DrawOptionalProperty(isChained, false, "Add New Quest On Complete");
+        DrawOptionalProperty(triggerCinematicOnComplete, false, "Start Cinematic On Complete");
 
-        if (isChained != null && isChained.boolValue)
+        bool hasChain = isChained != null && isChained.boolValue;
+        bool hasCinematic = triggerCinematicOnComplete != null && triggerCinematicOnComplete.boolValue;
+
+        if (!hasChain && !hasCinematic)
         {
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.HelpBox(
+                "No completion actions are enabled. Completing this quest will only mark it completed and allow reward claiming.",
+                MessageType.Info
+            );
+            return;
+        }
 
-            DrawOptionalProperty(newQuest, false, "New Quest On Completion");
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+        if (hasChain)
+        {
+            EditorGUILayout.LabelField("New Quest", EditorStyles.boldLabel);
+
+            DrawOptionalProperty(newQuest, false, "New Quest Data");
             DrawOptionalProperty(newQuestAutoClaimRewards, false, "New Quest Auto Claim Rewards");
 
             if (newQuest != null && newQuest.objectReferenceValue == null)
             {
                 EditorGUILayout.HelpBox(
-                    "isChained is enabled, but no new quest is assigned.",
+                    "Add New Quest On Complete is enabled, but no new quest is assigned.",
                     MessageType.Warning
                 );
             }
-
-            EditorGUILayout.EndVertical();
         }
+
+        if (hasCinematic)
+        {
+            if (hasChain)
+            {
+                EditorGUILayout.Space(6);
+            }
+
+            EditorGUILayout.LabelField("Completion Cinematic", EditorStyles.boldLabel);
+
+            DrawOptionalProperty(cinematicOnComplete, false, "Cinematic Scene Data");
+
+            if (cinematicOnComplete != null && cinematicOnComplete.objectReferenceValue == null)
+            {
+                EditorGUILayout.HelpBox(
+                    "Start Cinematic On Complete is enabled, but no cinematic SceneData is assigned.",
+                    MessageType.Warning
+                );
+            }
+        }
+
+        EditorGUILayout.EndVertical();
     }
 
     private void DrawRequirementSection()

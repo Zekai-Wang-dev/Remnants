@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fd2772d6df6b384d8327eff9e8a22be, type: 3}
+  m_Name: 1
+  m_EditorClassIdentifier: Assembly-CSharp::QuestData
+  questId: 1
+  questName: Defeat wolf
+  questType: 0
+  isChained: 0
+  triggerCinematicOnComplete: 1
+  newQuest: {fileID: 0}
+  cinematicOnComplete: {fileID: 11400000, guid: 37c63aa8982b45a41ba9a5b4551d8263, type: 2}
+  newQuestAutoClaimRewards: 1
+  questRequirementType: 1
+  enemyDefeatRequirement:
+    enemyId: Wolf
+    requiredAmount: 1
+  itemCollectionRequirement:
+    itemId: 000
+    requiredAmount: 1
+  locationVisitRequirement:
+    sceneId: 
+    areaId: 
+    requiredAmount: 1
+  talkToNPCRequirement:
+    npcId: Wolf
+    sceneId: 000
+    requiredAmount: 1
+  questRewards:
+  - item: {fileID: 11400000, guid: 41dacb3e350f28c48ad361545adbdacb, type: 2}
+    quantity: 1

@@ -21,8 +21,14 @@ public class QuestData : ScriptableObject
     [Tooltip("If true, completing this quest will immediately add newQuest.")]
     public bool isChained;
 
+    [Tooltip("If true, compelting this quest will activate a scene cinematic.")]
+    public bool triggerCinematicOnComplete;
+
     [Tooltip("Quest added automatically when this quest completes.")]
     public QuestData newQuest;
+
+    [Tooltip("Cinematic to trigger when this quest completes.")]
+    public SceneData cinematicOnComplete;
 
     [Tooltip("Whether the chained quest should auto-claim its own rewards when it completes.")]
     public bool newQuestAutoClaimRewards;

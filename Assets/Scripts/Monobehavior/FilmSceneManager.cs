@@ -14,7 +14,19 @@ public class FilmSceneManager : MonoBehaviour
     private string currentFilmSceneId;
     public bool inCinematic;
 
+    [Header("Queued Cinematics")]
+    [SerializeField] private bool queueCompletionCinematicsUntilWorldReady = true;
+    [SerializeField] private bool blockQueuedCinematicsInCombatScene = true;
+    [SerializeField] private bool blockQueuedCinematicsDuringSpawnTransitions = true;
+    [SerializeField] private bool requireSceneCharacterRegistryForQueuedCinematics = true;
+
+    [Header("Persistent Cinematic State")]
+    [Tooltip("Assign permanent SceneData assets here when they can be triggered without a CinematicsActivator, such as quest-completion cinematics. This lets saved activated cinematic IDs re-apply Destroy/Disable end commands after scene load.")]
+    [SerializeField] private List<SceneData> registeredPermanentCinematics = new List<SceneData>();
+
     private Coroutine activeCinematicCoroutine;
+    private Coroutine delayedRefreshCoroutine;
+    private Coroutine queuedCinematicCoroutine;
     private bool isRefreshingWorldState;
 
     public bool IsRefreshingWorldState => isRefreshingWorldState;
@@ -29,6 +41,9 @@ public class FilmSceneManager : MonoBehaviour
     }
 
     private readonly HashSet<string> activatedSceneIds = new HashSet<string>();
+    private readonly Queue<SceneData> queuedCinematics = new Queue<SceneData>();
+    private readonly HashSet<string> queuedCinematicIds = new HashSet<string>();
+    private readonly HashSet<SceneData> knownSceneDataReferences = new HashSet<SceneData>();
 
     private void Awake()
     {
@@ -40,6 +55,8 @@ public class FilmSceneManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        RegisterInspectorPermanentCinematics();
     }
 
     private void OnDestroy()
@@ -51,6 +68,179 @@ public class FilmSceneManager : MonoBehaviour
 
         CancelActiveCinematic("FilmSceneManager destroyed", true);
         Instance = null;
+    }
+
+    public void RequestDelayedCinematicWorldRefresh()
+    {
+        if (delayedRefreshCoroutine != null)
+        {
+            StopCoroutine(delayedRefreshCoroutine);
+        }
+
+        delayedRefreshCoroutine = StartCoroutine(DelayedCinematicWorldRefresh());
+    }
+
+    private IEnumerator DelayedCinematicWorldRefresh()
+    {
+        yield return null;
+        yield return null;
+
+        delayedRefreshCoroutine = null;
+        RefreshCinematicWorldState();
+    }
+
+    private void RegisterInspectorPermanentCinematics()
+    {
+        if (registeredPermanentCinematics == null)
+        {
+            return;
+        }
+
+        foreach (SceneData sceneData in registeredPermanentCinematics)
+        {
+            RegisterKnownCinematicSceneData(sceneData);
+        }
+    }
+
+    public void RegisterKnownCinematicSceneData(SceneData sceneData)
+    {
+        if (sceneData == null)
+        {
+            return;
+        }
+
+        knownSceneDataReferences.Add(sceneData);
+    }
+
+    public void QueueCinematic(SceneData filmScene)
+    {
+        if (filmScene == null)
+        {
+            Debug.LogWarning("Tried to queue null cinematic.");
+            return;
+        }
+
+        RegisterKnownCinematicSceneData(filmScene);
+
+        if (!queueCompletionCinematicsUntilWorldReady)
+        {
+            TryStartCinematic(filmScene);
+            return;
+        }
+
+        if (IsCinematicActivated(filmScene))
+        {
+            Debug.Log($"Queued cinematic '{GetCinematicId(filmScene)}' was skipped because it has already been activated.");
+            return;
+        }
+
+        string cinematicId = GetCinematicId(filmScene);
+
+        if (!string.IsNullOrWhiteSpace(cinematicId) && queuedCinematicIds.Contains(cinematicId))
+        {
+            Debug.Log($"Cinematic '{cinematicId}' is already queued.");
+            return;
+        }
+
+        queuedCinematics.Enqueue(filmScene);
+
+        if (!string.IsNullOrWhiteSpace(cinematicId))
+        {
+            queuedCinematicIds.Add(cinematicId);
+        }
+
+        EnsureQueuedCinematicCoroutineRunning();
+    }
+
+    private void EnsureQueuedCinematicCoroutineRunning()
+    {
+        if (queuedCinematicCoroutine != null)
+        {
+            return;
+        }
+
+        queuedCinematicCoroutine = StartCoroutine(PlayQueuedCinematicsWhenReady());
+    }
+
+    private IEnumerator PlayQueuedCinematicsWhenReady()
+    {
+        while (queuedCinematics.Count > 0)
+        {
+            SceneData nextCinematic = queuedCinematics.Peek();
+            string cinematicId = GetCinematicId(nextCinematic);
+
+            yield return new WaitUntil(CanPlayQueuedCinematic);
+
+            queuedCinematics.Dequeue();
+
+            if (!string.IsNullOrWhiteSpace(cinematicId))
+            {
+                queuedCinematicIds.Remove(cinematicId);
+            }
+
+            if (nextCinematic == null)
+            {
+                continue;
+            }
+
+            if (IsCinematicActivated(nextCinematic))
+            {
+                continue;
+            }
+
+            bool started = TryStartCinematic(nextCinematic);
+
+            if (!started)
+            {
+                Debug.LogWarning($"Queued cinematic '{cinematicId}' could not start even though the world appeared ready.");
+                yield return null;
+                continue;
+            }
+
+            yield return new WaitUntil(() => !inCinematic && activeCinematicCoroutine == null);
+        }
+
+        queuedCinematicCoroutine = null;
+    }
+
+    private bool CanPlayQueuedCinematic()
+    {
+        if (!IsReadyToStartCinematic)
+        {
+            return false;
+        }
+
+        if (inCinematic || activeCinematicCoroutine != null)
+        {
+            return false;
+        }
+
+        if (PlayerController.Instance == null)
+        {
+            return false;
+        }
+
+        if (requireSceneCharacterRegistryForQueuedCinematics && SceneCharacterRegistry.Instance == null)
+        {
+            return false;
+        }
+
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager != null)
+        {
+            if (blockQueuedCinematicsDuringSpawnTransitions && spawnManager.IsSceneTransitioning)
+            {
+                return false;
+            }
+
+            if (blockQueuedCinematicsInCombatScene && spawnManager.IsCurrentSceneCombat)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void StartCinematic(SceneData filmScene)
@@ -65,6 +255,8 @@ public class FilmSceneManager : MonoBehaviour
             Debug.LogWarning("Tried to start null cinematic.");
             return false;
         }
+
+        RegisterKnownCinematicSceneData(filmScene);
 
         if (!IsReadyToStartCinematic)
         {
@@ -141,9 +333,16 @@ public class FilmSceneManager : MonoBehaviour
 
         StopAllCoroutines();
         activeCinematicCoroutine = null;
+        delayedRefreshCoroutine = null;
+        queuedCinematicCoroutine = null;
 
         DestroyActiveSpeechBubbles();
         FinishCinematic(false, reason, enablePlayerMovement);
+
+        if (queuedCinematics.Count > 0)
+        {
+            EnsureQueuedCinematicCoroutineRunning();
+        }
     }
 
     private void FinishCinematic(bool startedCombat, string reason, bool enablePlayerMovement)
@@ -597,11 +796,11 @@ public class FilmSceneManager : MonoBehaviour
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Disable:
-                    ApplyActorEndCommand(command, disable: true);
+                    ApplyActorEndCommand(command, disable: true, warnIfMissing: true);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Destroy:
-                    ApplyActorEndCommand(command, disable: false);
+                    ApplyActorEndCommand(command, disable: false, warnIfMissing: true);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Quest:
@@ -623,7 +822,7 @@ public class FilmSceneManager : MonoBehaviour
         return false;
     }
 
-    private void ApplyActorEndCommand(SceneEndActorCommand command, bool disable)
+    private void ApplyActorEndCommand(SceneEndActorCommand command, bool disable, bool warnIfMissing)
     {
         if (command == null)
         {
@@ -634,7 +833,11 @@ public class FilmSceneManager : MonoBehaviour
 
         if (actor == null)
         {
-            Debug.LogWarning($"End command could not find actor '{command.actorId}'.");
+            if (warnIfMissing)
+            {
+                Debug.LogWarning($"End command could not find actor '{command.actorId}'.");
+            }
+
             return;
         }
 
@@ -723,6 +926,8 @@ public class FilmSceneManager : MonoBehaviour
         {
             return;
         }
+
+        RegisterKnownCinematicSceneData(filmScene);
 
         if (!filmScene.isPermanent)
         {
@@ -819,35 +1024,139 @@ public class FilmSceneManager : MonoBehaviour
                 );
             }
 
-            CinematicsActivator[] activators =
-                FindObjectsByType<CinematicsActivator>(FindObjectsSortMode.None);
-
-            foreach (CinematicsActivator activator in activators)
-            {
-                if (activator == null)
-                {
-                    continue;
-                }
-
-                activator.RefreshActivationState();
-            }
-
-            PersistentCinematicObject[] cinematicObjects =
-                FindObjectsByType<PersistentCinematicObject>(FindObjectsSortMode.None);
-
-            foreach (PersistentCinematicObject cinematicObject in cinematicObjects)
-            {
-                if (cinematicObject == null)
-                {
-                    continue;
-                }
-
-                cinematicObject.RefreshCinematicObjectState();
-            }
+            ReapplyCompletedCinematicActorEndCommands();
+            RefreshCinematicActivators();
+            RefreshPersistentCinematicObjects();
         }
         finally
         {
             isRefreshingWorldState = false;
+        }
+    }
+
+    private void RefreshCinematicActivators()
+    {
+        CinematicsActivator[] activators = FindObjectsByType<CinematicsActivator>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+
+        foreach (CinematicsActivator activator in activators)
+        {
+            if (activator == null)
+            {
+                continue;
+            }
+
+            activator.RefreshActivationState();
+        }
+    }
+
+    private void RefreshPersistentCinematicObjects()
+    {
+        PersistentCinematicObject[] cinematicObjects = FindObjectsByType<PersistentCinematicObject>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+
+        foreach (PersistentCinematicObject cinematicObject in cinematicObjects)
+        {
+            if (cinematicObject == null)
+            {
+                continue;
+            }
+
+            cinematicObject.RefreshCinematicObjectState();
+        }
+    }
+
+    private void ReapplyCompletedCinematicActorEndCommands()
+    {
+        HashSet<SceneData> sceneDatas = GetLoadedSceneDataReferences();
+
+        foreach (SceneData sceneData in sceneDatas)
+        {
+            if (sceneData == null)
+            {
+                continue;
+            }
+
+            if (!IsCinematicActivated(sceneData))
+            {
+                continue;
+            }
+
+            ReapplyPersistentActorEndCommands(sceneData);
+        }
+    }
+
+    private HashSet<SceneData> GetLoadedSceneDataReferences()
+    {
+        HashSet<SceneData> sceneDatas = new HashSet<SceneData>();
+
+        RegisterInspectorPermanentCinematics();
+
+        foreach (SceneData sceneData in knownSceneDataReferences)
+        {
+            if (sceneData != null)
+            {
+                sceneDatas.Add(sceneData);
+            }
+        }
+
+        if (registeredPermanentCinematics != null)
+        {
+            foreach (SceneData sceneData in registeredPermanentCinematics)
+            {
+                if (sceneData != null)
+                {
+                    sceneDatas.Add(sceneData);
+                }
+            }
+        }
+
+        CinematicsActivator[] activators = FindObjectsByType<CinematicsActivator>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+
+        foreach (CinematicsActivator activator in activators)
+        {
+            if (activator == null || activator.sceneData == null)
+            {
+                continue;
+            }
+
+            sceneDatas.Add(activator.sceneData);
+        }
+
+        return sceneDatas;
+    }
+
+    private void ReapplyPersistentActorEndCommands(SceneData sceneData)
+    {
+        if (sceneData == null || sceneData.endCommands == null)
+        {
+            return;
+        }
+
+        foreach (SceneEndActorCommand command in sceneData.endCommands)
+        {
+            if (command == null)
+            {
+                continue;
+            }
+
+            switch (command.endBehavior)
+            {
+                case SceneEndActorCommand.EndBehavior.Disable:
+                    ApplyActorEndCommand(command, disable: true, warnIfMissing: false);
+                    break;
+
+                case SceneEndActorCommand.EndBehavior.Destroy:
+                    ApplyActorEndCommand(command, disable: false, warnIfMissing: false);
+                    break;
+            }
         }
     }
 

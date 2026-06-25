@@ -431,6 +431,7 @@ public class QuestDataManager : MonoBehaviour
         }
 
         SaveRuntimeQuestState(quest);
+        TryQueueCompletionCinematic(quest);
 
         if (quest.autoClaimRewards)
         {
@@ -503,6 +504,35 @@ public class QuestDataManager : MonoBehaviour
         TryAddChainedQuest(currentQuest);
 
         NotifyQuestsChanged(true);
+    }
+
+    private void TryQueueCompletionCinematic(OngoingQuestData completedQuest)
+    {
+        if (completedQuest == null || completedQuest.questData == null)
+        {
+            return;
+        }
+
+        QuestData completedQuestData = completedQuest.questData;
+
+        if (!completedQuestData.triggerCinematicOnComplete)
+        {
+            return;
+        }
+
+        if (completedQuestData.cinematicOnComplete == null)
+        {
+            Debug.LogWarning($"Quest '{completedQuestData.name}' is marked to trigger a completion cinematic, but no cinematic is assigned.");
+            return;
+        }
+
+        if (FilmSceneManager.Instance == null)
+        {
+            Debug.LogWarning($"Quest '{completedQuestData.name}' tried to queue a completion cinematic, but FilmSceneManager is missing.");
+            return;
+        }
+
+        FilmSceneManager.Instance.QueueCinematic(completedQuestData.cinematicOnComplete);
     }
 
     private void TryAddChainedQuest(OngoingQuestData completedQuest)

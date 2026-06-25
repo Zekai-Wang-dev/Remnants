@@ -14052,16 +14052,6 @@ Tilemap:
   m_GameObject: {fileID: 984026741}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: -10, y: -2, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 99
-      m_TileSpriteIndex: 99
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 85
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: 2, y: 14, z: 0}
     second:
       serializedVersion: 2
@@ -14272,7 +14262,7 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 10574355273ef2c42b48f182db307dc0, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
@@ -14473,10 +14463,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 5497132294069786235, guid: 012bc1a882aee2242b8c5b257d549db4, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data:
       e00: 1
       e01: 0
@@ -14665,7 +14655,7 @@ Tilemap:
     m_Data: {r: 5e-44, g: 5e-44, b: 5e-44, a: 5e-44}
   - m_RefCount: 0
     m_Data: {r: 5e-44, g: 5e-44, b: 5e-44, a: 5e-44}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -15840,16 +15830,6 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 3, y: -2, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 99
-      m_TileSpriteIndex: 99
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 85
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 0
@@ -16050,7 +16030,7 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 10574355273ef2c42b48f182db307dc0, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
@@ -16251,10 +16231,10 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {fileID: 5497132294069786235, guid: 012bc1a882aee2242b8c5b257d549db4, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data:
       e00: 1
       e01: 0
@@ -16443,7 +16423,7 @@ Tilemap:
     m_Data: {r: 5e-44, g: 5e-44, b: 5e-44, a: 5e-44}
   - m_RefCount: 0
     m_Data: {r: 5e-44, g: 5e-44, b: 5e-44, a: 5e-44}
-  - m_RefCount: 2
+  - m_RefCount: 1
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -17273,9 +17253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03375e8afab549e4088f93cac49b2156, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PersistentCinematicObject
-  hideIfCinematicActivated: {fileID: 11400000, guid: eb888e172f1615241988ab58d6efa730, type: 2}
-  disableWhenActivated: 0
-  destroyWhenActivated: 1
+  cinematicSceneData: {fileID: 11400000, guid: 73cdc9d0650e8774c935527fc7b925ed, type: 2}
+  behaviorWhenCinematicCompleted: 2
+  waitForSaveLoad: 0
 --- !u!1 &1497987920
 GameObject:
   m_ObjectHideFlags: 0
@@ -17862,7 +17842,7 @@ MonoBehaviour:
     characterTransform: {fileID: 1464929720}
     hideIfCinematicActivated: {fileID: 0}
     disableWhenCinematicActivated: 1
-    destroyWhenCinematicActivated: 0
+    destroyWhenCinematicActivated: 1
 --- !u!4 &1606760367
 Transform:
   m_ObjectHideFlags: 0
@@ -18934,6 +18914,11 @@ MonoBehaviour:
   defaultCharactersPerSecond: 30
   defaultContinueKey: 32
   inCinematic: 0
+  queueCompletionCinematicsUntilWorldReady: 1
+  blockQueuedCinematicsInCombatScene: 1
+  blockQueuedCinematicsDuringSpawnTransitions: 1
+  requireSceneCharacterRegistryForQueuedCinematics: 1
+  registeredPermanentCinematics: []
 --- !u!4 &1770991888
 Transform:
   m_ObjectHideFlags: 0

@@ -3,64 +3,78 @@ using UnityEngine;
 
 public class PersistentCinematicObject : MonoBehaviour
 {
-    [Header("Hide/Destroy When This Cinematic Is Activated")]
-    public SceneData hideIfCinematicActivated;
+    public enum CompletedCinematicBehavior
+    {
+        None,
+        Disable,
+        Destroy
+    }
+
+    [Header("Cinematic Condition")]
+    [Tooltip("The permanent cinematic that controls whether this object should remain in the world.")]
+    public SceneData cinematicSceneData;
 
     [Header("Behavior")]
-    public bool disableWhenActivated = true;
-    public bool destroyWhenActivated = false;
+    public CompletedCinematicBehavior behaviorWhenCinematicCompleted =
+        CompletedCinematicBehavior.Destroy;
+
+    [Tooltip("If true, waits until GameSaveManager has loaded before checking cinematic state.")]
+    public bool waitForSaveLoad = true;
+
+    private bool hasRefreshedAfterLoad;
 
     private void Start()
     {
-        StartCoroutine(RefreshAfterSaveLoaded());
+        StartCoroutine(RefreshWhenReady());
     }
 
-    private IEnumerator RefreshAfterSaveLoaded()
+    private IEnumerator RefreshWhenReady()
     {
-        // Wait one frame so managers can initialize.
         yield return null;
 
-        // Wait until save data is loaded.
-        while (GameSaveManager.Instance != null && !GameSaveManager.Instance.HasLoaded)
+        if (waitForSaveLoad)
         {
-            yield return null;
+            yield return new WaitUntil(() =>
+                GameSaveManager.Instance == null ||
+                GameSaveManager.Instance.HasLoaded
+            );
         }
 
+        yield return null;
+
+        hasRefreshedAfterLoad = true;
         RefreshCinematicObjectState();
     }
 
     public void RefreshCinematicObjectState()
     {
-        if (hideIfCinematicActivated == null)
+        if (cinematicSceneData == null)
         {
             return;
         }
 
-        bool shouldHide = false;
-
-        if (FilmSceneManager.Instance != null)
-        {
-            shouldHide = FilmSceneManager.Instance.IsCinematicActivated(hideIfCinematicActivated);
-        }
-        else
-        {
-            shouldHide = hideIfCinematicActivated.isActivated;
-        }
-
-        if (!shouldHide)
+        if (FilmSceneManager.Instance == null)
         {
             return;
         }
 
-        if (destroyWhenActivated)
+        if (!FilmSceneManager.Instance.IsCinematicActivated(cinematicSceneData))
         {
-            Destroy(gameObject);
             return;
         }
 
-        if (disableWhenActivated)
+        switch (behaviorWhenCinematicCompleted)
         {
-            gameObject.SetActive(false);
+            case CompletedCinematicBehavior.None:
+                break;
+
+            case CompletedCinematicBehavior.Disable:
+                gameObject.SetActive(false);
+                break;
+
+            case CompletedCinematicBehavior.Destroy:
+                Destroy(gameObject);
+                break;
         }
     }
 }

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 [System.Serializable]
 public class Scene
@@ -42,6 +44,26 @@ public class SpawnManager : MonoBehaviour
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
+
+    public bool IsSceneTransitioning => isSceneTransitioning;
+
+    public bool IsCurrentSceneCombat
+    {
+        get
+        {
+            if (string.Equals(currentSceneId, "Combat", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            Scene currentScene = scenes != null
+                ? scenes.Find(s => s != null && s.sceneId == currentSceneId)
+                : null;
+
+            return currentScene != null &&
+                   string.Equals(currentScene.sceneName, "Combat", StringComparison.OrdinalIgnoreCase);
+        }
+    }
 
     private CameraController GetCameraController()
     {
@@ -484,6 +506,7 @@ public class SpawnManager : MonoBehaviour
         CleanupClaimedInteractables(areaId);
 
         QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
+        FilmSceneManager.Instance?.RequestDelayedCinematicWorldRefresh();
     }
 
     public void LoadScene(string sceneId, string areaId)
@@ -569,6 +592,8 @@ public class SpawnManager : MonoBehaviour
                 startCooldownAfterSceneLoad = false;
                 StartPostCombatRandomEncounterCooldown();
             }
+
+            FilmSceneManager.Instance?.RequestDelayedCinematicWorldRefresh();
         };
     }
 

@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd2772d6df6b384d8327eff9e8a22be, type: 3}
   m_Name: 0
   m_EditorClassIdentifier: Assembly-CSharp::QuestData
-  questId: 000
+  questId: 0
   questName: Find a weapon
   questType: 0
-  isChained: 0
-  newQuest: {fileID: 0}
+  isChained: 1
+  newQuest: {fileID: 11400000, guid: 3bd1dacd79f540041bf4323ad0144a05, type: 2}
   newQuestAutoClaimRewards: 1
   questRequirementType: 2
   enemyDefeatRequirement:

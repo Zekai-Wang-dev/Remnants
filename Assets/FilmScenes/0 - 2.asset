@@ -70,13 +70,12 @@ MonoBehaviour:
   isActivated: 1
   endCommands:
   - actorId: Wolf
-    endBehavior: 4
+    endBehavior: 1
     combatInteraction:
       combatId: Wolf
-      enemies:
-      - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
+      enemies: []
   - actorId: Wolf
-    endBehavior: 2
+    endBehavior: 4
     combatInteraction:
       combatId: Wolf
       enemies:
