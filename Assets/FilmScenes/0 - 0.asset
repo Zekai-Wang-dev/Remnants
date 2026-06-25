@@ -16,7 +16,7 @@ MonoBehaviour:
   sceneName: WakingUp
   actions:
   - actionName: Wake Up
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Player

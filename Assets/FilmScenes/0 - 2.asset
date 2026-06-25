@@ -16,7 +16,7 @@ MonoBehaviour:
   sceneName: WolfEncounter
   actions:
   - actionName: Question
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Player
@@ -31,7 +31,7 @@ MonoBehaviour:
       waitAfterLine: 0
     waitAfterAction: 0
   - actionName: Question
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Wolf
@@ -52,6 +52,8 @@ MonoBehaviour:
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
       moveSpeed: 15
+      spriteFlipMode: 0
+      targetFlipX: 0
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
     dialogueBeats:

@@ -45,6 +45,9 @@ public class FilmSceneManager : MonoBehaviour
     private readonly HashSet<string> queuedCinematicIds = new HashSet<string>();
     private readonly HashSet<SceneData> knownSceneDataReferences = new HashSet<SceneData>();
 
+    private SceneData pendingSceneEndCombatCinematic;
+    private string pendingSceneEndCombatCinematicId = "";
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -305,11 +308,19 @@ public class FilmSceneManager : MonoBehaviour
             }
 
             startedCombat = ApplyEndCommands(filmScene);
-            MarkCinematicActivated(filmScene);
 
-            if (filmScene.newQuest != null)
+            if (!startedCombat)
             {
-                QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+                MarkCinematicActivated(filmScene);
+
+                if (filmScene.newQuest != null)
+                {
+                    QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+                }
+            }
+            else
+            {
+                Debug.Log($"Cinematic '{cinematicId}' started scene-end combat. Permanent completion is waiting for combat victory.");
             }
 
             cleanupNeeded = false;
@@ -397,6 +408,10 @@ public class FilmSceneManager : MonoBehaviour
                 yield return StartCoroutine(PlayMoveAction(action));
                 break;
 
+            case SceneAction.ActionType.TurnAround:
+                yield return StartCoroutine(PlayTurnAroundAction(action));
+                break;
+
             case SceneAction.ActionType.Animation:
                 PlayAnimationAction(action);
                 break;
@@ -413,6 +428,59 @@ public class FilmSceneManager : MonoBehaviour
         if (action.waitAfterAction > 0f)
         {
             yield return new WaitForSeconds(action.waitAfterAction);
+        }
+    }
+
+    private IEnumerator PlayTurnAroundAction(SceneAction action)
+    {
+        if (action == null)
+        {
+            yield break;
+        }
+
+        if (action.actorCommands == null || action.actorCommands.Count == 0)
+        {
+            Debug.LogWarning($"TurnAround action '{action.actionName}' has no actor commands.");
+            yield break;
+        }
+
+        foreach (SceneActorCommand command in action.actorCommands)
+        {
+            if (command == null)
+            {
+                continue;
+            }
+
+            Transform actor = GetActor(command.actorId);
+
+            if (actor == null)
+            {
+                continue;
+            }
+
+            SpriteRenderer spriteRenderer = actor.GetComponent<SpriteRenderer>();
+
+            if (spriteRenderer == null)
+            {
+                spriteRenderer = actor.GetComponentInChildren<SpriteRenderer>(true);
+            }
+
+            if (spriteRenderer == null)
+            {
+                Debug.LogWarning($"Actor '{command.actorId}' has no SpriteRenderer to flip.");
+                continue;
+            }
+
+            switch (command.spriteFlipMode)
+            {
+                case SceneActorCommand.SpriteFlipMode.Toggle:
+                    spriteRenderer.flipX = !spriteRenderer.flipX;
+                    break;
+
+                case SceneActorCommand.SpriteFlipMode.SetValue:
+                    spriteRenderer.flipX = command.targetFlipX;
+                    break;
+            }
         }
     }
 
@@ -783,6 +851,14 @@ public class FilmSceneManager : MonoBehaviour
             return false;
         }
 
+        // If this cinematic ends in combat, treat the combat result as the real
+        // completion condition. This prevents permanent cleanup commands from
+        // deleting actors/triggers before the player has actually won.
+        if (TryStartAnyCombatEndCommand(filmScene))
+        {
+            return true;
+        }
+
         foreach (SceneEndActorCommand command in filmScene.endCommands)
         {
             if (command == null)
@@ -811,11 +887,30 @@ public class FilmSceneManager : MonoBehaviour
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Combat:
-                    if (StartCombatEndCommand(filmScene, command))
-                    {
-                        return true;
-                    }
                     break;
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryStartAnyCombatEndCommand(SceneData filmScene)
+    {
+        if (filmScene == null || filmScene.endCommands == null)
+        {
+            return false;
+        }
+
+        foreach (SceneEndActorCommand command in filmScene.endCommands)
+        {
+            if (command == null || command.endBehavior != SceneEndActorCommand.EndBehavior.Combat)
+            {
+                continue;
+            }
+
+            if (StartCombatEndCommand(filmScene, command))
+            {
+                return true;
             }
         }
 
@@ -882,10 +977,82 @@ public class FilmSceneManager : MonoBehaviour
 
         if (started)
         {
-            Debug.Log($"Cinematic end command started combat: {combatId}");
+            pendingSceneEndCombatCinematic = filmScene;
+            pendingSceneEndCombatCinematicId = GetCinematicId(filmScene);
+            RegisterKnownCinematicSceneData(filmScene);
+
+            Debug.Log($"Cinematic end command started combat: {combatId}. Cinematic completion will resolve after combat result.");
         }
 
         return started;
+    }
+
+    public void ResolveSceneEndCombatResult(bool playerWon)
+    {
+        if (pendingSceneEndCombatCinematic == null)
+        {
+            return;
+        }
+
+        SceneData completedCinematic = pendingSceneEndCombatCinematic;
+        string completedCinematicId = pendingSceneEndCombatCinematicId;
+
+        pendingSceneEndCombatCinematic = null;
+        pendingSceneEndCombatCinematicId = "";
+
+        if (!playerWon)
+        {
+            Debug.Log($"Scene-end combat for cinematic '{completedCinematicId}' was lost. Cinematic will not be marked activated, so its trigger/actors can remain for retry.");
+            return;
+        }
+
+        Debug.Log($"Scene-end combat for cinematic '{completedCinematicId}' was won. Applying post-combat cinematic completion.");
+
+        ApplyPostCombatVictoryEndCommands(completedCinematic);
+        MarkCinematicActivated(completedCinematic);
+
+        if (completedCinematic.newQuest != null)
+        {
+            QuestDataManager.Instance?.AddQuest(completedCinematic.newQuest);
+        }
+    }
+
+    private void ApplyPostCombatVictoryEndCommands(SceneData filmScene)
+    {
+        if (filmScene == null || filmScene.endCommands == null)
+        {
+            return;
+        }
+
+        foreach (SceneEndActorCommand command in filmScene.endCommands)
+        {
+            if (command == null)
+            {
+                continue;
+            }
+
+            switch (command.endBehavior)
+            {
+                case SceneEndActorCommand.EndBehavior.Disable:
+                    ApplyActorEndCommand(command, disable: true, warnIfMissing: true);
+                    break;
+
+                case SceneEndActorCommand.EndBehavior.Destroy:
+                    ApplyActorEndCommand(command, disable: false, warnIfMissing: true);
+                    break;
+
+                case SceneEndActorCommand.EndBehavior.Quest:
+                    if (filmScene.newQuest != null)
+                    {
+                        QuestDataManager.Instance?.AddQuest(filmScene.newQuest);
+                    }
+                    break;
+
+                case SceneEndActorCommand.EndBehavior.None:
+                case SceneEndActorCommand.EndBehavior.Combat:
+                    break;
+            }
+        }
     }
 
     private string BuildSceneEndCombatId(SceneData filmScene, SceneEndActorCommand command)
@@ -973,6 +1140,8 @@ public class FilmSceneManager : MonoBehaviour
         CancelActiveCinematic("CinematicSaveDataLoaded", true);
 
         activatedSceneIds.Clear();
+        pendingSceneEndCombatCinematic = null;
+        pendingSceneEndCombatCinematicId = "";
 
         if (saveData != null && saveData.activatedSceneIds != null)
         {
@@ -997,6 +1166,8 @@ public class FilmSceneManager : MonoBehaviour
         CancelActiveCinematic("CinematicRuntimeDataCleared", true);
 
         activatedSceneIds.Clear();
+        pendingSceneEndCombatCinematic = null;
+        pendingSceneEndCombatCinematicId = "";
         currentFilmSceneId = "";
         inCinematic = false;
 

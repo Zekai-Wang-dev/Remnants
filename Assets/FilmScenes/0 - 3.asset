@@ -16,7 +16,7 @@ MonoBehaviour:
   sceneName: WolfEncounter
   actions:
   - actionName: Question
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Player
@@ -31,7 +31,7 @@ MonoBehaviour:
       waitAfterLine: 0
     waitAfterAction: 0
   - actionName: Question
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Player

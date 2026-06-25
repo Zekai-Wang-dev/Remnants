@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f1162f1889dd540ab7123413dd4163, type: 3}
+  m_Name: Wolf 1
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  charType: Enemy
+  isPlayer: 0
+  maxHealth: 300
+  speed: 100
+  damage: 50
+  defense: 0
+  trueDefense: 0
+  accuracy: 30
+  blockBypassRate: 0
+  dodgeBypassRate: 0
+  energyReserves: 0
+  parryChance: 0.3
+  blockChance: 0.3
+  dodgeChance: 0
+  attackDuration: 1
+  gridLocation: 5
+  characterPrefab: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+  dropsPool:
+  - item: {fileID: 11400000, guid: 7409284665e9544418c5197aeccdafb0, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: c521965c6449a74459374acb31b85bc7, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 4a22fb08686309947af0d33c4dfcafda, type: 2}
+    dropChance: 0.3
+    isPermanentDrop: 0
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 41dacb3e350f28c48ad361545adbdacb, type: 2}
+    dropChance: 1
+    isPermanentDrop: 1
+    dropOnceOnly: 0
+    uniqueDropId: 
+    minQuantity: 1
+    maxQuantity: 5

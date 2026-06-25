@@ -41,6 +41,7 @@ public class SpawnManager : MonoBehaviour
     private float randomEncounterCooldownEndTime = 0f;
     private bool isSceneTransitioning = false;
     private bool startCooldownAfterSceneLoad = false;
+    private bool forceSpawnAtAreaSpawnOnNextLoad = false;
 
     private static SpawnManager _instance;
     public static SpawnManager Instance => _instance;
@@ -106,6 +107,28 @@ public class SpawnManager : MonoBehaviour
         currentEncounterAreaId = "";
         currentEncounterId = "";
         pendingCustomCombatEnemies.Clear();
+    }
+
+    public void ReturnFromCombat(bool playerWon)
+    {
+        if (!playerWon)
+        {
+            ForceNextAreaLoadToUseSpawnPoint();
+        }
+
+        ClearCurrentEncounter();
+        NextScene("CombatOver");
+    }
+
+    public void ForceNextAreaLoadToUseSpawnPoint()
+    {
+        forceSpawnAtAreaSpawnOnNextLoad = true;
+
+        if (!string.IsNullOrEmpty(previousAreaId))
+        {
+            areaPositions.Remove(previousAreaId);
+            Debug.Log($"Next area load will use player spawn instead of stored position for area '{previousAreaId}'.");
+        }
     }
 
     public bool StartCombatFromEnemyPool(List<CharacterData> enemies, string encounterId = "", string encounterAreaId = "")
@@ -484,13 +507,14 @@ public class SpawnManager : MonoBehaviour
 
         UpdateParallaxArea(areaData);
 
-        if (areaPositions.ContainsKey(areaId))
+        if (!forceSpawnAtAreaSpawnOnNextLoad && areaPositions.ContainsKey(areaId))
         {
             playerRb.position = areaPositions[areaId];
         }
         else
         {
             playerRb.position = spawnPoints.playerSpawn.position;
+            forceSpawnAtAreaSpawnOnNextLoad = false;
         }
 
         CameraController cam = GetCameraController();
@@ -562,13 +586,14 @@ public class SpawnManager : MonoBehaviour
 
             UpdateParallaxArea(areaData);
 
-            if (areaPositions.ContainsKey(areaId))
+            if (!forceSpawnAtAreaSpawnOnNextLoad && areaPositions.ContainsKey(areaId))
             {
                 playerRb.position = areaPositions[areaId];
             }
             else
             {
                 playerRb.position = spawnPoints.playerSpawn.position;
+                forceSpawnAtAreaSpawnOnNextLoad = false;
             }
 
             CameraController cam = GetCameraController();

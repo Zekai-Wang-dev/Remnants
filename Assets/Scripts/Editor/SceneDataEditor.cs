@@ -43,6 +43,14 @@ public class SceneDataEditor : Editor
         DrawOptionalProperty(isPermanent);
         DrawOptionalProperty(isActivated);
 
+        if (isPermanent != null && isPermanent.boolValue && sceneId != null && string.IsNullOrWhiteSpace(sceneId.stringValue))
+        {
+            EditorGUILayout.HelpBox(
+                "Permanent cinematics should have a stable sceneId so save/load can identify them.",
+                MessageType.Warning
+            );
+        }
+
         EditorGUILayout.Space(8);
 
         EditorGUILayout.LabelField("After Scene Ends", EditorStyles.boldLabel);
@@ -67,6 +75,7 @@ public class SceneDataEditor : Editor
 public class SceneActionDrawer : PropertyDrawer
 {
     private const float Spacing = 2f;
+    private const float BoxPadding = 4f;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -101,12 +110,7 @@ public class SceneActionDrawer : PropertyDrawer
         DrawProperty(ref y, position, actionName);
         DrawProperty(ref y, position, type);
 
-        SceneAction.ActionType actionType = SceneAction.ActionType.None;
-
-        if (type != null)
-        {
-            actionType = (SceneAction.ActionType)type.enumValueIndex;
-        }
+        SceneAction.ActionType actionType = GetActionType(type);
 
         EditorGUI.indentLevel++;
 
@@ -118,13 +122,20 @@ public class SceneActionDrawer : PropertyDrawer
 
             case SceneAction.ActionType.Move:
                 DrawHeader(ref y, position, "Move Settings");
-                DrawProperty(ref y, position, actorCommands, true);
+                DrawActorCommandList(ref y, position, actorCommands, actionType);
+                DrawProperty(ref y, position, waitAfterAction);
+                break;
+
+            case SceneAction.ActionType.TurnAround:
+                DrawHeader(ref y, position, "Sprite Flip Settings");
+                DrawInfoBox(ref y, position, "Toggle flips the current sprite direction. SetValue is safer when a cinematic may reload, replay, or start from a known direction.");
+                DrawActorCommandList(ref y, position, actorCommands, actionType);
                 DrawProperty(ref y, position, waitAfterAction);
                 break;
 
             case SceneAction.ActionType.Animation:
                 DrawHeader(ref y, position, "Animation Settings");
-                DrawProperty(ref y, position, actorCommands, true);
+                DrawActorCommandList(ref y, position, actorCommands, actionType);
                 DrawProperty(ref y, position, waitAfterAction);
                 break;
 
@@ -164,12 +175,7 @@ public class SceneActionDrawer : PropertyDrawer
         height += GetPropertyHeight(actionName);
         height += GetPropertyHeight(type);
 
-        SceneAction.ActionType actionType = SceneAction.ActionType.None;
-
-        if (type != null)
-        {
-            actionType = (SceneAction.ActionType)type.enumValueIndex;
-        }
+        SceneAction.ActionType actionType = GetActionType(type);
 
         switch (actionType)
         {
@@ -179,13 +185,20 @@ public class SceneActionDrawer : PropertyDrawer
 
             case SceneAction.ActionType.Move:
                 height += GetHeaderHeight();
-                height += GetPropertyHeight(actorCommands, true);
+                height += GetActorCommandListHeight(actorCommands, actionType);
+                height += GetPropertyHeight(waitAfterAction);
+                break;
+
+            case SceneAction.ActionType.TurnAround:
+                height += GetHeaderHeight();
+                height += GetHelpBoxHeight();
+                height += GetActorCommandListHeight(actorCommands, actionType);
                 height += GetPropertyHeight(waitAfterAction);
                 break;
 
             case SceneAction.ActionType.Animation:
                 height += GetHeaderHeight();
-                height += GetPropertyHeight(actorCommands, true);
+                height += GetActorCommandListHeight(actorCommands, actionType);
                 height += GetPropertyHeight(waitAfterAction);
                 break;
 
@@ -204,21 +217,25 @@ public class SceneActionDrawer : PropertyDrawer
         return height;
     }
 
+    private SceneAction.ActionType GetActionType(SerializedProperty type)
+    {
+        if (type == null)
+        {
+            return SceneAction.ActionType.None;
+        }
+
+        return (SceneAction.ActionType)type.enumValueIndex;
+    }
+
     private string GetFoldoutLabel(
         SerializedProperty actionName,
         SerializedProperty type,
         GUIContent defaultLabel)
     {
-        string nameText = "";
-
-        if (actionName != null)
-        {
-            nameText = actionName.stringValue;
-        }
-
+        string nameText = actionName != null ? actionName.stringValue : "";
         string typeText = "Action";
 
-        if (type != null)
+        if (type != null && type.enumValueIndex >= 0 && type.enumValueIndex < type.enumDisplayNames.Length)
         {
             typeText = type.enumDisplayNames[type.enumValueIndex];
         }
@@ -231,11 +248,226 @@ public class SceneActionDrawer : PropertyDrawer
         return $"{nameText} - {typeText}";
     }
 
+    private void DrawActorCommandList(
+        ref float y,
+        Rect position,
+        SerializedProperty actorCommands,
+        SceneAction.ActionType actionType)
+    {
+        if (actorCommands == null)
+        {
+            return;
+        }
+
+        Rect foldoutRect = new Rect(
+            position.x,
+            y,
+            position.width,
+            EditorGUIUtility.singleLineHeight
+        );
+
+        actorCommands.isExpanded = EditorGUI.Foldout(
+            foldoutRect,
+            actorCommands.isExpanded,
+            $"Actor Commands ({actorCommands.arraySize})",
+            true
+        );
+
+        y += EditorGUIUtility.singleLineHeight + Spacing;
+
+        if (!actorCommands.isExpanded)
+        {
+            return;
+        }
+
+        EditorGUI.indentLevel++;
+
+        SerializedProperty sizeProperty = actorCommands.FindPropertyRelative("Array.size");
+        DrawProperty(ref y, position, sizeProperty, false, "Size");
+
+        for (int i = 0; i < actorCommands.arraySize; i++)
+        {
+            SerializedProperty command = actorCommands.GetArrayElementAtIndex(i);
+            DrawActorCommandElement(ref y, position, command, i, actionType);
+        }
+
+        EditorGUI.indentLevel--;
+    }
+
+    private float GetActorCommandListHeight(
+        SerializedProperty actorCommands,
+        SceneAction.ActionType actionType)
+    {
+        if (actorCommands == null)
+        {
+            return 0f;
+        }
+
+        float height = EditorGUIUtility.singleLineHeight + Spacing;
+
+        if (!actorCommands.isExpanded)
+        {
+            return height;
+        }
+
+        SerializedProperty sizeProperty = actorCommands.FindPropertyRelative("Array.size");
+        height += GetPropertyHeight(sizeProperty);
+
+        for (int i = 0; i < actorCommands.arraySize; i++)
+        {
+            SerializedProperty command = actorCommands.GetArrayElementAtIndex(i);
+            height += GetActorCommandElementHeight(command, actionType);
+        }
+
+        return height;
+    }
+
+    private void DrawActorCommandElement(
+        ref float y,
+        Rect position,
+        SerializedProperty command,
+        int index,
+        SceneAction.ActionType actionType)
+    {
+        if (command == null)
+        {
+            return;
+        }
+
+        Rect boxRect = new Rect(
+            position.x,
+            y,
+            position.width,
+            GetActorCommandElementHeight(command, actionType) - Spacing
+        );
+
+        GUI.Box(boxRect, GUIContent.none, EditorStyles.helpBox);
+
+        Rect foldoutRect = new Rect(
+            position.x + BoxPadding,
+            y + BoxPadding,
+            position.width - BoxPadding * 2f,
+            EditorGUIUtility.singleLineHeight
+        );
+
+        command.isExpanded = EditorGUI.Foldout(
+            foldoutRect,
+            command.isExpanded,
+            $"Command {index}",
+            true
+        );
+
+        y += EditorGUIUtility.singleLineHeight + Spacing + BoxPadding;
+
+        if (!command.isExpanded)
+        {
+            y += BoxPadding;
+            return;
+        }
+
+        EditorGUI.indentLevel++;
+
+        Rect childPosition = new Rect(
+            position.x + BoxPadding,
+            y,
+            position.width - BoxPadding * 2f,
+            position.height
+        );
+
+        DrawProperty(ref y, childPosition, command.FindPropertyRelative("actorId"));
+
+        switch (actionType)
+        {
+            case SceneAction.ActionType.Move:
+                DrawProperty(ref y, childPosition, command.FindPropertyRelative("moveDirection"));
+                DrawProperty(ref y, childPosition, command.FindPropertyRelative("moveDistance"));
+                DrawProperty(ref y, childPosition, command.FindPropertyRelative("moveSpeed"));
+                break;
+
+            case SceneAction.ActionType.TurnAround:
+                SerializedProperty spriteFlipMode = command.FindPropertyRelative("spriteFlipMode");
+                DrawProperty(ref y, childPosition, spriteFlipMode);
+
+                if (spriteFlipMode != null &&
+                    spriteFlipMode.enumValueIndex == (int)SceneActorCommand.SpriteFlipMode.SetValue)
+                {
+                    DrawProperty(ref y, childPosition, command.FindPropertyRelative("targetFlipX"));
+                }
+                break;
+
+            case SceneAction.ActionType.Animation:
+                DrawProperty(ref y, childPosition, command.FindPropertyRelative("animationClip"));
+                break;
+
+            default:
+                EditorGUI.PropertyField(
+                    new Rect(childPosition.x, y, childPosition.width, EditorGUIUtility.singleLineHeight),
+                    command,
+                    true
+                );
+                y += EditorGUI.GetPropertyHeight(command, true) + Spacing;
+                break;
+        }
+
+        EditorGUI.indentLevel--;
+        y += BoxPadding;
+    }
+
+    private float GetActorCommandElementHeight(
+        SerializedProperty command,
+        SceneAction.ActionType actionType)
+    {
+        if (command == null)
+        {
+            return 0f;
+        }
+
+        float height = EditorGUIUtility.singleLineHeight + Spacing + BoxPadding * 2f;
+
+        if (!command.isExpanded)
+        {
+            return height;
+        }
+
+        height += GetPropertyHeight(command.FindPropertyRelative("actorId"));
+
+        switch (actionType)
+        {
+            case SceneAction.ActionType.Move:
+                height += GetPropertyHeight(command.FindPropertyRelative("moveDirection"));
+                height += GetPropertyHeight(command.FindPropertyRelative("moveDistance"));
+                height += GetPropertyHeight(command.FindPropertyRelative("moveSpeed"));
+                break;
+
+            case SceneAction.ActionType.TurnAround:
+                SerializedProperty spriteFlipMode = command.FindPropertyRelative("spriteFlipMode");
+                height += GetPropertyHeight(spriteFlipMode);
+
+                if (spriteFlipMode != null &&
+                    spriteFlipMode.enumValueIndex == (int)SceneActorCommand.SpriteFlipMode.SetValue)
+                {
+                    height += GetPropertyHeight(command.FindPropertyRelative("targetFlipX"));
+                }
+                break;
+
+            case SceneAction.ActionType.Animation:
+                height += GetPropertyHeight(command.FindPropertyRelative("animationClip"));
+                break;
+
+            default:
+                height += GetPropertyHeight(command, true);
+                break;
+        }
+
+        return height;
+    }
+
     private void DrawProperty(
         ref float y,
         Rect position,
         SerializedProperty property,
-        bool includeChildren = false)
+        bool includeChildren = false,
+        string customLabel = "")
     {
         if (property == null)
         {
@@ -251,7 +483,14 @@ public class SceneActionDrawer : PropertyDrawer
             height
         );
 
-        EditorGUI.PropertyField(rect, property, includeChildren);
+        if (string.IsNullOrWhiteSpace(customLabel))
+        {
+            EditorGUI.PropertyField(rect, property, includeChildren);
+        }
+        else
+        {
+            EditorGUI.PropertyField(rect, property, new GUIContent(customLabel), includeChildren);
+        }
 
         y += height + Spacing;
     }

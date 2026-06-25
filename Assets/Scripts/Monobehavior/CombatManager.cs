@@ -1130,12 +1130,13 @@ public class CombatManager : MonoBehaviour
             }
         }
 
+        FilmSceneManager.Instance?.ResolveSceneEndCombatResult(playerWon);
+
         Debug.Log($"Combat ended. Waiting {bufferTimePostCombat} seconds before returning...");
 
         yield return new WaitForSeconds(bufferTimePostCombat);
 
-        spawnManager.ClearCurrentEncounter();
-        spawnManager.NextScene("CombatOver");
+        spawnManager.ReturnFromCombat(playerWon);
 
         // Wait through scene/SpawnManager return logic, then unlock again.
         // This prevents a film end command or scene-return callback from

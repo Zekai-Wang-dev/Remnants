@@ -37,6 +37,7 @@ public class SceneAction
     {
         None,
         Move,
+        TurnAround,
         Animation,
         Dialogue,
         Wait
@@ -86,12 +87,25 @@ public class SceneActorCommand
     public float moveDistance = 1f;
     public float moveSpeed = 1f;
 
+    [Header("Sprite Flip")]
+    [Tooltip("Toggle flips the current SpriteRenderer.flipX value. SetValue forces a specific flipX value and is safer for cutscenes that can reload or replay.")]
+    public SpriteFlipMode spriteFlipMode = SpriteFlipMode.Toggle;
+
+    [Tooltip("Used only when Sprite Flip Mode is SetValue. false = normal orientation, true = horizontally flipped.")]
+    public bool targetFlipX;
+
     [Header("Dialogue - Old Optional ScriptableObject")]
     [Tooltip("Still supported for old actions, but for new dialogue use SceneAction.dialogueBeats instead.")]
     public DialogueLine dialogueLine;
 
     [Header("Animation")]
     public AnimationClip animationClip;
+
+    public enum SpriteFlipMode
+    {
+        Toggle,
+        SetValue
+    }
 }
 
 [System.Serializable]

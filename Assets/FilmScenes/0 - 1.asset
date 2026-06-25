@@ -16,7 +16,7 @@ MonoBehaviour:
   sceneName: First Weapon
   actions:
   - actionName: Talk
-    type: 3
+    type: 4
     actorCommands: []
     dialogueBeats:
     - actorId: Player
