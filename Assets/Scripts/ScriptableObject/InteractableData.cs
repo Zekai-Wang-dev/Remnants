@@ -4,7 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "InteractableData", menuName = "Game/Interactable Data")]
 public class InteractableData : ScriptableObject
 {
+    [Header("ID")]
+    [Tooltip("Stable ID used by saves and generated interactable combat IDs. Auto-filled from asset name if blank.")]
     public string interactableId;
+
     public string displayName;
     public GameObject interactablePrefab;
 
@@ -21,6 +24,13 @@ public class InteractableData : ScriptableObject
     public SceneInteraction sceneInteraction;
     public QuestInteraction questInteraction;
     public CombatInteraction combatInteraction;
+
+    public string Id => GameIdUtility.GetInteractableId(this);
+
+    private void OnValidate()
+    {
+        interactableId = GameIdUtility.CleanOrCreate(interactableId, this);
+    }
 }
 
 [System.Serializable]

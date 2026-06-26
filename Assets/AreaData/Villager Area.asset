@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
   m_Name: Villager Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 001
+  areaId: villager_area
   areaName: Villager Area
   areaIndex: {x: 1, y: 0}
   enemies: []

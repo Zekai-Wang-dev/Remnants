@@ -4,7 +4,11 @@ using UnityEngine;
 public class ItemData : ScriptableObject
 {
     public ItemType itemType;
+
+    [Header("ID")]
+    [Tooltip("Stable ID used by inventory saves and item collection quests. Auto-filled from asset name if blank.")]
     public string itemId;
+
     public string itemName;
     public string description;
     public Sprite imageIcon;
@@ -19,6 +23,13 @@ public class ItemData : ScriptableObject
     public WeaponData weaponData;
     public EquipmentData equipmentData;
     public ConsumableData consumableData;
+
+    public string Id => GameIdUtility.GetItemId(this);
+
+    private void OnValidate()
+    {
+        itemId = GameIdUtility.CleanOrCreate(itemId, this);
+    }
 }
 
 public enum ItemType

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Dagger
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 0
-  itemId: 001
+  itemId: dagger
   itemName: Dagger
   description: A light weapon for starters
   imageIcon: {fileID: 8780202901261718726, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}

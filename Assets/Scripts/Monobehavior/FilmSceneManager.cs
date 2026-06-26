@@ -205,13 +205,20 @@ public class FilmSceneManager : MonoBehaviour
                 continue;
             }
 
+            if (!CanStartWorldCinematicNow(nextCinematic, false))
+            {
+                // Do not let a queued cinematic for a different area or missing actor
+                // block every later queued cinematic. Rotate it to the back and try later.
+                MovePeekedQueuedCinematicToBack(cinematicId);
+                yield return new WaitForSeconds(0.1f);
+                continue;
+            }
+
             bool started = TryStartCinematic(nextCinematic);
 
             if (!started)
             {
-                // Do not drop the cinematic. This can happen during a same-frame
-                // combat return / scene refresh race. Keep it queued and try again.
-                Debug.Log($"Queued cinematic '{cinematicId}' is still waiting for a safe world state.");
+                MovePeekedQueuedCinematicToBack(cinematicId);
                 yield return new WaitForSeconds(0.1f);
                 continue;
             }
@@ -236,6 +243,22 @@ public class FilmSceneManager : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(cinematicId))
         {
             queuedCinematicIds.Remove(cinematicId);
+        }
+    }
+
+    private void MovePeekedQueuedCinematicToBack(string cinematicId)
+    {
+        if (queuedCinematics.Count <= 1)
+        {
+            return;
+        }
+
+        SceneData delayed = queuedCinematics.Dequeue();
+        queuedCinematics.Enqueue(delayed);
+
+        if (!string.IsNullOrWhiteSpace(cinematicId))
+        {
+            queuedCinematicIds.Add(cinematicId);
         }
     }
 
@@ -388,6 +411,16 @@ public class FilmSceneManager : MonoBehaviour
             return false;
         }
 
+        if (filmScene != null && !IsCinematicLocationValid(filmScene, logWarnings))
+        {
+            return false;
+        }
+
+        if (filmScene != null && !AreRequiredCinematicActorsAvailable(filmScene, logWarnings))
+        {
+            return false;
+        }
+
         if (filmScene != null && IsCinematicActivated(filmScene))
         {
             if (logWarnings)
@@ -399,6 +432,78 @@ public class FilmSceneManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private bool IsCinematicLocationValid(SceneData filmScene, bool logWarnings)
+    {
+        if (filmScene == null)
+        {
+            return true;
+        }
+
+        SpawnManager spawnManager = SpawnManager.Instance;
+        if (spawnManager == null)
+        {
+            return true;
+        }
+
+        string requiredSceneId = GameIdUtility.Normalize(filmScene.requiredSceneId);
+        string requiredAreaId = GameIdUtility.Normalize(filmScene.requiredAreaId);
+
+        if (!string.IsNullOrWhiteSpace(requiredSceneId) && !GameIdUtility.IdEquals(requiredSceneId, spawnManager.currentSceneId))
+        {
+            if (logWarnings)
+            {
+                Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' is waiting for scene '{requiredSceneId}', but current scene is '{spawnManager.currentSceneId}'.");
+            }
+
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(requiredAreaId) && !GameIdUtility.IdEquals(requiredAreaId, spawnManager.currentAreaId))
+        {
+            if (logWarnings)
+            {
+                Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' is waiting for area '{requiredAreaId}', but current area is '{spawnManager.currentAreaId}'.");
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool AreRequiredCinematicActorsAvailable(SceneData filmScene, bool logWarnings)
+    {
+        if (filmScene == null)
+        {
+            return true;
+        }
+
+        if (SceneCharacterRegistry.Instance == null)
+        {
+            if (logWarnings)
+            {
+                Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' cannot validate actors because SceneCharacterRegistry is missing.");
+            }
+
+            return !requireSceneCharacterRegistryForQueuedCinematics;
+        }
+
+        List<string> requiredActorIds = filmScene.GetRequiredActorIds();
+        List<string> missingActorIds = SceneCharacterRegistry.Instance.GetMissingActorIds(requiredActorIds);
+
+        if (missingActorIds.Count <= 0)
+        {
+            return true;
+        }
+
+        if (logWarnings)
+        {
+            Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' cannot start in the current scene because these required actors are missing: {string.Join(", ", missingActorIds)}");
+        }
+
+        return false;
     }
 
     private bool CanPlayQueuedCinematic()
@@ -1626,19 +1731,14 @@ public class FilmSceneManager : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(filmScene.sceneId))
         {
-            return NormalizeCinematicId(filmScene.sceneId);
+            return GameIdUtility.GetSceneId(filmScene);
         }
 
-        return NormalizeCinematicId(filmScene.name);
+        return GameIdUtility.GetSceneId(filmScene);
     }
 
     private string NormalizeCinematicId(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return "";
-        }
-
-        return value.Trim().ToLowerInvariant();
+        return GameIdUtility.Normalize(value);
     }
 }

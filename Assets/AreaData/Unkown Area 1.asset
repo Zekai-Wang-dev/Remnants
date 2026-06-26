@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
   m_Name: Unkown Area 1
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 003
+  areaId: unkown_area_1
   areaName: Unknown Area 1
   areaIndex: {x: 3, y: 0}
   enemies: []

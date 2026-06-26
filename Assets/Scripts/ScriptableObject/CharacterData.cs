@@ -4,6 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharacterData", menuName = "Scriptable Objects/CharacterData")]
 public class CharacterData : ScriptableObject
 {
+    [Header("ID")]
+    [Tooltip("Stable ID used by quests, random encounters, logs, and saves. Auto-filled from asset name if blank.")]
+    public string characterId;
+
     public string charType;
     public bool isPlayer;
 
@@ -28,6 +32,13 @@ public class CharacterData : ScriptableObject
 
     [Header("Drops")]
     public List<ItemDrop> dropsPool = new();
+
+    public string Id => GameIdUtility.GetCharacterId(this);
+
+    private void OnValidate()
+    {
+        characterId = GameIdUtility.CleanOrCreate(characterId, this);
+    }
 }
 
 [System.Serializable]

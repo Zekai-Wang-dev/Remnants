@@ -885,17 +885,7 @@ public class QuestDataManager : MonoBehaviour
 
     private string GetQuestId(QuestData questData)
     {
-        if (questData == null)
-        {
-            return "";
-        }
-
-        if (!string.IsNullOrWhiteSpace(questData.questId))
-        {
-            return NormalizeId(questData.questId, false);
-        }
-
-        return NormalizeId(questData.name, false);
+        return GameIdUtility.GetQuestId(questData);
     }
 
     private bool CanProgressQuest(OngoingQuestData quest)
@@ -917,25 +907,12 @@ public class QuestDataManager : MonoBehaviour
             return false;
         }
 
-        return NormalizeId(requiredId, stripRandomPrefix) ==
-               NormalizeId(actualId, stripRandomPrefix);
+        return GameIdUtility.IdEquals(requiredId, actualId, stripRandomPrefix);
     }
 
     private string NormalizeId(string value, bool stripRandomPrefix)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return "";
-        }
-
-        string normalized = value.Trim().ToLowerInvariant();
-
-        if (stripRandomPrefix && normalized.StartsWith("random_"))
-        {
-            normalized = normalized.Substring("random_".Length);
-        }
-
-        return normalized;
+        return GameIdUtility.Normalize(value, stripRandomPrefix);
     }
 
     private void NotifyQuestsChanged(bool save)

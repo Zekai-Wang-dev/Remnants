@@ -22,7 +22,7 @@ MonoBehaviour:
   newQuestAutoClaimRewards: 1
   questRequirementType: 1
   enemyDefeatRequirement:
-    enemyId: Wolf
+    enemyId: wolf
     requiredAmount: 1
   itemCollectionRequirement:
     itemId: 000

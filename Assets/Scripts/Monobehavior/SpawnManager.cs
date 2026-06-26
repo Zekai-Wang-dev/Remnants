@@ -361,7 +361,10 @@ public class SpawnManager : MonoBehaviour
 
     public void NextScene(string direction)
     {
-        if (direction == "Combat")
+        bool goingToCombat = string.Equals(direction, "Combat", StringComparison.OrdinalIgnoreCase);
+        bool returningFromCombat = string.Equals(direction, "CombatOver", StringComparison.OrdinalIgnoreCase);
+
+        if (goingToCombat)
         {
             if (isSceneTransitioning)
             {
@@ -381,9 +384,17 @@ public class SpawnManager : MonoBehaviour
             return;
         }
 
+        if (returningFromCombat)
+        {
+            ReturnToPreviousOverworldScene();
+            return;
+        }
+
         StoreCurrentAreaPosition();
 
-        if (currentSceneId != "001")
+        // Save the overworld return point before entering combat or moving to a new scene.
+        // Do not allow the Combat scene itself to overwrite previousSceneId/previousAreaId.
+        if (!IsCurrentSceneCombat && !string.Equals(currentSceneId, "001", StringComparison.OrdinalIgnoreCase))
         {
             previousSceneIndex = currentSceneIndex;
             previousSceneId = currentSceneId;
@@ -414,18 +425,33 @@ public class SpawnManager : MonoBehaviour
                 currentAreaIndex = new Vector2(0, 0);
                 SetPlayerVisibility(false);
                 break;
-
-            case "CombatOver":
-                currentSceneIndex = previousSceneIndex;
-                currentAreaIndex = previousAreaIndex;
-                SetPlayerVisibility(true);
-
-                // Cooldown starts after the original area finishes loading.
-                startCooldownAfterSceneLoad = true;
-                break;
         }
 
         UpdateCurrentIdInfo();
+        LoadScene(currentSceneId, currentAreaId);
+        GetCameraController()?.changeBorders();
+    }
+
+    private void ReturnToPreviousOverworldScene()
+    {
+        if (string.IsNullOrWhiteSpace(previousSceneId) || string.IsNullOrWhiteSpace(previousAreaId))
+        {
+            Debug.LogError("Cannot return from combat because SpawnManager has no previous overworld scene/area saved.");
+            return;
+        }
+
+        currentSceneIndex = previousSceneIndex;
+        currentAreaIndex = previousAreaIndex;
+        currentSceneId = previousSceneId;
+        currentAreaId = previousAreaId;
+
+        SetPlayerVisibility(true);
+
+        // Cooldown starts after the original area finishes loading.
+        startCooldownAfterSceneLoad = true;
+
+        Debug.Log($"Returning from combat to scene '{currentSceneId}', area '{currentAreaId}'.");
+
         LoadScene(currentSceneId, currentAreaId);
         GetCameraController()?.changeBorders();
     }

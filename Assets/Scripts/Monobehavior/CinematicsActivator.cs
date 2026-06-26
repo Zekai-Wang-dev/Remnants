@@ -70,6 +70,8 @@ public class CinematicsActivator : MonoBehaviour
             return;
         }
 
+        Debug.Log("CinematicsActivator: Requesting cinematic start for scene: " + sceneData.name);
+
         StartCoroutine(StartCinematicWhenReady());
     }
 
@@ -85,13 +87,17 @@ public class CinematicsActivator : MonoBehaviour
 
         while (FilmSceneManager.Instance == null)
         {
+            Debug.LogWarning("CinematicsActivator: FilmSceneManager instance is null. Waiting for it to be available...");
             yield return null;
         }
 
         while (waitForGameSaveLoad && GameSaveManager.Instance != null && !GameSaveManager.Instance.HasLoaded)
         {
+            Debug.LogWarning("CinematicsActivator: Waiting for GameSaveManager to finish loading...");
             yield return null;
         }
+
+        float nextReasonLogTime = 0f;
 
         while (sceneData != null &&
                FilmSceneManager.Instance != null &&
@@ -100,7 +106,15 @@ public class CinematicsActivator : MonoBehaviour
             if (FilmSceneManager.Instance.IsCinematicActivated(sceneData))
             {
                 DisableOrDestroyActivator();
+                Debug.LogWarning("CinematicsActivator: Cinematic already activated. Disabling activator.");
                 yield break;
+            }
+
+            if (Time.time >= nextReasonLogTime)
+            {
+                Debug.LogWarning("CinematicsActivator: Waiting for conditions to start cinematic...");
+                FilmSceneManager.Instance.CanStartWorldCinematicNow(sceneData, true);
+                nextReasonLogTime = Time.time + 1f;
             }
 
             yield return null;
@@ -111,6 +125,7 @@ public class CinematicsActivator : MonoBehaviour
 
         if (sceneData == null || FilmSceneManager.Instance == null)
         {
+            Debug.LogWarning("CinematicsActivator: SceneData or FilmSceneManager instance is null. Cannot start cinematic.");
             startPending = false;
             hasTriggered = false;
             yield break;
@@ -118,6 +133,7 @@ public class CinematicsActivator : MonoBehaviour
 
         if (FilmSceneManager.Instance.IsCinematicActivated(sceneData))
         {
+            Debug.LogWarning("CinematicsActivator: Cinematic already activated after waiting. Disabling activator.");
             DisableOrDestroyActivator();
             yield break;
         }
@@ -128,6 +144,7 @@ public class CinematicsActivator : MonoBehaviour
 
         if (!started)
         {
+            Debug.LogWarning("CinematicsActivator: Failed to start cinematic for scene: " + sceneData.name);
             hasTriggered = false;
             yield break;
         }

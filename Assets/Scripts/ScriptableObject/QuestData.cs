@@ -13,7 +13,9 @@ public class QuestReward
 public class QuestData : ScriptableObject
 {
     [Header("Quest Info")]
+    [Tooltip("Stable ID used by quest saves. Auto-filled from asset name if blank.")]
     public string questId;
+
     public string questName;
     public QuestType questType;
 
@@ -21,7 +23,7 @@ public class QuestData : ScriptableObject
     [Tooltip("If true, completing this quest will immediately add newQuest.")]
     public bool isChained;
 
-    [Tooltip("If true, compelting this quest will activate a scene cinematic.")]
+    [Tooltip("If true, completing this quest will queue a completion cinematic.")]
     public bool triggerCinematicOnComplete;
 
     [Tooltip("Quest added automatically when this quest completes.")]
@@ -43,6 +45,13 @@ public class QuestData : ScriptableObject
 
     [Header("Rewards")]
     public List<QuestReward> questRewards = new List<QuestReward>();
+
+    public string Id => GameIdUtility.GetQuestId(this);
+
+    private void OnValidate()
+    {
+        questId = GameIdUtility.CleanOrCreate(questId, this);
+    }
 }
 
 public enum QuestType
@@ -66,7 +75,7 @@ public enum QuestRequirementType
 [Serializable]
 public class EnemyDefeatRequirement
 {
-    [Tooltip("For fixed encounters, use EncounterTrigger.encounterId / EnemyEntry.spawnPointId. For random encounters, use the enemy id/name without the random_ prefix.")]
+    [Tooltip("Use CharacterData.characterId. For random encounters, do not include the random_ prefix.")]
     public string enemyId;
 
     public int requiredAmount = 1;
@@ -75,6 +84,7 @@ public class EnemyDefeatRequirement
 [Serializable]
 public class ItemCollectionRequirement
 {
+    [Tooltip("Use ItemData.itemId.")]
     public string itemId;
     public int requiredAmount = 1;
 }
@@ -82,15 +92,23 @@ public class ItemCollectionRequirement
 [Serializable]
 public class LocationVisitRequirement
 {
+    [Tooltip("Use SpawnManager sceneId.")]
     public string sceneId;
+
+    [Tooltip("Use AreaData.areaId.")]
     public string areaId;
+
     public int requiredAmount = 1;
 }
 
 [Serializable]
 public class TalkToNPCRequirement
 {
+    [Tooltip("Use SceneCharacterRegistry actorId.")]
     public string npcId;
+
+    [Tooltip("Optional. Use SceneData.sceneId if you want this conversation to count only during a specific cinematic.")]
     public string sceneId;
+
     public int requiredAmount = 1;
 }

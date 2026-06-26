@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
   m_Name: Alleryway Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 004
+  areaId: alleryway_area
   areaName: Alleyway Area
   areaIndex: {x: 3, y: 1}
   enemies: []

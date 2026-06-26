@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class EncounterTrigger : MonoBehaviour
 {
-    public string encounterId; // Unique ID for this encounter group
-    public string areaId; // Which area this encounter belongs to
+    public string encounterId;
+    public string areaId;
+
+    private void OnValidate()
+    {
+        encounterId = GameIdUtility.Normalize(encounterId);
+        areaId = GameIdUtility.Normalize(areaId);
+    }
 }

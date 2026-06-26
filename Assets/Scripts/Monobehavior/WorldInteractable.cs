@@ -153,7 +153,7 @@ public class WorldInteractable : MonoBehaviour
     {
         foreach (string flag in GetStringList(interactableData, "requiredFlags"))
         {
-            if (!StoryFlagManager.HasFlag(flag))
+            if (!StoryFlagManager.HasFlag(GameIdUtility.Normalize(flag)))
             {
                 return false;
             }
@@ -244,8 +244,8 @@ public class WorldInteractable : MonoBehaviour
     {
         string id = !string.IsNullOrWhiteSpace(interactableSaveId)
             ? interactableSaveId
-            : interactableData != null && !string.IsNullOrWhiteSpace(interactableData.interactableId)
-                ? interactableData.interactableId
+            : interactableData != null
+                ? GameIdUtility.GetInteractableId(interactableData)
                 : name;
 
         string sourceAreaId = !string.IsNullOrWhiteSpace(areaId)
@@ -254,7 +254,7 @@ public class WorldInteractable : MonoBehaviour
                 ? SpawnManager.Instance.currentAreaId
                 : "unknown_area";
 
-        return $"interactable_{sourceAreaId}_{id}";
+        return GameIdUtility.Build("interactable", sourceAreaId, id);
     }
 
     private void ExecuteFlagInteraction()
@@ -268,7 +268,7 @@ public class WorldInteractable : MonoBehaviour
     {
         foreach (string flag in GetStringList(interactableData, memberName))
         {
-            StoryFlagManager.SetFlag(flag);
+            StoryFlagManager.SetFlag(GameIdUtility.Normalize(flag));
             Debug.Log($"Story flag set: {flag}");
         }
     }

@@ -45,37 +45,18 @@ public class QuestDatabase : ScriptableObject
             Initialize();
         }
 
-        if (string.IsNullOrWhiteSpace(questId))
+        string normalizedId = GameIdUtility.Normalize(questId);
+        if (string.IsNullOrWhiteSpace(normalizedId))
         {
             return null;
         }
 
-        lookup.TryGetValue(NormalizeId(questId), out QuestData quest);
+        lookup.TryGetValue(normalizedId, out QuestData quest);
         return quest;
     }
 
     public string GetQuestId(QuestData questData)
     {
-        if (questData == null)
-        {
-            return "";
-        }
-
-        if (!string.IsNullOrWhiteSpace(questData.questId))
-        {
-            return NormalizeId(questData.questId);
-        }
-
-        return NormalizeId(questData.name);
-    }
-
-    private string NormalizeId(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return "";
-        }
-
-        return value.Trim().ToLowerInvariant();
+        return GameIdUtility.GetQuestId(questData);
     }
 }

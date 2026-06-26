@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iron Chestplate
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 1
-  itemId: 003
+  itemId: iron_chestplate
   itemName: Iron Chestplate
   description: A very sturdy armor made by a competent blacksmith
   imageIcon: {fileID: -2588823126644354792, guid: 012bc1a882aee2242b8c5b257d549db4, type: 3}

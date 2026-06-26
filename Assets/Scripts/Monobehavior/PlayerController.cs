@@ -218,7 +218,7 @@ public class PlayerController : MonoBehaviour
 
             ClearHighlightedInteractable();
 
-            spawnManager.SetCurrentEncounter(area.areaId, "random_" + enemy.name);
+            spawnManager.SetCurrentEncounter(area.areaId, GameIdUtility.RandomEncounterPrefix + GameIdUtility.GetCharacterId(enemy));
             ResetDistanceTracking();
             spawnManager.NextScene("Combat");
         }

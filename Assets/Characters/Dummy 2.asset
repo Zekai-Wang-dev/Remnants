@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3f1162f1889dd540ab7123413dd4163, type: 3}
   m_Name: Dummy 2
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterId: dummy_2
   charType: Enemy
   isPlayer: 0
   maxHealth: 300
@@ -29,3 +30,4 @@ MonoBehaviour:
   attackDuration: 1
   gridLocation: 8
   characterPrefab: {fileID: 4024246200929757137, guid: d606e03af610a04478eddc878585f4f6, type: 3}
+  dropsPool: []

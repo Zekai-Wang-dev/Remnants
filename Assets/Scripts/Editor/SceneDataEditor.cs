@@ -8,6 +8,10 @@ public class SceneDataEditor : Editor
     private SerializedProperty sceneId;
     private SerializedProperty sceneName;
     private SerializedProperty actions;
+    private SerializedProperty requiredSceneId;
+    private SerializedProperty requiredAreaId;
+    private SerializedProperty autoCollectRequiredActorIds;
+    private SerializedProperty requiredActorIds;
     private SerializedProperty isPermanent;
     private SerializedProperty isActivated;
     private SerializedProperty endCommands;
@@ -18,6 +22,10 @@ public class SceneDataEditor : Editor
         sceneId = serializedObject.FindProperty("sceneId");
         sceneName = serializedObject.FindProperty("sceneName");
         actions = serializedObject.FindProperty("actions");
+        requiredSceneId = serializedObject.FindProperty("requiredSceneId");
+        requiredAreaId = serializedObject.FindProperty("requiredAreaId");
+        autoCollectRequiredActorIds = serializedObject.FindProperty("autoCollectRequiredActorIds");
+        requiredActorIds = serializedObject.FindProperty("requiredActorIds");
         isPermanent = serializedObject.FindProperty("isPermanent");
         isActivated = serializedObject.FindProperty("isActivated");
         endCommands = serializedObject.FindProperty("endCommands");
@@ -31,6 +39,16 @@ public class SceneDataEditor : Editor
         EditorGUILayout.LabelField("Scene Info", EditorStyles.boldLabel);
         DrawOptionalProperty(sceneId);
         DrawOptionalProperty(sceneName);
+
+        EditorGUILayout.Space(8);
+
+        EditorGUILayout.LabelField("Playback Requirements", EditorStyles.boldLabel);
+        DrawOptionalProperty(requiredSceneId);
+        DrawOptionalProperty(requiredAreaId);
+        DrawOptionalProperty(autoCollectRequiredActorIds);
+        DrawOptionalProperty(requiredActorIds, true);
+
+        EditorGUILayout.HelpBox("Leave Required Scene/Area blank for generic cinematics. For quest completion cinematics, fill them so queued scenes only play in the correct loaded area.", MessageType.Info);
 
         EditorGUILayout.Space(8);
 

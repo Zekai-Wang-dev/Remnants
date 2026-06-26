@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
   m_Name: Combat
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 000
+  areaId: combat
   areaName: Combat
   areaIndex: {x: 0, y: 0}
   enemies: []
+  enableRandomEncounters: 0
+  randomEncounterPool: []
+  randomEncounterChance: 0.1
+  minDistanceBetweenEncounters: 5
+  interactables: []

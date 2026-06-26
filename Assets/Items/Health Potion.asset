@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Health Potion
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 2
-  itemId: 004
+  itemId: health_potion
   itemName: Health Potion
   description: Drink this to refill your health
   imageIcon: {fileID: -858339694377427426, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}

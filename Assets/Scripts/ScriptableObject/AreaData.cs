@@ -8,21 +8,22 @@ public class AreaData : ScriptableObject
     public string areaName;
     public Vector2 areaIndex;
 
-    // Permanent / fixed encounter enemies.
     public List<EnemyEntry> enemies = new();
 
-    // Random encounter system.
     public bool enableRandomEncounters = false;
     public List<RandomEnemyEntry> randomEncounterPool = new();
-    public float randomEncounterChance = 0.1f; // Base chance per movement check.
-    public float minDistanceBetweenEncounters = 5f; // Minimum distance before another can spawn.
+    public float randomEncounterChance = 0.1f;
+    public float minDistanceBetweenEncounters = 5f;
 
     public List<InteractableEntry> interactables = new();
 
-    /// <summary>
-    /// Picks one valid random enemy using weights.
-    /// Keeps the old no-argument call working, but also supports level/flag filtering later.
-    /// </summary>
+    public string Id => GameIdUtility.GetAreaId(this);
+
+    private void OnValidate()
+    {
+        areaId = GameIdUtility.CleanOrCreate(areaId, this);
+    }
+
     public CharacterData PickRandomEnemy(int playerLevel = 1, HashSet<string> activeFlags = null)
     {
         if (randomEncounterPool == null || randomEncounterPool.Count == 0)
@@ -50,7 +51,7 @@ public class AreaData : ScriptableObject
                 {
                     foreach (string flag in entry.requiredFlags)
                     {
-                        if (!activeFlags.Contains(flag))
+                        if (!activeFlags.Contains(GameIdUtility.Normalize(flag)))
                         {
                             hasRequiredFlags = false;
                             break;
@@ -103,11 +104,15 @@ public class AreaData : ScriptableObject
 
     public CharacterData FindFixedEnemyByEncounterId(string encounterId)
     {
-        if (string.IsNullOrEmpty(encounterId) || enemies == null) return null;
+        if (string.IsNullOrWhiteSpace(encounterId) || enemies == null) return null;
+
+        string normalizedEncounterId = GameIdUtility.Normalize(encounterId);
 
         foreach (EnemyEntry entry in enemies)
         {
-            if (entry != null && entry.spawnPointId == encounterId)
+            if (entry == null || entry.enemyData == null) continue;
+
+            if (GameIdUtility.Normalize(entry.spawnPointId) == normalizedEncounterId)
             {
                 return entry.enemyData;
             }
@@ -118,18 +123,19 @@ public class AreaData : ScriptableObject
 
     public CharacterData FindRandomEnemyByEncounterId(string encounterId)
     {
-        if (string.IsNullOrEmpty(encounterId) || randomEncounterPool == null) return null;
+        if (string.IsNullOrWhiteSpace(encounterId) || randomEncounterPool == null) return null;
 
-        const string randomPrefix = "random_";
-        string enemyName = encounterId.StartsWith(randomPrefix)
-            ? encounterId.Substring(randomPrefix.Length)
-            : encounterId;
+        string enemyId = GameIdUtility.Normalize(encounterId, true);
 
         foreach (RandomEnemyEntry entry in randomEncounterPool)
         {
             if (entry == null || entry.enemyData == null) continue;
 
-            if (entry.enemyData.name == enemyName || entry.enemyData.charType == enemyName)
+            string characterId = GameIdUtility.GetCharacterId(entry.enemyData);
+            string assetNameId = GameIdUtility.ToStableId(entry.enemyData.name);
+            string charTypeId = GameIdUtility.Normalize(entry.enemyData.charType);
+
+            if (enemyId == characterId || enemyId == assetNameId || enemyId == charTypeId)
             {
                 return entry.enemyData;
             }
@@ -143,22 +149,22 @@ public class AreaData : ScriptableObject
 public class InteractableEntry
 {
     public InteractableData interactableData;
-    public string spawnPointId; // Matches SpawnPointRegistry.InteractableSpawn.spawnPointId.
+    public string spawnPointId;
 }
 
 [System.Serializable]
 public class EnemyEntry
 {
-    public CharacterData enemyData;   // ScriptableObject with stats + prefab.
-    public string spawnPointId;       // Matches ID in SpawnPointRegistry / EncounterTrigger.
+    public CharacterData enemyData;
+    public string spawnPointId;
 }
 
 [System.Serializable]
 public class RandomEnemyEntry
 {
-    public CharacterData enemyData;             // The enemy to spawn.
-    public float weight = 1f;                   // Higher weight = more common.
-    public int minPlayerLevel = 1;              // Minimum player level for this enemy.
-    public int maxPlayerLevel = 99;             // Maximum player level for this enemy.
-    public List<string> requiredFlags = new();  // Optional: only spawn if story flags are set.
+    public CharacterData enemyData;
+    public float weight = 1f;
+    public int minPlayerLevel = 1;
+    public int maxPlayerLevel = 99;
+    public List<string> requiredFlags = new();
 }

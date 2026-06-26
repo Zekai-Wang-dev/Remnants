@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3f1162f1889dd540ab7123413dd4163, type: 3}
   m_Name: Dummy 1
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterId: dummy_1
   charType: Enemy
   isPlayer: 0
   maxHealth: 300

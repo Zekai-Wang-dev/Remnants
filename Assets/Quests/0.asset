@@ -16,14 +16,16 @@ MonoBehaviour:
   questName: Find a weapon
   questType: 0
   isChained: 1
+  triggerCinematicOnComplete: 0
   newQuest: {fileID: 11400000, guid: 3bd1dacd79f540041bf4323ad0144a05, type: 2}
+  cinematicOnComplete: {fileID: 0}
   newQuestAutoClaimRewards: 1
   questRequirementType: 2
   enemyDefeatRequirement:
     enemyId: Dummy
     requiredAmount: 4
   itemCollectionRequirement:
-    itemId: 000
+    itemId: sword
     requiredAmount: 1
   locationVisitRequirement:
     sceneId: 

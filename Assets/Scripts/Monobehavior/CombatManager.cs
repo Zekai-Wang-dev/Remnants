@@ -1210,9 +1210,12 @@ public class CombatManager : MonoBehaviour
 
         if (deadCharacter.team == 1 && deadCharacter.data != null)
         {
-            string defeatedEnemyId = !string.IsNullOrWhiteSpace(deadCharacter.data.name)
-                ? deadCharacter.data.name
-                : removedName;
+            string defeatedEnemyId = GameIdUtility.GetCharacterId(deadCharacter.data);
+
+            if (string.IsNullOrWhiteSpace(defeatedEnemyId))
+            {
+                defeatedEnemyId = GameIdUtility.ToStableId(removedName);
+            }
 
             QuestDataManager.Instance?.ReportEnemyDefeated(defeatedEnemyId);
         }

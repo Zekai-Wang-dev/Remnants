@@ -581,7 +581,7 @@ public class InventoryManager : MonoBehaviour
             return false;
         }
 
-        return collectedOnceOnlyDropIds.Contains(dropId);
+        return collectedOnceOnlyDropIds.Contains(GameIdUtility.Normalize(dropId));
     }
 
     public void MarkOnceOnlyDropCollected(string dropId)
@@ -591,7 +591,9 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        if (collectedOnceOnlyDropIds.Add(dropId))
+        string normalizedDropId = GameIdUtility.Normalize(dropId);
+
+        if (collectedOnceOnlyDropIds.Add(normalizedDropId))
         {
             SaveCollectedOnceOnlyDrops();
         }
@@ -621,7 +623,7 @@ public class InventoryManager : MonoBehaviour
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
-                collectedOnceOnlyDropIds.Add(id);
+                collectedOnceOnlyDropIds.Add(GameIdUtility.Normalize(id));
             }
         }
     }
@@ -646,7 +648,7 @@ public class InventoryManager : MonoBehaviour
 
             if (slot != null && !slot.IsEmpty && slot.item != null)
             {
-                slotSave.itemId = slot.item.itemId;
+                slotSave.itemId = GameIdUtility.GetItemId(slot.item);
                 slotSave.quantity = slot.quantity;
                 slotSave.equipped = slot.equipped;
             }
@@ -709,7 +711,7 @@ public class InventoryManager : MonoBehaviour
             {
                 if (!string.IsNullOrWhiteSpace(id))
                 {
-                    collectedOnceOnlyDropIds.Add(id);
+                    collectedOnceOnlyDropIds.Add(GameIdUtility.Normalize(id));
                 }
             }
         }

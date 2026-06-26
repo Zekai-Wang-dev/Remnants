@@ -4,8 +4,23 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SceneData", menuName = "Scriptable Objects/SceneData")]
 public class SceneData : ScriptableObject
 {
+    [Header("Scene Info")]
+    [Tooltip("Stable ID used by cinematic saves and queues. Auto-filled from asset name if blank.")]
     public string sceneId;
     public string sceneName;
+
+    [Header("Playback Requirements")]
+    [Tooltip("Optional. If filled, this cinematic can only start while SpawnManager.currentSceneId matches this value.")]
+    public string requiredSceneId;
+
+    [Tooltip("Optional. If filled, this cinematic can only start while SpawnManager.currentAreaId matches this value.")]
+    public string requiredAreaId;
+
+    [Tooltip("If true, requiredActorIds is rebuilt from actions whenever the asset validates in the editor.")]
+    public bool autoCollectRequiredActorIds = true;
+
+    [Tooltip("Actor IDs that must exist in SceneCharacterRegistry before this cinematic is allowed to play. When autoCollectRequiredActorIds is true, this list is rebuilt from scene actions only. Do not put combat enemy IDs here.")]
+    public List<string> requiredActorIds = new();
 
     public List<SceneAction> actions = new();
 
@@ -15,6 +30,124 @@ public class SceneData : ScriptableObject
     [Header("After Scene Ends")]
     public List<SceneEndActorCommand> endCommands = new();
     public OngoingQuestData newQuest;
+
+    public string Id => GameIdUtility.GetSceneId(this);
+
+    private void OnValidate()
+    {
+        sceneId = GameIdUtility.CleanOrCreate(sceneId, this);
+        requiredSceneId = GameIdUtility.Normalize(requiredSceneId);
+        requiredAreaId = GameIdUtility.Normalize(requiredAreaId);
+
+        if (autoCollectRequiredActorIds)
+        {
+            RebuildRequiredActorIds();
+        }
+        else
+        {
+            NormalizeRequiredActorIds();
+        }
+    }
+
+    public List<string> GetRequiredActorIds()
+    {
+        if (requiredActorIds == null)
+        {
+            requiredActorIds = new List<string>();
+        }
+
+        if (autoCollectRequiredActorIds)
+        {
+            RebuildRequiredActorIds();
+        }
+        else
+        {
+            NormalizeRequiredActorIds();
+        }
+
+        return requiredActorIds;
+    }
+
+    public void RebuildRequiredActorIds()
+    {
+        // Important: this is a true rebuild.
+        // Do not seed from the old requiredActorIds list, because that keeps stale IDs forever.
+        // Combat enemies and other old accidental entries should disappear after OnValidate/Validate runs.
+        HashSet<string> ids = new HashSet<string>();
+
+        if (actions != null)
+        {
+            foreach (SceneAction action in actions)
+            {
+                if (action == null) continue;
+
+                if (action.actorCommands != null)
+                {
+                    foreach (SceneActorCommand command in action.actorCommands)
+                    {
+                        if (command == null) continue;
+                        AddRequiredActorId(ids, command.actorId);
+
+                        if (command.dialogueLine != null)
+                        {
+                            AddRequiredActorId(ids, command.dialogueLine.characterID);
+                        }
+                    }
+                }
+
+                if (action.dialogueBeats != null)
+                {
+                    foreach (DialogueBeat beat in action.dialogueBeats)
+                    {
+                        if (beat == null) continue;
+                        AddRequiredActorId(ids, beat.actorId);
+                    }
+                }
+            }
+        }
+
+        if (endCommands != null)
+        {
+            foreach (SceneEndActorCommand command in endCommands)
+            {
+                if (command == null) continue;
+
+                if (command.endBehavior == SceneEndActorCommand.EndBehavior.Disable ||
+                    command.endBehavior == SceneEndActorCommand.EndBehavior.Destroy)
+                {
+                    AddRequiredActorId(ids, command.actorId);
+                }
+            }
+        }
+
+        requiredActorIds = new List<string>(ids);
+        requiredActorIds.Sort();
+    }
+
+    private void NormalizeRequiredActorIds()
+    {
+        HashSet<string> ids = new HashSet<string>();
+
+        if (requiredActorIds != null)
+        {
+            foreach (string actorId in requiredActorIds)
+            {
+                AddRequiredActorId(ids, actorId);
+            }
+        }
+
+        requiredActorIds = new List<string>(ids);
+        requiredActorIds.Sort();
+    }
+
+    private void AddRequiredActorId(HashSet<string> ids, string actorId)
+    {
+        string normalizedId = GameIdUtility.Normalize(actorId);
+        if (!string.IsNullOrWhiteSpace(normalizedId))
+        {
+            ids.Add(normalizedId);
+        }
+    }
 }
 
 [System.Serializable]

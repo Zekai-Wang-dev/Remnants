@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93015560bf079ff4990bd6616a8b6a49, type: 3}
   m_Name: Starting Area
   m_EditorClassIdentifier: Assembly-CSharp::AreaData
-  areaId: 000
+  areaId: starting_area
   areaName: Starting Area
   areaIndex: {x: 0, y: 0}
   enemies: []
@@ -22,4 +22,4 @@ MonoBehaviour:
   minDistanceBetweenEncounters: 0
   interactables:
   - interactableData: {fileID: 11400000, guid: 9ffb2a429af6c2e4db0383c4b961be39, type: 2}
-    spawnPointId: FirstWeapon
+    spawnPointId: firstweapon

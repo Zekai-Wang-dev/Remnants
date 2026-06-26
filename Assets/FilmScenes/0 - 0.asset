@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ea08d1017a4bc4c9102e6c7e204734, type: 3}
   m_Name: 0 - 0
   m_EditorClassIdentifier: Assembly-CSharp::SceneData
-  sceneId: 0-0
+  sceneId: 0_0
   sceneName: WakingUp
+  requiredSceneId: 
+  requiredAreaId: 
+  autoCollectRequiredActorIds: 1
+  requiredActorIds:
+  - player
   actions:
   - actionName: Wake Up
     type: 4

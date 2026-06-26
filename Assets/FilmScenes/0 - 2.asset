@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13ea08d1017a4bc4c9102e6c7e204734, type: 3}
   m_Name: 0 - 2
   m_EditorClassIdentifier: Assembly-CSharp::SceneData
-  sceneId: 0-2
+  sceneId: 0_2
   sceneName: WolfEncounter
+  requiredSceneId: 000
+  requiredAreaId: starting_area
+  autoCollectRequiredActorIds: 0
+  requiredActorIds:
+  - player
+  - training_dummy_0
   actions:
   - actionName: Question
     type: 4
@@ -34,7 +40,7 @@ MonoBehaviour:
     type: 4
     actorCommands: []
     dialogueBeats:
-    - actorId: Wolf
+    - actorId: training_dummy_0
       line: Grr...
       speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
       charactersPerSecond: 30
@@ -48,7 +54,7 @@ MonoBehaviour:
   - actionName: Question
     type: 1
     actorCommands:
-    - actorId: Wolf
+    - actorId: training_dummy_0
       moveDirection: {x: -1, y: 0}
       moveDistance: 5
       moveSpeed: 15
@@ -69,9 +75,9 @@ MonoBehaviour:
       waitAfterLine: 0
     waitAfterAction: 0
   isPermanent: 1
-  isActivated: 1
+  isActivated: 0
   endCommands:
-  - actorId: Wolf
+  - actorId: training_dummy_0
     endBehavior: 1
     combatInteraction:
       combatId: Wolf
@@ -79,7 +85,7 @@ MonoBehaviour:
   - actorId: 
     endBehavior: 4
     combatInteraction:
-      combatId: Wolf
+      combatId: training_dummy_0
       enemies:
       - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
   newQuest:

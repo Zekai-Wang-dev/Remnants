@@ -21,9 +21,30 @@ public class SceneCharacterRegistry : MonoBehaviour
         StartCoroutine(RefreshAfterSaveLoaded());
     }
 
+    private void OnValidate()
+    {
+        if (characters == null)
+        {
+            return;
+        }
+
+        foreach (SceneCharacterEntry entry in characters)
+        {
+            if (entry == null) continue;
+
+            if (string.IsNullOrWhiteSpace(entry.actorId) && entry.characterTransform != null)
+            {
+                entry.actorId = GameIdUtility.ToStableId(entry.characterTransform.name);
+            }
+            else
+            {
+                entry.actorId = GameIdUtility.Normalize(entry.actorId);
+            }
+        }
+    }
+
     private IEnumerator RefreshAfterSaveLoaded()
     {
-        // Wait until GameSaveManager has loaded cinematic save data.
         while (GameSaveManager.Instance != null && !GameSaveManager.Instance.HasLoaded)
         {
             yield return null;
@@ -49,7 +70,6 @@ public class SceneCharacterRegistry : MonoBehaviour
             if (string.IsNullOrWhiteSpace(entry.actorId)) continue;
             if (entry.characterTransform == null) continue;
 
-            // Do not register hidden/destroyed cinematic actors.
             if (!entry.characterTransform.gameObject.activeInHierarchy)
             {
                 continue;
@@ -119,7 +139,7 @@ public class SceneCharacterRegistry : MonoBehaviour
 
         if (playerObject != null)
         {
-            RegisterActor("Player", playerObject.transform);
+            RegisterActor("player", playerObject.transform);
         }
     }
 
@@ -132,6 +152,41 @@ public class SceneCharacterRegistry : MonoBehaviour
         lookup[normalizedId] = actorTransform;
 
         Debug.Log($"Registered actor ID '{normalizedId}' -> {actorTransform.name}");
+    }
+
+    public bool HasActor(string actorId)
+    {
+        return TryGetActor(actorId, out _);
+    }
+
+    public bool TryGetActor(string actorId, out Transform actor)
+    {
+        actor = null;
+
+        if (string.IsNullOrWhiteSpace(actorId))
+        {
+            return false;
+        }
+
+        string normalizedId = NormalizeId(actorId);
+
+        if (lookup.TryGetValue(normalizedId, out actor) && actor != null)
+        {
+            return true;
+        }
+
+        if (normalizedId == "player")
+        {
+            AutoRegisterPlayer();
+
+            if (lookup.TryGetValue(normalizedId, out actor) && actor != null)
+            {
+                return true;
+            }
+        }
+
+        actor = null;
+        return false;
     }
 
     public Transform GetActor(string actorId)
@@ -151,26 +206,14 @@ public class SceneCharacterRegistry : MonoBehaviour
             return null;
         }
 
-        string normalizedId = NormalizeId(actorId);
-
-        if (lookup.TryGetValue(normalizedId, out Transform actor) && actor != null)
+        if (TryGetActor(actorId, out Transform actor))
         {
             return actor;
         }
 
-        // Last chance: maybe the player appeared after the lookup was built.
-        if (normalizedId == "player")
-        {
-            AutoRegisterPlayer();
-
-            if (lookup.TryGetValue(normalizedId, out actor) && actor != null)
-            {
-                return actor;
-            }
-        }
-
         if (logWarnings)
         {
+            string normalizedId = NormalizeId(actorId);
             Debug.LogWarning($"Could not find actor with ID '{actorId}'. Normalized ID was '{normalizedId}'.");
             Debug.LogWarning($"Currently registered actors: {string.Join(", ", lookup.Keys)}");
         }
@@ -178,9 +221,32 @@ public class SceneCharacterRegistry : MonoBehaviour
         return null;
     }
 
+    public List<string> GetMissingActorIds(IEnumerable<string> actorIds)
+    {
+        List<string> missing = new List<string>();
+
+        if (actorIds == null)
+        {
+            return missing;
+        }
+
+        foreach (string actorId in actorIds)
+        {
+            string normalizedId = NormalizeId(actorId);
+            if (string.IsNullOrWhiteSpace(normalizedId)) continue;
+
+            if (!HasActor(normalizedId) && !missing.Contains(normalizedId))
+            {
+                missing.Add(normalizedId);
+            }
+        }
+
+        return missing;
+    }
+
     private string NormalizeId(string actorId)
     {
-        return actorId.Trim().ToLowerInvariant();
+        return GameIdUtility.Normalize(actorId);
     }
 }
 

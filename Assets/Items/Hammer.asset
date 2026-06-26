@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hammer
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemType: 0
-  itemId: 002
+  itemId: hammer
   itemName: Hammer
   description: A heavy weapon for starters
   imageIcon: {fileID: 4024874358180539849, guid: 9c0cc21626384d74ca48d29b673565c7, type: 3}

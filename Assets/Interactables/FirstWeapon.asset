@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25d8ca51eac9470468a64f049e92ed87, type: 3}
   m_Name: FirstWeapon
   m_EditorClassIdentifier: Assembly-CSharp::InteractableData
-  interactableId: FirstWeapon
+  interactableId: firstweapon
   displayName: FirstWeapon
   interactablePrefab: {fileID: 2868209051854855979, guid: 4c0f40eae9c2ca24d8800b002a9e9250, type: 3}
   interactionPrompt: "Press \"E\" \n"

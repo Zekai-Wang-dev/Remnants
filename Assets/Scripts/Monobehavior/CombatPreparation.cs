@@ -24,7 +24,48 @@ public class CombatPreparation : MonoBehaviour
             return;
         }
 
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager == null)
+        {
+            Debug.LogError("SpawnManager is missing, so CombatPreparation cannot start combat.");
+            enabled = false;
+            return;
+        }
+
+        if (!spawnManager.IsCurrentSceneCombat)
+        {
+            Debug.LogWarning("CombatPreparation exists in a non-combat scene. It will not start combat.");
+            enabled = false;
+            return;
+        }
+
+        bool hasCustomEnemyPool = spawnManager.HasPendingCustomCombatEnemyPool();
+        bool hasEncounterId = !string.IsNullOrWhiteSpace(spawnManager.currentEncounterId);
+
+        if (!hasCustomEnemyPool && !hasEncounterId)
+        {
+            Debug.LogWarning("CombatPreparation found no pending custom enemy pool and no current encounter ID. Combat will not start.");
+            enabled = false;
+            return;
+        }
+
         PrepareCombatants();
+
+        if (t0Characters.Count == 0)
+        {
+            Debug.LogError("CombatPreparation created no player-side combatants. Combat will not start.");
+            enabled = false;
+            return;
+        }
+
+        if (t1Characters.Count == 0)
+        {
+            Debug.LogError("CombatPreparation created no enemy-side combatants. Combat will not start. Check currentEncounterId/currentEncounterAreaId or custom combat enemies.");
+            enabled = false;
+            return;
+        }
+
         combatManager.StartCombat(t0Characters, t1Characters);
     }
 
@@ -175,14 +216,13 @@ public class CombatPreparation : MonoBehaviour
         }
 
         AreaData encounterArea = spawnManager.GetAreaDataById(spawnManager.currentEncounterAreaId);
-        if (encounterArea == null)
-        {
-            encounterArea = spawnManager.GetCurrentAreaData();
-        }
 
+        // Fixed/fallback encounter data must come from the overworld area that started combat.
+        // Do not fall back to GetCurrentAreaData() here, because while CombatPreparation runs
+        // the current scene is the Combat scene, so that would read the Combat scene's area data.
         if (encounterArea == null)
         {
-            Debug.LogError("Could not find encounter area data for combat.");
+            Debug.LogError($"Could not find encounter area data for combat. currentEncounterAreaId='{spawnManager.currentEncounterAreaId}', currentEncounterId='{spawnManager.currentEncounterId}'.");
             return;
         }
 
