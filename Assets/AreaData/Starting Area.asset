@@ -15,9 +15,7 @@ MonoBehaviour:
   areaId: 000
   areaName: Starting Area
   areaIndex: {x: 0, y: 0}
-  enemies:
-  - enemyData: {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
-    spawnPointId: EnemySpawn1
+  enemies: []
   enableRandomEncounters: 0
   randomEncounterPool: []
   randomEncounterChance: 0

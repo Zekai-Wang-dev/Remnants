@@ -46,7 +46,7 @@ MonoBehaviour:
       waitAfterLine: 0
     waitAfterAction: 0
   isPermanent: 1
-  isActivated: 1
+  isActivated: 0
   endCommands: []
   newQuest:
     questData: {fileID: 0}

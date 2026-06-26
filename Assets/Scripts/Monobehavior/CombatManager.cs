@@ -538,6 +538,9 @@ public class CombatManager : MonoBehaviour
     private readonly List<Character> activePlayerTeam = new();
 
     private bool combatEnding = false;
+    private bool combatActive = false;
+
+    public bool IsCombatActive => combatActive || combatEnding;
 
     private void Awake()
     {
@@ -556,6 +559,7 @@ public class CombatManager : MonoBehaviour
 
         PlayerController.Instance?.DisableMovementForCombat();
 
+        combatActive = true;
         combatEnding = false;
         pendingLoot.Clear();
         activePlayerTeam.Clear();
@@ -1138,14 +1142,21 @@ public class CombatManager : MonoBehaviour
 
         spawnManager.ReturnFromCombat(playerWon);
 
-        // Wait through scene/SpawnManager return logic, then unlock again.
-        // This prevents a film end command or scene-return callback from
-        // re-disabling movement after the first unlock.
+        // Keep IsCombatActive true until SpawnManager has fully returned to the
+        // overworld. Otherwise queued cinematics can start during the same-frame
+        // combat return window, before the correct SceneCharacterRegistry exists.
+        yield return new WaitUntil(() =>
+            SpawnManager.Instance == null ||
+            (!SpawnManager.Instance.IsSceneTransitioning && !SpawnManager.Instance.IsCurrentSceneCombat)
+        );
+
         yield return null;
         RestorePlayerControlAfterCombat();
 
         yield return new WaitForEndOfFrame();
         RestorePlayerControlAfterCombat();
+
+        combatActive = false;
 
         combatants.Clear();
         currentTurnIndex = 0;

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13ea08d1017a4bc4c9102e6c7e204734, type: 3}
-  m_Name: 0-4
+  m_Name: 0 - 4
   m_EditorClassIdentifier: Assembly-CSharp::SceneData
   sceneId: 0-4
   sceneName: SaveVillager
@@ -28,7 +28,7 @@ MonoBehaviour:
       animationClip: {fileID: 0}
     dialogueBeats: []
     waitAfterAction: 2
-  - actionName: Grr
+  - actionName: Villager help
     type: 4
     actorCommands:
     - actorId: Wolf2
@@ -40,10 +40,33 @@ MonoBehaviour:
       dialogueLine: {fileID: 0}
       animationClip: {fileID: 0}
     dialogueBeats:
+    - actorId: Villager
+      line: Help!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 15
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Grr
+    type: 4
+    actorCommands:
+    - actorId: Wolf2
+      moveDirection: {x: -1, y: 0}
+      moveDistance: 5
+      moveSpeed: 15
+      spriteFlipMode: 0
+      targetFlipX: 0
+      dialogueLine: {fileID: 0}
+      animationClip: {fileID: 0}
+    dialogueBeats:
     - actorId: Wolf2
       line: Grr...
       speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
-      charactersPerSecond: 15
+      charactersPerSecond: 30
       waitForPlayerInputAfterLine: 1
       continueKey: 32
       speakingAnimationClip: {fileID: 0}
@@ -82,17 +105,22 @@ MonoBehaviour:
     combatInteraction:
       combatId: Wolf2
       enemies: []
-  - actorId: Wolf2
+  - actorId: Villager
+    endBehavior: 3
+    combatInteraction:
+      combatId: 
+      enemies: []
+  - actorId: 
     endBehavior: 4
     combatInteraction:
-      combatId: Wolf2
+      combatId: Wolf
       enemies:
       - {fileID: 11400000, guid: 6119d7c84ebfbff4ea7741b17e4f17d3, type: 2}
       - {fileID: 11400000, guid: c7eb9c0d1b237f74caf410ab52e44906, type: 2}
   newQuest:
-    questData: {fileID: 0}
+    questData: {fileID: 11400000, guid: 6eb429bdede1f164c833adb0b8f04957, type: 2}
     currentProgress: 0
-    maxProgress: 0
-    autoClaimRewards: 0
+    maxProgress: 1
+    autoClaimRewards: 1
     isCompleted: 0
     rewardClaimed: 0

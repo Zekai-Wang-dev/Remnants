@@ -66,6 +66,28 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    private bool IsCombatScene(Scene scene)
+    {
+        if (scene == null)
+        {
+            return false;
+        }
+
+        return string.Equals(scene.sceneId, "Combat", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(scene.sceneName, "Combat", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void RunOverworldPostLoadSystems(Scene sceneToLoad, string sceneId, string areaId)
+    {
+        if (IsCombatScene(sceneToLoad))
+        {
+            return;
+        }
+
+        QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
+        FilmSceneManager.Instance?.RequestDelayedCinematicWorldRefresh();
+    }
+
     private CameraController GetCameraController()
     {
         return Camera.main != null ? Camera.main.GetComponent<CameraController>() : null;
@@ -529,8 +551,7 @@ public class SpawnManager : MonoBehaviour
         CleanupDefeatedEncounters(areaId);
         CleanupClaimedInteractables(areaId);
 
-        QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
-        FilmSceneManager.Instance?.RequestDelayedCinematicWorldRefresh();
+        RunOverworldPostLoadSystems(sceneToLoad, sceneId, areaId);
     }
 
     public void LoadScene(string sceneId, string areaId)
@@ -608,8 +629,6 @@ public class SpawnManager : MonoBehaviour
             CleanupDefeatedEncounters(areaId);
             CleanupClaimedInteractables(areaId);
 
-            QuestDataManager.Instance?.ReportLocationVisited(sceneId, areaId);
-
             isSceneTransitioning = false;
 
             if (startCooldownAfterSceneLoad)
@@ -618,7 +637,7 @@ public class SpawnManager : MonoBehaviour
                 StartPostCombatRandomEncounterCooldown();
             }
 
-            FilmSceneManager.Instance?.RequestDelayedCinematicWorldRefresh();
+            RunOverworldPostLoadSystems(sceneToLoad, sceneId, areaId);
         };
     }
 

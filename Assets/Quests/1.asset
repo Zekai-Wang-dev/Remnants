@@ -15,9 +15,9 @@ MonoBehaviour:
   questId: 1
   questName: Defeat wolf
   questType: 0
-  isChained: 0
+  isChained: 1
   triggerCinematicOnComplete: 1
-  newQuest: {fileID: 0}
+  newQuest: {fileID: 11400000, guid: 6eb429bdede1f164c833adb0b8f04957, type: 2}
   cinematicOnComplete: {fileID: 11400000, guid: 37c63aa8982b45a41ba9a5b4551d8263, type: 2}
   newQuestAutoClaimRewards: 1
   questRequirementType: 1

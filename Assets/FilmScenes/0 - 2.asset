@@ -76,7 +76,7 @@ MonoBehaviour:
     combatInteraction:
       combatId: Wolf
       enemies: []
-  - actorId: Wolf
+  - actorId: 
     endBehavior: 4
     combatInteraction:
       combatId: Wolf

@@ -48,6 +48,12 @@ public class FilmSceneManager : MonoBehaviour
     private SceneData pendingSceneEndCombatCinematic;
     private string pendingSceneEndCombatCinematicId = "";
 
+    private SceneData pendingSceneEndCombatVictoryCinematic;
+    private string pendingSceneEndCombatVictoryCinematicId = "";
+    private Coroutine pendingSceneEndCombatVictoryCoroutine;
+
+    public bool HasPendingSceneEndCombatResolution => pendingSceneEndCombatVictoryCinematic != null;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -125,21 +131,28 @@ public class FilmSceneManager : MonoBehaviour
 
         RegisterKnownCinematicSceneData(filmScene);
 
+        string cinematicId = GetCinematicId(filmScene);
+
+        if (IsCinematicActivated(filmScene))
+        {
+            PurgeQueuedCinematic(filmScene);
+            Debug.Log($"Queued cinematic '{cinematicId}' was skipped because it has already been activated.");
+            return;
+        }
+
+        if (IsCinematicIdPendingSceneEndCombat(cinematicId))
+        {
+            Debug.Log($"Cinematic '{cinematicId}' was not queued because it is already waiting for a scene-end combat result.");
+            return;
+        }
+
         if (!queueCompletionCinematicsUntilWorldReady)
         {
             TryStartCinematic(filmScene);
             return;
         }
 
-        if (IsCinematicActivated(filmScene))
-        {
-            Debug.Log($"Queued cinematic '{GetCinematicId(filmScene)}' was skipped because it has already been activated.");
-            return;
-        }
-
-        string cinematicId = GetCinematicId(filmScene);
-
-        if (!string.IsNullOrWhiteSpace(cinematicId) && queuedCinematicIds.Contains(cinematicId))
+        if (IsCinematicAlreadyQueued(filmScene, cinematicId))
         {
             Debug.Log($"Cinematic '{cinematicId}' is already queued.");
             return;
@@ -174,20 +187,21 @@ public class FilmSceneManager : MonoBehaviour
 
             yield return new WaitUntil(CanPlayQueuedCinematic);
 
-            queuedCinematics.Dequeue();
-
-            if (!string.IsNullOrWhiteSpace(cinematicId))
-            {
-                queuedCinematicIds.Remove(cinematicId);
-            }
-
             if (nextCinematic == null)
             {
+                RemovePeekedQueuedCinematic(cinematicId);
                 continue;
             }
 
             if (IsCinematicActivated(nextCinematic))
             {
+                RemovePeekedQueuedCinematic(cinematicId);
+                continue;
+            }
+
+            if (IsCinematicIdPendingSceneEndCombat(cinematicId))
+            {
+                RemovePeekedQueuedCinematic(cinematicId);
                 continue;
             }
 
@@ -195,10 +209,14 @@ public class FilmSceneManager : MonoBehaviour
 
             if (!started)
             {
-                Debug.LogWarning($"Queued cinematic '{cinematicId}' could not start even though the world appeared ready.");
-                yield return null;
+                // Do not drop the cinematic. This can happen during a same-frame
+                // combat return / scene refresh race. Keep it queued and try again.
+                Debug.Log($"Queued cinematic '{cinematicId}' is still waiting for a safe world state.");
+                yield return new WaitForSeconds(0.1f);
                 continue;
             }
+
+            RemovePeekedQueuedCinematic(cinematicId);
 
             yield return new WaitUntil(() => !inCinematic && activeCinematicCoroutine == null);
         }
@@ -206,44 +224,217 @@ public class FilmSceneManager : MonoBehaviour
         queuedCinematicCoroutine = null;
     }
 
-    private bool CanPlayQueuedCinematic()
+
+
+    private void RemovePeekedQueuedCinematic(string cinematicId)
+    {
+        if (queuedCinematics.Count > 0)
+        {
+            queuedCinematics.Dequeue();
+        }
+
+        if (!string.IsNullOrWhiteSpace(cinematicId))
+        {
+            queuedCinematicIds.Remove(cinematicId);
+        }
+    }
+
+    private bool IsCinematicAlreadyQueued(SceneData filmScene, string cinematicId)
+    {
+        if (!string.IsNullOrWhiteSpace(cinematicId) && queuedCinematicIds.Contains(cinematicId))
+        {
+            return true;
+        }
+
+        foreach (SceneData queuedCinematic in queuedCinematics)
+        {
+            if (queuedCinematic == filmScene)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void PurgeQueuedCinematic(SceneData filmScene)
+    {
+        if (filmScene == null || queuedCinematics.Count == 0)
+        {
+            return;
+        }
+
+        string cinematicId = GetCinematicId(filmScene);
+        Queue<SceneData> keptCinematics = new Queue<SceneData>();
+        queuedCinematicIds.Clear();
+
+        while (queuedCinematics.Count > 0)
+        {
+            SceneData queuedCinematic = queuedCinematics.Dequeue();
+            string queuedId = GetCinematicId(queuedCinematic);
+
+            bool sameReference = queuedCinematic == filmScene;
+            bool sameId = !string.IsNullOrWhiteSpace(cinematicId) && cinematicId == queuedId;
+
+            if (sameReference || sameId)
+            {
+                continue;
+            }
+
+            keptCinematics.Enqueue(queuedCinematic);
+
+            if (!string.IsNullOrWhiteSpace(queuedId))
+            {
+                queuedCinematicIds.Add(queuedId);
+            }
+        }
+
+        while (keptCinematics.Count > 0)
+        {
+            queuedCinematics.Enqueue(keptCinematics.Dequeue());
+        }
+    }
+
+    private bool IsCinematicIdPendingSceneEndCombat(string cinematicId)
+    {
+        if (string.IsNullOrWhiteSpace(cinematicId))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(pendingSceneEndCombatCinematicId) &&
+            cinematicId == pendingSceneEndCombatCinematicId)
+        {
+            return true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(pendingSceneEndCombatVictoryCinematicId) &&
+            cinematicId == pendingSceneEndCombatVictoryCinematicId)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsCombatBlockingCinematics()
+    {
+        if (CombatManager.Instance != null && CombatManager.Instance.IsCombatActive)
+        {
+            return true;
+        }
+
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager != null && spawnManager.IsCurrentSceneCombat)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsWorldReadyForCinematic(SceneData filmScene = null, bool logWarnings = false)
     {
         if (!IsReadyToStartCinematic)
         {
+            if (logWarnings)
+            {
+                Debug.LogWarning("Cannot start cinematic because save/load or cinematic world refresh is not finished.");
+            }
+
             return false;
         }
 
         if (inCinematic || activeCinematicCoroutine != null)
         {
+            if (logWarnings)
+            {
+                Debug.LogWarning("Cannot start cinematic because another cinematic is already active.");
+            }
+
             return false;
         }
 
-        if (PlayerController.Instance == null)
+        if (IsCombatBlockingCinematics())
         {
-            return false;
-        }
+            if (logWarnings)
+            {
+                Debug.LogWarning("Cannot start cinematic while combat is active, ending, or returning to the overworld.");
+            }
 
-        if (requireSceneCharacterRegistryForQueuedCinematics && SceneCharacterRegistry.Instance == null)
-        {
             return false;
         }
 
         SpawnManager spawnManager = SpawnManager.Instance;
 
-        if (spawnManager != null)
+        if (spawnManager != null && spawnManager.IsSceneTransitioning)
         {
-            if (blockQueuedCinematicsDuringSpawnTransitions && spawnManager.IsSceneTransitioning)
+            if (logWarnings)
             {
-                return false;
+                Debug.LogWarning("Cannot start cinematic during a SpawnManager scene transition.");
             }
 
-            if (blockQueuedCinematicsInCombatScene && spawnManager.IsCurrentSceneCombat)
+            return false;
+        }
+
+        if (requireSceneCharacterRegistryForQueuedCinematics && SceneCharacterRegistry.Instance == null)
+        {
+            if (logWarnings)
             {
-                return false;
+                Debug.LogWarning("Cannot start cinematic because SceneCharacterRegistry is missing.");
             }
+
+            return false;
+        }
+
+        if (filmScene != null && IsCinematicActivated(filmScene))
+        {
+            if (logWarnings)
+            {
+                Debug.Log($"Cinematic '{GetCinematicId(filmScene)}' has already been activated.");
+            }
+
+            return false;
         }
 
         return true;
+    }
+
+    private bool CanPlayQueuedCinematic()
+    {
+        if (pendingSceneEndCombatVictoryCinematic != null ||
+            pendingSceneEndCombatVictoryCoroutine != null)
+        {
+            return false;
+        }
+
+        return IsWorldReadyForCinematic(null, false);
+    }
+
+    public bool CanStartWorldCinematicNow(SceneData filmScene, bool logWarnings = false)
+    {
+        if (filmScene == null)
+        {
+            if (logWarnings)
+            {
+                Debug.LogWarning("Tried to check a null cinematic.");
+            }
+
+            return false;
+        }
+
+        if (pendingSceneEndCombatVictoryCinematic != null)
+        {
+            if (logWarnings)
+            {
+                Debug.LogWarning("Cannot start cinematic because scene-end combat victory cleanup is still waiting to resolve.");
+            }
+
+            return false;
+        }
+
+        return IsWorldReadyForCinematic(filmScene, logWarnings);
     }
 
     public void StartCinematic(SceneData filmScene)
@@ -261,21 +452,16 @@ public class FilmSceneManager : MonoBehaviour
 
         RegisterKnownCinematicSceneData(filmScene);
 
-        if (!IsReadyToStartCinematic)
+        string cinematicId = GetCinematicId(filmScene);
+
+        if (IsCinematicIdPendingSceneEndCombat(cinematicId))
         {
-            Debug.LogWarning($"Cinematic '{GetCinematicId(filmScene)}' tried to start before save/load world refresh finished.");
+            Debug.Log($"Cinematic '{cinematicId}' is already waiting for a scene-end combat result, so it will not start again.");
             return false;
         }
 
-        if (inCinematic || activeCinematicCoroutine != null)
+        if (!CanStartWorldCinematicNow(filmScene, true))
         {
-            Debug.LogWarning("Already in cinematic.");
-            return false;
-        }
-
-        if (IsCinematicActivated(filmScene))
-        {
-            Debug.Log($"Cinematic '{GetCinematicId(filmScene)}' has already been activated.");
             return false;
         }
 
@@ -346,9 +532,15 @@ public class FilmSceneManager : MonoBehaviour
         activeCinematicCoroutine = null;
         delayedRefreshCoroutine = null;
         queuedCinematicCoroutine = null;
+        pendingSceneEndCombatVictoryCoroutine = null;
 
         DestroyActiveSpeechBubbles();
         FinishCinematic(false, reason, enablePlayerMovement);
+
+        if (pendingSceneEndCombatVictoryCinematic != null)
+        {
+            EnsureSceneEndCombatVictoryCoroutineRunning();
+        }
 
         if (queuedCinematics.Count > 0)
         {
@@ -657,7 +849,7 @@ public class FilmSceneManager : MonoBehaviour
         return GetActor(actorId);
     }
 
-    private Transform GetActor(string actorId)
+    private Transform GetActor(string actorId, bool logWarnings = true)
     {
         if (string.IsNullOrWhiteSpace(actorId))
         {
@@ -666,18 +858,15 @@ public class FilmSceneManager : MonoBehaviour
 
         if (SceneCharacterRegistry.Instance == null)
         {
-            Debug.LogWarning("SceneCharacterRegistry is missing, so dialogue cannot follow an actor.");
+            if (logWarnings)
+            {
+                Debug.LogWarning("SceneCharacterRegistry is missing, so the cinematic actor lookup cannot be resolved.");
+            }
+
             return null;
         }
 
-        Transform actor = SceneCharacterRegistry.Instance.GetActor(actorId);
-
-        if (actor == null)
-        {
-            Debug.LogWarning($"Could not find actor with ID '{actorId}'.");
-        }
-
-        return actor;
+        return SceneCharacterRegistry.Instance.GetActor(actorId, logWarnings);
     }
 
     private void PlaySpeakingAnimation(Transform speaker, DialogueBeat beat)
@@ -924,7 +1113,7 @@ public class FilmSceneManager : MonoBehaviour
             return;
         }
 
-        Transform actor = GetActor(command.actorId);
+        Transform actor = GetActor(command.actorId, warnIfMissing);
 
         if (actor == null)
         {
@@ -1000,21 +1189,106 @@ public class FilmSceneManager : MonoBehaviour
         pendingSceneEndCombatCinematic = null;
         pendingSceneEndCombatCinematicId = "";
 
+        // If this same cinematic was accidentally queued during combat, remove it.
+        // The combat result is now the authority for whether this cinematic completed.
+        PurgeQueuedCinematic(completedCinematic);
+
         if (!playerWon)
         {
             Debug.Log($"Scene-end combat for cinematic '{completedCinematicId}' was lost. Cinematic will not be marked activated, so its trigger/actors can remain for retry.");
             return;
         }
 
-        Debug.Log($"Scene-end combat for cinematic '{completedCinematicId}' was won. Applying post-combat cinematic completion.");
+        Debug.Log($"Scene-end combat for cinematic '{completedCinematicId}' was won. Waiting until the overworld is loaded before applying cinematic completion.");
 
-        ApplyPostCombatVictoryEndCommands(completedCinematic);
-        MarkCinematicActivated(completedCinematic);
+        pendingSceneEndCombatVictoryCinematic = completedCinematic;
+        pendingSceneEndCombatVictoryCinematicId = completedCinematicId;
+        RegisterKnownCinematicSceneData(completedCinematic);
 
-        if (completedCinematic.newQuest != null)
+        EnsureSceneEndCombatVictoryCoroutineRunning();
+    }
+
+    private void EnsureSceneEndCombatVictoryCoroutineRunning()
+    {
+        if (pendingSceneEndCombatVictoryCoroutine != null)
         {
-            QuestDataManager.Instance?.AddQuest(completedCinematic.newQuest);
+            return;
         }
+
+        pendingSceneEndCombatVictoryCoroutine = StartCoroutine(ResolveSceneEndCombatVictoryWhenWorldReady());
+    }
+
+    private IEnumerator ResolveSceneEndCombatVictoryWhenWorldReady()
+    {
+        while (pendingSceneEndCombatVictoryCinematic != null)
+        {
+            yield return new WaitUntil(CanResolveSceneEndCombatVictory);
+
+            SceneData completedCinematic = pendingSceneEndCombatVictoryCinematic;
+            string completedCinematicId = pendingSceneEndCombatVictoryCinematicId;
+
+            pendingSceneEndCombatVictoryCinematic = null;
+            pendingSceneEndCombatVictoryCinematicId = "";
+
+            Debug.Log($"Applying post-combat cinematic completion for '{completedCinematicId}' after returning to the overworld.");
+
+            ApplyPostCombatVictoryEndCommands(completedCinematic);
+            MarkCinematicActivated(completedCinematic);
+
+            if (completedCinematic != null && completedCinematic.newQuest != null)
+            {
+                QuestDataManager.Instance?.AddQuest(completedCinematic.newQuest);
+            }
+
+            yield return null;
+        }
+
+        pendingSceneEndCombatVictoryCoroutine = null;
+
+        if (queuedCinematics.Count > 0)
+        {
+            EnsureQueuedCinematicCoroutineRunning();
+        }
+    }
+
+    private bool CanResolveSceneEndCombatVictory()
+    {
+        if (!IsReadyToStartCinematic)
+        {
+            return false;
+        }
+
+        if (inCinematic || activeCinematicCoroutine != null)
+        {
+            return false;
+        }
+
+        if (CombatManager.Instance != null && CombatManager.Instance.IsCombatActive)
+        {
+            return false;
+        }
+
+        SpawnManager spawnManager = SpawnManager.Instance;
+
+        if (spawnManager != null)
+        {
+            if (spawnManager.IsSceneTransitioning)
+            {
+                return false;
+            }
+
+            if (spawnManager.IsCurrentSceneCombat)
+            {
+                return false;
+            }
+        }
+
+        if (requireSceneCharacterRegistryForQueuedCinematics && SceneCharacterRegistry.Instance == null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private void ApplyPostCombatVictoryEndCommands(SceneData filmScene)
@@ -1034,11 +1308,11 @@ public class FilmSceneManager : MonoBehaviour
             switch (command.endBehavior)
             {
                 case SceneEndActorCommand.EndBehavior.Disable:
-                    ApplyActorEndCommand(command, disable: true, warnIfMissing: true);
+                    ApplyActorEndCommand(command, disable: true, warnIfMissing: false);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Destroy:
-                    ApplyActorEndCommand(command, disable: false, warnIfMissing: true);
+                    ApplyActorEndCommand(command, disable: false, warnIfMissing: false);
                     break;
 
                 case SceneEndActorCommand.EndBehavior.Quest:
@@ -1109,6 +1383,8 @@ public class FilmSceneManager : MonoBehaviour
             return;
         }
 
+        PurgeQueuedCinematic(filmScene);
+
         filmScene.isActivated = true;
 
         if (activatedSceneIds.Add(cinematicId))
@@ -1140,8 +1416,13 @@ public class FilmSceneManager : MonoBehaviour
         CancelActiveCinematic("CinematicSaveDataLoaded", true);
 
         activatedSceneIds.Clear();
+        queuedCinematics.Clear();
+        queuedCinematicIds.Clear();
         pendingSceneEndCombatCinematic = null;
         pendingSceneEndCombatCinematicId = "";
+        pendingSceneEndCombatVictoryCinematic = null;
+        pendingSceneEndCombatVictoryCinematicId = "";
+        pendingSceneEndCombatVictoryCoroutine = null;
 
         if (saveData != null && saveData.activatedSceneIds != null)
         {
@@ -1166,8 +1447,13 @@ public class FilmSceneManager : MonoBehaviour
         CancelActiveCinematic("CinematicRuntimeDataCleared", true);
 
         activatedSceneIds.Clear();
+        queuedCinematics.Clear();
+        queuedCinematicIds.Clear();
         pendingSceneEndCombatCinematic = null;
         pendingSceneEndCombatCinematicId = "";
+        pendingSceneEndCombatVictoryCinematic = null;
+        pendingSceneEndCombatVictoryCinematicId = "";
+        pendingSceneEndCombatVictoryCoroutine = null;
         currentFilmSceneId = "";
         inCinematic = false;
 

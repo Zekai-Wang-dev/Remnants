@@ -93,8 +93,16 @@ public class CinematicsActivator : MonoBehaviour
             yield return null;
         }
 
-        while (FilmSceneManager.Instance != null && FilmSceneManager.Instance.IsRefreshingWorldState)
+        while (sceneData != null &&
+               FilmSceneManager.Instance != null &&
+               !FilmSceneManager.Instance.CanStartWorldCinematicNow(sceneData, false))
         {
+            if (FilmSceneManager.Instance.IsCinematicActivated(sceneData))
+            {
+                DisableOrDestroyActivator();
+                yield break;
+            }
+
             yield return null;
         }
 

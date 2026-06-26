@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ea08d1017a4bc4c9102e6c7e204734, type: 3}
+  m_Name: 0 - 5
+  m_EditorClassIdentifier: Assembly-CSharp::SceneData
+  sceneId: 0-5
+  sceneName: Villager Saved
+  actions:
+  - actionName: Villager sasved
+    type: 4
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Villager
+      line: 'Thank you! '
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 0
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    - actorId: Villager
+      line: I thought I was going to die!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Villager sasved
+    type: 4
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Player
+      line: 'No problem. '
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 0
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    - actorId: Player
+      line: 'Do you know what''s happening? '
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Villager sasved
+    type: 4
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Villager
+      line: A bunch of wolves suddenly attacked!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 0
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    - actorId: Villager
+      line: Please help me drive all of them out!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  - actionName: Villager sasved
+    type: 4
+    actorCommands: []
+    dialogueBeats:
+    - actorId: Player
+      line: No problem
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    - actorId: villager
+      line: Thank you!
+      speechBubblePrefab: {fileID: 1816462707052278837, guid: d7ac76f1f855122479a82e0f81b1da91, type: 3}
+      charactersPerSecond: 30
+      waitForPlayerInputAfterLine: 1
+      continueKey: 32
+      speakingAnimationClip: {fileID: 0}
+      speakingAnimationStateName: 
+      animationStateAfterLine: 
+      waitAfterLine: 0
+    waitAfterAction: 0
+  isPermanent: 1
+  isActivated: 0
+  endCommands:
+  - actorId: Player
+    endBehavior: 3
+    combatInteraction:
+      combatId: 
+      enemies: []
+  newQuest:
+    questData: {fileID: 11400000, guid: 14d65ffe62e24dc4ab4b3081b83bc828, type: 2}
+    currentProgress: 0
+    maxProgress: 5
+    autoClaimRewards: 1
+    isCompleted: 0
+    rewardClaimed: 0

@@ -136,9 +136,18 @@ public class SceneCharacterRegistry : MonoBehaviour
 
     public Transform GetActor(string actorId)
     {
+        return GetActor(actorId, true);
+    }
+
+    public Transform GetActor(string actorId, bool logWarnings)
+    {
         if (string.IsNullOrWhiteSpace(actorId))
         {
-            Debug.LogWarning("Tried to get actor with empty actorId.");
+            if (logWarnings)
+            {
+                Debug.LogWarning("Tried to get actor with empty actorId.");
+            }
+
             return null;
         }
 
@@ -160,8 +169,11 @@ public class SceneCharacterRegistry : MonoBehaviour
             }
         }
 
-        Debug.LogWarning($"Could not find actor with ID '{actorId}'. Normalized ID was '{normalizedId}'.");
-        Debug.LogWarning($"Currently registered actors: {string.Join(", ", lookup.Keys)}");
+        if (logWarnings)
+        {
+            Debug.LogWarning($"Could not find actor with ID '{actorId}'. Normalized ID was '{normalizedId}'.");
+            Debug.LogWarning($"Currently registered actors: {string.Join(", ", lookup.Keys)}");
+        }
 
         return null;
     }
